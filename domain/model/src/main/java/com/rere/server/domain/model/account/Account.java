@@ -1,5 +1,6 @@
 package com.rere.server.domain.model.account;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
  * Models an account of a user.
  */
 @Data
+@AllArgsConstructor
 public class Account {
 
     /**
