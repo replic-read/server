@@ -58,4 +58,19 @@ public class AuthToken {
      */
     private boolean invalidated;
 
+    /**
+     * Checks whether the token is valid for a given set of expectations, as well regarding expiration and invalidation.
+     * @param targetAccount The account that the token is expected to be for.
+     * @param expectedType  The expected token type.
+     * @return True if the token is valid.
+     */
+    public boolean isValid(Account targetAccount, AuthToken expectedType) {
+        boolean expired = getExpirationTimestamp().isBefore(Instant.now());
+        boolean notInvalidated = !isInvalidated();
+        boolean validAccount = account.getId().equals(targetAccount.getId());
+        boolean typeMatches = type.equals(expectedType.getType());
+
+        return expired && notInvalidated && validAccount && typeMatches;
+    }
+
 }

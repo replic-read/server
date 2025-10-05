@@ -3,7 +3,11 @@ package com.rere.server.domain.model.config;
 import lombok.Data;
 import lombok.NonNull;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Models the configuration that can be made by admins on the server.
@@ -43,5 +47,26 @@ public class ServerConfig {
      * The maximum timespan between a replics creation and expiration.
      */
     private Period maximumActivePeriod;
+
+    /**
+     * Checks whether the current server configuration allows the specific expiration timestamp.
+     * @param expirationTimestamp The timestamp that should be checked.
+     * @return Whether the timestamp is allowed.
+     */
+    public boolean allowsExpiration(Instant expirationTimestamp) {
+        if(getMaximumActivePeriod() == null) {
+            return true;
+        }
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDate now = LocalDate.now(zone);
+        LocalDate maximumExpirationDate = now.plus(getMaximumActivePeriod());
+
+        // Shifts the instant to midnight of the next date.
+        Instant actualExpirationEndOfDay = expirationTimestamp.plus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
+        LocalDate actualExpirationDate = LocalDate.ofInstant(actualExpirationEndOfDay, zone);
+
+        return actualExpirationDate.isBefore(maximumExpirationDate) ||
+               actualExpirationDate.isEqual(maximumExpirationDate);
+    }
 
 }

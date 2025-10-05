@@ -60,4 +60,20 @@ public class BaseReplic {
      */
     Account owner;
 
+    /**
+     * Checks whether a password is required to access this replic.
+     * @return True if a password is required.
+     */
+    public boolean requiresPassword() {
+        return getPasswordHash() != null;
+    }
+
+    /**
+     * Checks whether a replic is expired at this specific time.
+     * @return True if the replic is expired.
+     */
+    public boolean isExpired() {
+        return getExpirationTimestamp() != null && getExpirationTimestamp().isBefore(Instant.now());
+    }
+
 }
