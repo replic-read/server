@@ -44,6 +44,7 @@ An in-depth overview about the architecture, interfaces and third-party librarie
 
 ### Internal components
 The internal component structure can be visualized as follows:
+<br>
 <img src="https://raw.githubusercontent.com/replic-read/server/499e58f2b770dee041433b7c501e7a20cc94eb8c/images/components-server.svg">
 
 This component structure is reflected in the code by the following gradle modules:
