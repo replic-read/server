@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 /**
  * Tests for the {@link AuthToken} class.
  */
-public class AuthTokenTest {
+class AuthTokenTest {
 
     private static Account createAccount(UUID id) {
         Account account = mock(Account.class);
@@ -28,7 +28,7 @@ public class AuthTokenTest {
             1,
             163202
     })
-    public void isValidFailsForExpired(long instant) {
+    void isValidFailsForExpired(long instant) {
         Instant now = Instant.ofEpochSecond(75847300);
 
         Account account = createAccount(UUID.randomUUID());
@@ -43,7 +43,7 @@ public class AuthTokenTest {
             99999999,
             888888888
     })
-    public void isValidWorksForNonExpired(long instant) {
+    void isValidWorksForNonExpired(long instant) {
         Instant now = Instant.ofEpochSecond(75847300);
 
         Account account = createAccount(UUID.randomUUID());
@@ -53,7 +53,7 @@ public class AuthTokenTest {
     }
 
     @Test
-    public void isValidUsesInvalidation() {
+    void isValidUsesInvalidation() {
         Account account = createAccount(UUID.randomUUID());
         Instant now = Instant.ofEpochSecond(75847300);
         Instant expiration = now.plusSeconds(1000);
@@ -66,7 +66,7 @@ public class AuthTokenTest {
     }
 
     @Test
-    public void isValidUsesAccountId() {
+    void isValidUsesAccountId() {
         Instant now = Instant.ofEpochSecond(75847300);
         Instant expiration = now.plusSeconds(1000);
         UUID id1 = UUID.fromString("b6c241de-b456-4a74-87c8-f3021e4ec825");
@@ -84,7 +84,7 @@ public class AuthTokenTest {
     }
 
     @Test
-    public void isValidUsesType() {
+    void isValidUsesType() {
         Instant now = Instant.ofEpochSecond(75847300);
         Instant expiration = now.plusSeconds(1000);
         Account account = createAccount(UUID.randomUUID());
