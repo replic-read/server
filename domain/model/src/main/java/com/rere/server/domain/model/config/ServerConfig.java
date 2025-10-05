@@ -1,5 +1,6 @@
 package com.rere.server.domain.model.config;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -13,6 +14,7 @@ import java.time.temporal.ChronoUnit;
  * Models the configuration that can be made by admins on the server.
  */
 @Data
+@AllArgsConstructor
 public class ServerConfig {
 
     /**
