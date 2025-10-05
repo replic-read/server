@@ -70,10 +70,11 @@ public class BaseReplic {
 
     /**
      * Checks whether a replic is expired at this specific time.
+     * @param now The current reference timestamp.
      * @return True if the replic is expired.
      */
-    public boolean isExpired() {
-        return getExpirationTimestamp() != null && getExpirationTimestamp().isBefore(Instant.now());
+    public boolean isExpired(Instant now) {
+        return getExpirationTimestamp() != null && getExpirationTimestamp().isBefore(now);
     }
 
 }
