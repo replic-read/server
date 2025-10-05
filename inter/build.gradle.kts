@@ -1,7 +1,7 @@
 plugins {
-    id("java-conventions")
-    id("test-conventions")
-    id("org.springframework.boot") version "3.5.6"
+    alias(libs.plugins.convention.java)
+    alias(libs.plugins.convention.test)
+    alias(libs.plugins.spring.boot)
 }
 
 repositories {
@@ -9,6 +9,6 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter:3.5.6")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:3.5.6")
+    implementation(libs.starter)
+    testImplementation(libs.starter.test)
 }

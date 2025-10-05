@@ -1,0 +1,14 @@
+[versions]
+spring_starter = "3.5.6"
+
+sonarcube_plugin = "6.3.1.5724"
+
+[libraries]
+starter = { group = "org.springframework.boot", name = "spring-boot-starter", version.ref = "spring_starter" }
+starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test", version.ref = "spring_starter" }
+
+[plugins]
+sonarqube = { id = "org.sonarqube", version.ref = "sonarcube_plugin" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring_starter" }
+convention-java = { id = "java-conventions" }
+convention-test = { id = "test-conventions" }
