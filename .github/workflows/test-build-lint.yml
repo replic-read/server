@@ -24,9 +24,3 @@ jobs:
 
       - name: Run Gradle 'build'
         run: ./gradlew build
-
-      - name: Run SonarQube analysis
-        uses: SonarSource/sonarqube-scan-action@v6.0.0
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST }}
