@@ -12,7 +12,7 @@ import java.util.UUID;
 /**
  * Contains tests for the {@link BaseReplic} class.
  */
-public class BaseReplicTest {
+class BaseReplicTest {
 
     private static final URL URL;
 
@@ -29,7 +29,7 @@ public class BaseReplicTest {
     }
 
     @Test
-    public void requiresPasswordWorks() {
+    void requiresPasswordWorks() {
         BaseReplic withPassword = createBaseReplic("password", Instant.now());
         BaseReplic withoutPassword = createBaseReplic(null, Instant.now());
 
@@ -38,7 +38,7 @@ public class BaseReplicTest {
     }
 
     @Test
-    public void isExpiredWorks() {
+    void isExpiredWorks() {
         Instant now = Instant.ofEpochSecond(68493730);
         BaseReplic expiredReplic = createBaseReplic(null, now.minusSeconds(1000));
         BaseReplic nonExpiredReplic1 = createBaseReplic(null, now.plusSeconds(1000));

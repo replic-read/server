@@ -12,7 +12,7 @@ import java.time.ZoneId;
 /**
  * Tests the {@link ServerConfig} class.
  */
-public class ServerConfigTest {
+class ServerConfigTest {
 
     private static ServerConfig createForExpiration(Period maxExpiration) {
         return new ServerConfig(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, true, null, maxExpiration);
@@ -27,7 +27,7 @@ public class ServerConfigTest {
             "2025-12-24T00:00:00Z",
             "2026-01-01T16:54:33Z",
     })
-    public void allowsExpirationNoticesInvalid(String instant) {
+    void allowsExpirationNoticesInvalid(String instant) {
         LocalDate now = LocalDate.of(2024, 10, 12);
         Period maxExpiration = Period.of(1, 2, 3);
 
@@ -43,7 +43,7 @@ public class ServerConfigTest {
             "2024-10-12T00:00:00Z",
             "2023-10-12T00:00:00Z", // Earlier values are allowed, although useless
     })
-    public void allowsExpirationNoticesValid(String instant) {
+    void allowsExpirationNoticesValid(String instant) {
         LocalDate now = LocalDate.of(2024, 10, 12);
         Period maxExpiration = Period.of(1, 2, 3);
 
@@ -63,7 +63,7 @@ public class ServerConfigTest {
             "2025-12-24T00:00:00Z",
             "2026-01-01T16:54:33Z",
     })
-    public void returnsTrueWhenNoneSet(String instant) {
+    void returnsTrueWhenNoneSet(String instant) {
         LocalDate now = LocalDate.of(2024, 10, 12);
         Period maxExpiration = null;
 
