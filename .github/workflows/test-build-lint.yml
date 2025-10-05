@@ -24,3 +24,6 @@ jobs:
 
       - name: Run Gradle 'build'
         run: ./gradlew build
+
+      - name: Run Gradle 'sonar'
+        run: ./gradlew sonar -Dsonar.projectKey=server -Dsonar.projectName='Replic-Read Server' -Dsonar.host.url={{ secrets.SONAR_HOST }} -Dsonar.token={{ secrets.SONAR_TOKEN }}
