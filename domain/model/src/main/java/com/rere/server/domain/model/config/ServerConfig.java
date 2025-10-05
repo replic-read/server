@@ -6,8 +6,11 @@ import lombok.NonNull;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Period;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -52,23 +55,20 @@ public class ServerConfig {
 
     /**
      * Checks whether the current server configuration allows the specific expiration timestamp.
+     * @param now The reference {@link LocalDate} instance.
      * @param expirationTimestamp The timestamp that should be checked.
      * @return Whether the timestamp is allowed.
      */
-    public boolean allowsExpiration(Instant expirationTimestamp) {
+    public boolean allowsExpiration(LocalDate now, Instant expirationTimestamp, ZoneId zone) {
         if(getMaximumActivePeriod() == null) {
             return true;
         }
-        ZoneId zone = ZoneId.systemDefault();
-        LocalDate now = LocalDate.now(zone);
+
+        LocalDate expirationDate = LocalDate.ofInstant(expirationTimestamp, zone);
         LocalDate maximumExpirationDate = now.plus(getMaximumActivePeriod());
 
-        // Shifts the instant to midnight of the next date.
-        Instant actualExpirationEndOfDay = expirationTimestamp.plus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
-        LocalDate actualExpirationDate = LocalDate.ofInstant(actualExpirationEndOfDay, zone);
-
-        return actualExpirationDate.isBefore(maximumExpirationDate) ||
-               actualExpirationDate.isEqual(maximumExpirationDate);
+        return expirationDate.isBefore(maximumExpirationDate) ||
+               expirationDate.isEqual(maximumExpirationDate);
     }
 
 }
