@@ -1,5 +1,6 @@
 package com.rere.server.domain.model.account;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
  * Models an authentication token.
  */
 @Data
+@AllArgsConstructor
 public class AuthToken {
 
     /**
@@ -64,13 +66,13 @@ public class AuthToken {
      * @param expectedType  The expected token type.
      * @return True if the token is valid.
      */
-    public boolean isValid(Account targetAccount, AuthToken expectedType) {
-        boolean expired = getExpirationTimestamp().isBefore(Instant.now());
+    public boolean isValid(Account targetAccount, AuthTokenType expectedType, Instant now) {
+        boolean expired = getExpirationTimestamp().isBefore(now);
         boolean notInvalidated = !isInvalidated();
         boolean validAccount = account.getId().equals(targetAccount.getId());
-        boolean typeMatches = type.equals(expectedType.getType());
+        boolean typeMatches = type.equals(expectedType);
 
-        return expired && notInvalidated && validAccount && typeMatches;
+        return !expired && notInvalidated && validAccount && typeMatches;
     }
 
 }
