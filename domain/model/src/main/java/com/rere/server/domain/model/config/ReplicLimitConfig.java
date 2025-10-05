@@ -3,6 +3,7 @@ package com.rere.server.domain.model.config;
 import lombok.Data;
 import lombok.NonNull;
 
+import java.time.Instant;
 import java.time.Period;
 
 /**
@@ -21,5 +22,11 @@ public class ReplicLimitConfig {
      * The count of replics that can be created
      */
     private int count;
+
+    /**
+     * The timestamp on which the current period settings were started.
+     */
+    @NonNull
+    private Instant periodStart;
 
 }
