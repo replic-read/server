@@ -16,3 +16,4 @@ sonarqube = { id = "org.sonarqube", version.ref = "sonarcube_plugin" }
 spring-boot = { id = "org.springframework.boot", version.ref = "spring_starter" }
 convention-java = { id = "java-conventions" }
 convention-test = { id = "test-conventions" }
+convention-spring = { id = "spring-conventions" }
