@@ -1,3 +1,5 @@
+import com.rere.server.build.versions.lib
+
 plugins {
     jacoco
 }
@@ -9,6 +11,7 @@ repositories {
 dependencies {
     add("testImplementation", "org.junit.jupiter:junit-jupiter:5.11.3")
     add("testRuntimeOnly", "org.junit.platform:junit-platform-launcher")
+    add("testImplementation", lib("mockito"))
 }
 
 tasks.named<Test>("test") {
