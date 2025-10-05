@@ -1,8 +1,7 @@
-<picture style="display: flex; align-items: center; justify-content: center; padding: 16px 0 16px 0; width: 100%;">
+<picture>
   <source srcset="./images/Logo-light.svg" media="(prefers-color-scheme: light)"/>
 
   <source srcset="./images/Logo-dark.svg"  media="(prefers-color-scheme: dark)"/>
 
-  <img src="./images/Logo-light.svg" alt="Logo"/>
-</picture>    
-
+  <img src="./images/Logo-light.svg" alt="Logo" width="60%"/>
+</picture>
