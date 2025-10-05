@@ -25,5 +25,8 @@ jobs:
       - name: Run Gradle 'build'
         run: ./gradlew build
 
-      - name: Run Gradle 'sonar'
-        run: ./gradlew sonar -Dsonar.projectKey=server -Dsonar.projectName='Replic-Read Server' -Dsonar.host.url=${{ secrets.SONAR_HOST }} -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+      - name: Run SonarQube analysis
+        uses: SonarSource/sonarqube-scan-action@5.0.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
