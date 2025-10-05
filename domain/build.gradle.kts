@@ -1,7 +1,6 @@
 plugins {
     id("java-conventions")
     id("test-conventions")
-    id("io.spring.dependency-management") version "1.1.7"
 }
 
 repositories {
@@ -9,6 +8,6 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation("org.springframework.boot:spring-boot-starter:3.5.6")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:3.5.6")
 }
