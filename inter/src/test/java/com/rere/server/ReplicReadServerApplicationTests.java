@@ -12,6 +12,7 @@ class ReplicReadServerApplicationTests {
 
     @Test
     void contextLoads() {
+        // Test tests that the context loads.
     }
 
     @Test
