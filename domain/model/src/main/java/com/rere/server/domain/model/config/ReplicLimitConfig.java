@@ -1,5 +1,6 @@
 package com.rere.server.domain.model.config;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -10,6 +11,7 @@ import java.time.Period;
  * Models the configuration for the replic-limit imposed on a user-basis.
  */
 @Data
+@AllArgsConstructor
 public class ReplicLimitConfig {
 
     /**
