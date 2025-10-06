@@ -1,26 +1,12 @@
 package com.rere.server.domain.service;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.TestInstance;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * Makes basic configuration to test classes.
  */
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 public abstract class BaseDomainServiceTest {
-
-    private AutoCloseable closeable;
-
-    @BeforeAll
-    void setUp() {
-        closeable = MockitoAnnotations.openMocks(this);
-    }
-
-    @AfterAll
-    void tearDown() throws Exception {
-        closeable.close();
-    }
 
 }

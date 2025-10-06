@@ -11,6 +11,7 @@ starter-test = { group = "org.springframework.boot", name = "spring-boot-starter
 starter-security = { group = "org.springframework.boot", name = "spring-boot-starter-security", version.ref = "spring_starter" }
 lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
 mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockito-junit = { group = "org.mockito", name = "mockito-junit-jupiter", version.ref = "mockito" }
 
 [plugins]
 sonarqube = { id = "org.sonarqube", version.ref = "sonarcube_plugin" }
