@@ -57,7 +57,7 @@ import static org.mockito.Mockito.when;
 /**
  * Tests for the {@link ReplicServiceImpl} class.
  */
-public class ReplicServiceImplTest extends BaseDomainServiceTest {
+class ReplicServiceImplTest extends BaseDomainServiceTest {
 
     private static final URL URL;
 
@@ -343,7 +343,7 @@ public class ReplicServiceImplTest extends BaseDomainServiceTest {
         verify(replicRepo, times(1)).save(replicCaptor.capture());
 
         Assertions.assertEquals(returned, replicCaptor.getValue());
-        Assertions.assertEquals(returned.getState(), ReplicState.REMOVED);
+        Assertions.assertEquals(ReplicState.REMOVED, returned.getState());
     }
 
     @Test
@@ -385,7 +385,7 @@ public class ReplicServiceImplTest extends BaseDomainServiceTest {
 
         Assertions.assertEquals(returned, accessCaptor.getValue());
         Assertions.assertEquals(returned.replic(), replic);
-        Assertions.assertEquals(returned.visitor(), null);
+        Assertions.assertNull(returned.visitor());
     }
 
     @Test

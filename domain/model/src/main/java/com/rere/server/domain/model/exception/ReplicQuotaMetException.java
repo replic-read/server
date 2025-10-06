@@ -14,7 +14,7 @@ public class ReplicQuotaMetException extends DomainException {
     /**
      * The account that tried to overstep ther quota.
      */
-    private final Account account;
+    private final transient Account account;
 
     /**
      * Creates a new DomainException with a given message.

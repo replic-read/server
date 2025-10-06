@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 /**
  * tests for the {@link ServerConfigServiceImpl} class.
  */
-public class ServerConfigServiceImplTest extends BaseDomainServiceTest {
+class ServerConfigServiceImplTest extends BaseDomainServiceTest {
 
     @Mock
     private ServerConfigRepository configRepo;

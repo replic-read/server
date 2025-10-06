@@ -32,14 +32,11 @@ public class ReportServiceImpl implements ReportService {
 
     private final AccountRepository accountRepo;
 
-    private final ServerConfigService configService;
-
     @Autowired
     public ReportServiceImpl(ReportRepository reportRepo, ReplicRepository replicRepo, AccountRepository accountRepo, ServerConfigService configService) {
         this.reportRepo = reportRepo;
         this.replicRepo = replicRepo;
         this.accountRepo = accountRepo;
-        this.configService = configService;
     }
 
     @Nonnull
