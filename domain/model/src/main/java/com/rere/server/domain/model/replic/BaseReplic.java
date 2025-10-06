@@ -41,6 +41,12 @@ public class BaseReplic {
     MediaMode mediaMode;
 
     /**
+     * The current state of the replic.
+     */
+    @NonNull
+    ReplicState state;
+
+    /**
      * The description of the replic, if it exists.
      */
     String description;
