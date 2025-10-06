@@ -7,4 +7,7 @@ plugins {
 dependencies {
     implementation(project(":domain:model"))
     implementation(project(":domain:repository"))
+    implementation(project(":domain:io"))
+    implementation(project(":domain:messaging"))
+    implementation(libs.starter.security)
 }
