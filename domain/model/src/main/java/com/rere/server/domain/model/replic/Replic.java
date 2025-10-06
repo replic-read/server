@@ -26,7 +26,7 @@ public class Replic extends BaseReplic {
             BaseReplic base,
             long size) {
         super(base.getId(), base.getCreationTimestamp(), base.getOriginalUrl(),
-                base.getMediaMode(), base.getDescription(), base.getExpirationTimestamp(),
+                base.getMediaMode(), base.getState(), base.getDescription(), base.getExpirationTimestamp(),
                 base.getPasswordHash(), base.getOwner());
         this.size = size;
     }

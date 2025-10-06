@@ -63,6 +63,9 @@ public class ServerConfig {
         if(getMaximumActivePeriod() == null) {
             return true;
         }
+        if(expirationTimestamp == null) {
+            return false;
+        }
 
         LocalDate expirationDate = LocalDate.ofInstant(expirationTimestamp, zone);
         LocalDate maximumExpirationDate = now.plus(getMaximumActivePeriod());
