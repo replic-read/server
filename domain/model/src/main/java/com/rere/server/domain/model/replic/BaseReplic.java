@@ -1,6 +1,8 @@
 package com.rere.server.domain.model.replic;
 
 import com.rere.server.domain.model.account.Account;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
@@ -12,59 +14,59 @@ import java.util.UUID;
 /**
  * Models a base replic, i.e. a replic without associated file data.
  */
-@Value
-@NonFinal
+@Data
+@AllArgsConstructor
 public class BaseReplic {
 
     /**
      * The id of the replic.
      */
     @NonNull
-    UUID id;
+    private final UUID id;
 
     /**
      * The creation timestamp of the replic.
      */
     @NonNull
-    Instant creationTimestamp;
+    private final Instant creationTimestamp;
 
     /**
      * The url of the resource that was replicated-
      */
     @NonNull
-    URL originalUrl;
+    private final URL originalUrl;
 
     /**
      * The media mode of te replic.
      */
     @NonNull
-    MediaMode mediaMode;
+    private final MediaMode mediaMode;
 
     /**
      * The current state of the replic.
      */
     @NonNull
-    ReplicState state;
+    private ReplicState state;
 
     /**
      * The description of the replic, if it exists.
      */
-    String description;
+    private final String description;
 
     /**
      * The timestamp of expiration of this replic, if it has one.
      */
-    Instant expirationTimestamp;
+    private final Instant expirationTimestamp;
 
     /**
      * The hashed password of the replic, if it exists.
      */
-    String passwordHash;
+    private final String passwordHash;
 
     /**
      * The account owner of the replic, if it exists.
      */
-    Account owner;
+    private final Account owner;
 
     /**
      * Checks whether a password is required to access this replic.

@@ -1,6 +1,8 @@
 package com.rere.server.domain.model.replic;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.Value;
 
@@ -9,13 +11,14 @@ import lombok.Value;
  */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Value
+@Getter
+@Setter
 public class Replic extends BaseReplic {
 
     /**
      * The size of the content-file associated with this replic in bytes.
      */
-    long size;
+    private final long size;
 
     /**
      * Creates a new replic with a given {@link BaseReplic}.
