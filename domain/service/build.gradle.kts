@@ -10,4 +10,5 @@ dependencies {
     implementation(project(":domain:io"))
     implementation(project(":domain:messaging"))
     implementation(libs.starter.security)
+    implementation(libs.jwt)
 }
