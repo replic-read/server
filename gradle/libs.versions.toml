@@ -10,6 +10,7 @@ sonarcube_plugin = "6.3.1.5724"
 starter = { group = "org.springframework.boot", name = "spring-boot-starter", version.ref = "spring_starter" }
 starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test", version.ref = "spring_starter" }
 starter-security = { group = "org.springframework.boot", name = "spring-boot-starter-security", version.ref = "spring_starter" }
+starter-data = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa", version.ref = "spring_starter" }
 lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
 mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 mockito-junit = { group = "org.mockito", name = "mockito-junit-jupiter", version.ref = "mockito" }
