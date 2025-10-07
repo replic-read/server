@@ -18,7 +18,7 @@ public class NotFoundException extends DomainException {
     /**
      * The identifier the object was searched by.
      */
-    private final Object identifier;
+    private final transient Object identifier;
 
     /**
      * Creates a new NotFoundException.

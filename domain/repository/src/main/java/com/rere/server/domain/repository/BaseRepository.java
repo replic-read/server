@@ -31,4 +31,11 @@ public interface BaseRepository<M> {
      */
     M save(M m);
 
+    /**
+     * Deletes a model.
+     * @param m The model to delete.
+     * @return The model, if it has been deleted, or an empty optional.
+     */
+    Optional<M> delete(M m);
+
 }

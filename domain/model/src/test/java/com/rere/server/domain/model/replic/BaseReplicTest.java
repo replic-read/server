@@ -25,7 +25,7 @@ class BaseReplicTest {
     }
 
     private static BaseReplic createBaseReplic(String passwordHash, Instant expirationTimestamp) {
-        return new BaseReplic(UUID.randomUUID(), Instant.now(), URL, MediaMode.ALL, null, expirationTimestamp, passwordHash, null);
+        return new BaseReplic(UUID.randomUUID(), Instant.now(), URL, MediaMode.ALL, ReplicState.ACTIVE,null, expirationTimestamp, passwordHash, null);
     }
 
     @Test

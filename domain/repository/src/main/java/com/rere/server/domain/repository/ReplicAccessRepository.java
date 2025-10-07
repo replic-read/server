@@ -1,9 +1,9 @@
 package com.rere.server.domain.repository;
 
-import com.rere.server.domain.model.replic.Replic;
+import com.rere.server.domain.model.replic.ReplicAccess;
 
 /**
- * Repository for {@link Replic} models.
+ * Repository for {@link ReplicAccess} models.
  */
-public interface ReplicAccessRepository extends BaseRepository<Replic> {
+public interface ReplicAccessRepository extends BaseRepository<ReplicAccess> {
 }

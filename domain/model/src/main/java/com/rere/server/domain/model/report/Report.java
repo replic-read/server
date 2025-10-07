@@ -32,6 +32,11 @@ public class Report {
     private final Replic replic;
 
     /**
+     * The description of the report.
+     */
+    private final String description;
+
+    /**
      * The account the report was created by, if it exists.
      */
     private final Account author;

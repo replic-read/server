@@ -12,6 +12,7 @@ dependencies {
     add("testImplementation", "org.junit.jupiter:junit-jupiter:5.11.3")
     add("testRuntimeOnly", "org.junit.platform:junit-platform-launcher")
     add("testImplementation", lib("mockito"))
+    add("testImplementation", lib("mockito.junit"))
 }
 
 tasks.named<Test>("test") {
