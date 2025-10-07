@@ -52,14 +52,14 @@ class ServerConfigServiceImplTest extends BaseDomainServiceTest {
         subject.save(config);
 
         ArgumentCaptor<ServerConfig> configCaptor = ArgumentCaptor.forClass(ServerConfig.class);
-        verify(configRepo, times(1)).save(configCaptor.capture());
+        verify(configRepo, times(1)).saveConfig(configCaptor.capture());
 
         Assertions.assertEquals(config, configCaptor.getValue());
     }
 
     @Test
     void getUsesDefault() {
-        when(configRepo.get()).thenReturn(Optional.empty());
+        when(configRepo.getConfig()).thenReturn(Optional.empty());
 
         ServerConfig config = subject.get();
 
@@ -69,7 +69,7 @@ class ServerConfigServiceImplTest extends BaseDomainServiceTest {
     @Test
     void getDelegatesToRepo() {
         ServerConfig config = createConfig();
-        when(configRepo.get()).thenReturn(Optional.of(config));
+        when(configRepo.getConfig()).thenReturn(Optional.of(config));
 
         ServerConfig returned = subject.get();
 

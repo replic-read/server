@@ -20,7 +20,7 @@ public class ServerConfigServiceImpl implements ServerConfigService {
 
     @Override
     public void save(ServerConfig config) {
-        configRepo.save(config);
+        configRepo.saveConfig(config);
     }
 
     /**
@@ -37,6 +37,6 @@ public class ServerConfigServiceImpl implements ServerConfigService {
 
     @Override
     public ServerConfig get() {
-        return configRepo.get().orElse(UNRESTRICTED_CONFIG);
+        return configRepo.getConfig().orElse(UNRESTRICTED_CONFIG);
     }
 }
