@@ -3,23 +3,19 @@ package com.rere.server.domain.service.impl;
 import com.rere.server.domain.model.exception.DomainException;
 import com.rere.server.domain.model.exception.NotFoundException;
 import com.rere.server.domain.model.exception.NotFoundSubject;
-import com.rere.server.domain.model.replic.BaseReplic;
-import com.rere.server.domain.model.replic.MediaMode;
+import com.rere.server.domain.model.impl.ReplicImpl;
+import com.rere.server.domain.model.impl.ReportImpl;
 import com.rere.server.domain.model.replic.Replic;
-import com.rere.server.domain.model.replic.ReplicState;
 import com.rere.server.domain.model.report.Report;
-import com.rere.server.domain.model.report.ReportState;
-import com.rere.server.domain.repository.AccountRepository;
-import com.rere.server.domain.repository.ReplicRepository;
 import com.rere.server.domain.repository.ReportRepository;
+import com.rere.server.domain.service.AccountService;
 import com.rere.server.domain.service.BaseDomainServiceTest;
-import com.rere.server.domain.service.ServerConfigService;
+import com.rere.server.domain.service.ReplicService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,29 +40,13 @@ class ReportServiceImplTest extends BaseDomainServiceTest {
     private ReportRepository reportRepo;
 
     @Mock
-    private ReplicRepository replicRepo;
+    private ReplicService replicService;
 
     @Mock
-    private ServerConfigService configService;
-
-    @Mock
-    private AccountRepository accountRepo;
+    private AccountService accountService;
 
     @InjectMocks
     private ReportServiceImpl subject;
-
-    private static Replic createReplic(UUID id) {
-        return new Replic(
-                new BaseReplic(id, Instant.now(), createUrl("https://google.com/"),
-                        MediaMode.ALL, ReplicState.REMOVED, null, null,
-                        null, null),
-                42
-        );
-    }
-
-    private static Report createReport(UUID id, String description) {
-        return new Report(id, Instant.now(), createReplic(UUID.randomUUID()), description, null, ReportState.OPEN);
-    }
 
     @Test
     void getReportsSorts() {
@@ -80,7 +60,7 @@ class ReportServiceImplTest extends BaseDomainServiceTest {
 
         List<Report> reports = new ArrayList<>();
         for (UUID id : shuffledIds) {
-            reports.add(createReport(id, null));
+            reports.add(ReportImpl.builder().id(id).build());
         }
 
         when(reportRepo.getAll()).thenReturn(reports);
@@ -98,9 +78,9 @@ class ReportServiceImplTest extends BaseDomainServiceTest {
     void getReportsFiltersQuery() {
         List<Report> reports = new ArrayList<>();
         for (int i = 0; i < 15; i++) {
-            reports.add(createReport(UUID.randomUUID(), null));
+            reports.add(ReportImpl.builder().build());
         }
-        Report specialReport = createReport(UUID.randomUUID(), "sfdsfsfthe universe, life and everythingjdu881");
+        Report specialReport = ReportImpl.builder().description("fdsfsfdsfthe universe, life and everythingfsfsdfsfd").build();
         reports.add(specialReport);
 
         when(reportRepo.getAll()).thenReturn(reports);
@@ -113,15 +93,14 @@ class ReportServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void reportReplicFailsForNotFindReplicOrAccount() {
-        UUID replicExistId = UUID.randomUUID();
         UUID replicNotExistId = UUID.randomUUID();
         UUID accountNotExistId = UUID.randomUUID();
 
-        Replic replic = createReplic(replicExistId);
+        Replic replic = ReplicImpl.builder().build();
 
-        when(replicRepo.getById(replicExistId)).thenReturn(Optional.of(replic));
-        when(replicRepo.getById(replicNotExistId)).thenReturn(Optional.empty());
-        when(accountRepo.getById(accountNotExistId)).thenReturn(Optional.empty());
+        when(replicService.getReplicById(replic.getId())).thenReturn(Optional.of(replic));
+        when(replicService.getReplicById(replicNotExistId)).thenReturn(Optional.empty());
+        when(accountService.getAccountById(accountNotExistId)).thenReturn(Optional.empty());
 
         NotFoundException ex1 = assertThrows(NotFoundException.class,
                 () -> subject.reportReplic(replicNotExistId, accountNotExistId, null));
@@ -129,7 +108,7 @@ class ReportServiceImplTest extends BaseDomainServiceTest {
         assertEquals(replicNotExistId, ex1.getIdentifier());
 
         NotFoundException ex2 = assertThrows(NotFoundException.class,
-                () -> subject.reportReplic(replicExistId, accountNotExistId, null));
+                () -> subject.reportReplic(replic.getId(), accountNotExistId, null));
         assertEquals(NotFoundSubject.ACCOUNT, ex2.getSubject());
         assertEquals(accountNotExistId, ex2.getIdentifier());
     }
@@ -138,9 +117,10 @@ class ReportServiceImplTest extends BaseDomainServiceTest {
     void reportReplicDelegatesAndReturns() throws DomainException {
         UUID replicId = UUID.randomUUID();
 
-        Replic replic = createReplic(replicId);
+        Replic replic = ReplicImpl.builder()
+                .id(replicId).build();
 
-        when(replicRepo.getById(replicId)).thenReturn(Optional.of(replic));
+        when(replicService.getReplicById(replicId)).thenReturn(Optional.of(replic));
         when(reportRepo.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
 
         Report returned = subject.reportReplic(replicId, null, "description");
@@ -149,7 +129,7 @@ class ReportServiceImplTest extends BaseDomainServiceTest {
         verify(reportRepo, times((1))).save(reportCaptor.capture());
 
         assertEquals(returned, reportCaptor.getValue());
-        assertNull(returned.getAuthor());
+        assertNull(returned.getAuthorId());
         assertEquals("description", returned.getDescription());
     }
 

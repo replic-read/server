@@ -2,6 +2,7 @@ package com.rere.server.domain.service.impl;
 
 import com.rere.server.domain.model.account.Account;
 import com.rere.server.domain.model.account.AccountState;
+import com.rere.server.domain.model.impl.AccountImpl;
 import com.rere.server.domain.repository.AccountRepository;
 import com.rere.server.domain.service.BaseDomainServiceTest;
 import org.junit.jupiter.api.Assertions;
@@ -31,11 +32,11 @@ class AccountServiceImplTest extends BaseDomainServiceTest {
     private AccountServiceImpl subject;
 
     private static Account createAccount(UUID id) {
-        return new Account(id, Instant.now(), "", "", "", false, AccountState.ACTIVE, 0);
+        return new AccountImpl(id, Instant.now(), "", "", "", false, AccountState.ACTIVE, 0);
     }
 
     private static Account createAccount(AccountState state) {
-        return new Account(UUID.randomUUID(), Instant.now(), "", "", "", false, state, 0);
+        return new AccountImpl(UUID.randomUUID(), Instant.now(), "", "", "", false, state, 0);
     }
 
     @Test
@@ -111,8 +112,8 @@ class AccountServiceImplTest extends BaseDomainServiceTest {
     @Test
     void getAccountsFiltersQuery() {
         String query = "life, the universe and everything";
-        Account account1 = new Account(UUID.randomUUID(), Instant.now(), "sdf4r4" + query + "andsciuasi", "", "", false, AccountState.ACTIVE, 0);
-        Account account2 = new Account(UUID.randomUUID(), Instant.now(), "", "aeqe2" + query + "adasda", "", false, AccountState.ACTIVE, 0);
+        Account account1 = new AccountImpl(UUID.randomUUID(), Instant.now(), "sdf4r4" + query + "andsciuasi", "", "", false, AccountState.ACTIVE, 0);
+        Account account2 = new AccountImpl(UUID.randomUUID(), Instant.now(), "", "aeqe2" + query + "adasda", "", false, AccountState.ACTIVE, 0);
         List<Account> accounts = new ArrayList<>();
         accounts.add(account1);
         accounts.add(account2);

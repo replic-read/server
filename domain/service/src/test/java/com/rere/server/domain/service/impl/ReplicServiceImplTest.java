@@ -2,8 +2,6 @@ package com.rere.server.domain.service.impl;
 
 import com.rere.server.domain.io.ReplicFileAccessor;
 import com.rere.server.domain.model.account.Account;
-import com.rere.server.domain.model.account.AccountState;
-import com.rere.server.domain.model.config.AuthUserGroup;
 import com.rere.server.domain.model.config.ReplicLimitConfig;
 import com.rere.server.domain.model.config.ServerConfig;
 import com.rere.server.domain.model.exception.DomainException;
@@ -13,10 +11,17 @@ import com.rere.server.domain.model.exception.NotFoundException;
 import com.rere.server.domain.model.exception.NotFoundSubject;
 import com.rere.server.domain.model.exception.ReplicContentWriteException;
 import com.rere.server.domain.model.exception.ReplicQuotaMetException;
-import com.rere.server.domain.model.replic.BaseReplic;
+import com.rere.server.domain.model.impl.AccountImpl;
+import com.rere.server.domain.model.impl.ReplicBaseDataImpl;
+import com.rere.server.domain.model.impl.ReplicFileDataImpl;
+import com.rere.server.domain.model.impl.ReplicImpl;
+import com.rere.server.domain.model.impl.ReplicLimitConfigImpl;
+import com.rere.server.domain.model.impl.ServerConfigImpl;
 import com.rere.server.domain.model.replic.MediaMode;
 import com.rere.server.domain.model.replic.Replic;
 import com.rere.server.domain.model.replic.ReplicAccess;
+import com.rere.server.domain.model.replic.ReplicBaseData;
+import com.rere.server.domain.model.replic.ReplicFileData;
 import com.rere.server.domain.model.replic.ReplicState;
 import com.rere.server.domain.repository.AccountRepository;
 import com.rere.server.domain.repository.ReplicAccessRepository;
@@ -28,8 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.internal.verification.Times;
-import org.mockito.stubbing.Answer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.ByteArrayInputStream;
@@ -84,28 +87,6 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
     @InjectMocks
     private ReplicServiceImpl subject;
 
-    private static ServerConfig createConfig(ReplicLimitConfig limit, Period expirationPeriod) {
-        return new ServerConfig(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, true, limit, expirationPeriod);
-    }
-
-    private static Replic createReplic(Account owner, Instant creation, ReplicState state) {
-        return new Replic(
-                new BaseReplic(UUID.randomUUID(), creation != null ? creation : Instant.now(), URL, MediaMode.ALL, state != null ? state : ReplicState.ACTIVE, null, null, null, owner),
-                42
-        );
-    }
-
-    private static Replic createReplic(UUID id) {
-        return new Replic(
-                new BaseReplic(id, Instant.now(), URL, MediaMode.ALL, ReplicState.REMOVED, null, null, null, null),
-                42
-        );
-    }
-
-    private static Account createAccount(UUID id) {
-        return new Account(id, Instant.now(), "", "", "", false, AccountState.ACTIVE, 0);
-    }
-
     @Test
     void createReplicThrowsForQuotaViolation() {
         /*
@@ -115,17 +96,31 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
          */
         Instant now = Instant.now();
         Instant periodStart = now.minus(12, ChronoUnit.DAYS);
-        ServerConfig config = createConfig(new ReplicLimitConfig(Period.of(0, 0, 5), 3, periodStart), null);
+        ReplicLimitConfig limit = ReplicLimitConfigImpl.builder()
+                .count(3)
+                .periodStart(periodStart)
+                .period(Period.of(0, 0, 5)).build();
+        ServerConfig config = ServerConfigImpl.builder()
+                .limit(limit).build();
         when(configService.get()).thenReturn(config);
 
-        Account account = createAccount(UUID.randomUUID());
-        Account accountFake = createAccount(UUID.randomUUID());
+        Account account = AccountImpl.builder().build();
+        Account accountFake = AccountImpl.builder().build();
 
         // There are three replics in the current period created by 'account'. The last one is a fake to test the filtering.
-        Replic replic1 = createReplic(account, now.minusSeconds(300), null);
-        Replic replic2 = createReplic(account, now.minusSeconds(600), null);
-        Replic replic3 = createReplic(account, now.minusSeconds(900), null);
-        Replic replic4 = createReplic(accountFake, now.minusSeconds(1200), null);
+        Replic replic1 = ReplicImpl.builder()
+                .ownerId(account.getId())
+                .expirationTimestamp(now.minusSeconds(300)).build();
+        Replic replic2 = ReplicImpl.builder()
+                .ownerId(account.getId())
+                .expirationTimestamp(now.minusSeconds(600)).build();
+        Replic replic3 = ReplicImpl.builder()
+                .ownerId(account.getId())
+                .expirationTimestamp(now.minusSeconds(900)).build();
+        Replic replic4 = ReplicImpl.builder()
+                .ownerId(accountFake.getId())
+                .expirationTimestamp(now.minusSeconds(1200)).build();
+
         when(replicRepo.getAll()).thenReturn(List.of(replic1, replic2, replic3, replic4));
 
         ReplicQuotaMetException ex = Assertions.assertThrows(ReplicQuotaMetException.class, () -> {
@@ -136,7 +131,8 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void createReplicThrowsForMissingExpiration() {
-        ServerConfig config = createConfig(null, Period.of(1, 2, 3));
+        ServerConfig config = ServerConfigImpl.builder()
+                .maximumActivePeriod(Period.of(1, 2, 3)).build();
         when(configService.get()).thenReturn(config);
 
         InvalidExpirationException ex = Assertions.assertThrows(InvalidExpirationException.class,
@@ -147,7 +143,8 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
     @Test
     void createReplicThrowsForInvalidExpiration() {
         Instant now = Instant.now();
-        ServerConfig config = createConfig(null, Period.of(0, 0, 5));
+        ServerConfig config = ServerConfigImpl.builder()
+                .maximumActivePeriod(Period.of(0, 0, 5)).build();
         when(configService.get()).thenReturn(config);
 
         // Attempt to create replic that expires 6 days in the future, but 5 is maximum allowed
@@ -158,7 +155,7 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void createReplicUsesFileCallbackAndThrowsForFailure() {
-        ServerConfig config = createConfig(null, null);
+        ServerConfig config = ServerConfigImpl.builder().build();
         when(configService.get()).thenReturn(config);
 
         // Attempt to create replic that expires 6 days in the future, but 5 is maximum allowed
@@ -174,35 +171,38 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void createReplicSavesReplicWithCorrectPropertiesAndReturnsIt() throws DomainException {
-        ServerConfig config = createConfig(null, null);
+        ServerConfig config = ServerConfigImpl.builder().build();
         when(configService.get()).thenReturn(config);
 
         // Attempt to create replic that expires 6 days in the future, but 5 is maximum allowed
-        when(fileAccessor.getDataSize(any())).thenReturn(42L);
-        when(replicRepo.save(any())).thenAnswer((Answer<Replic>) invocation -> invocation.getArgument(0));
+        when(fileAccessor.getFileData(any())).thenReturn(ReplicFileDataImpl.builder()
+                .size(42).build());
+        when(replicRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(passwordEncoder.encode(any())).thenReturn("hash");
 
         Replic createdReplic = subject.createReplic(URL, MediaMode.ALL, null, null, null, null, file -> true);
 
-        ArgumentCaptor<Replic> replicCaptor = ArgumentCaptor.forClass(Replic.class);
-        verify(replicRepo, new Times(1)).save(replicCaptor.capture());
+        ArgumentCaptor<ReplicBaseData> replicCaptor = ArgumentCaptor.captor();
+        verify(replicRepo, times(1)).save(replicCaptor.capture());
 
-        Assertions.assertEquals(createdReplic, replicCaptor.getValue());
-
-        Assertions.assertEquals(42L, replicCaptor.getValue().getSize());
+        Assertions.assertEquals(createdReplic.getId(), replicCaptor.getValue().getId());
         Assertions.assertEquals(URL, replicCaptor.getValue().getOriginalUrl());
     }
 
     @Test
     void getReplicsFiltersAccountId() {
-        Account acc1 = createAccount(UUID.randomUUID());
-        Account acc2 = createAccount(UUID.randomUUID());
-        List<Replic> replics = new ArrayList<>();
+        Account acc1 = AccountImpl.builder().build();
+        ReplicBaseData replic1 = ReplicBaseDataImpl.builder()
+                .ownerId(acc1.getId()).build();
+        Account acc2 = AccountImpl.builder().build();
+        ReplicBaseDataImpl replic2 = ReplicBaseDataImpl.builder()
+                .ownerId(acc2.getId()).build();
+        List<ReplicBaseData> replics = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            replics.add(createReplic(acc1, null, null));
+            replics.add(replic1);
         }
         for (int i = 0; i < 5; i++) {
-            replics.add(createReplic(acc2, null, null));
+            replics.add(replic2);
         }
         Collections.shuffle(replics);
 
@@ -212,18 +212,20 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
 
         Assertions.assertEquals(5, filtered.size());
         for (Replic replic : filtered) {
-            Assertions.assertEquals(acc1.getId(), replic.getOwner().getId());
+            Assertions.assertEquals(acc1.getId(), replic.getOwnerId());
         }
     }
 
     @Test
     void getReplicsFiltersReplicId() {
         UUID specialId = UUID.randomUUID();
-        List<Replic> replics = new ArrayList<>();
+        List<ReplicBaseData> replics = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            replics.add(createReplic(null, null, null));
+            replics.add(ReplicImpl.builder().build());
         }
-        replics.add(new Replic(new BaseReplic(specialId, Instant.now(), URL, MediaMode.ALL, ReplicState.ACTIVE, null, null, null, null), 42));
+        ReplicBaseData specialBaseData = ReplicBaseDataImpl.builder()
+                .id(specialId).build();
+        replics.add(specialBaseData);
         Collections.shuffle(replics);
 
         when(replicRepo.getAll()).thenReturn(replics);
@@ -236,11 +238,14 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void getReplicsFiltersReplicState() {
-        List<Replic> replics = new ArrayList<>();
+        List<ReplicBaseData> replics = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            replics.add(createReplic(null, null, ReplicState.ACTIVE));
-            replics.add(createReplic(null, null, ReplicState.INACTIVE));
-            replics.add(createReplic(null, null, ReplicState.REMOVED));
+            replics.add(ReplicBaseDataImpl.builder()
+                    .state(ReplicState.ACTIVE).build());
+            replics.add(ReplicBaseDataImpl.builder()
+                    .state(ReplicState.INACTIVE).build());
+            replics.add(ReplicBaseDataImpl.builder()
+                    .state(ReplicState.REMOVED).build());
         }
         Collections.shuffle(replics);
 
@@ -258,19 +263,15 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void getReplicsFiltersQuery() throws MalformedURLException {
-        List<Replic> replics = new ArrayList<>();
+        List<ReplicBaseData> replics = new ArrayList<>();
         for (int i = 0; i < 15; i++) {
-            replics.add(createReplic(null, null, null));
+            replics.add(ReplicBaseDataImpl.builder().build());
         }
-        Replic withDescription = new Replic(
-                new BaseReplic(UUID.randomUUID(), Instant.now(), URL, MediaMode.ALL, ReplicState.ACTIVE, "adsnksdn" + "the-universe-life-and-everything" + "sdfdsf", null, null, null),
-                42
-        );
+        ReplicBaseData withDescription = ReplicBaseDataImpl.builder()
+                .description("adsnksdn" + "the-universe-life-and-everything" + "sdfdsf").build();
         URL specialUrl = URI.create("https://the-universe-life-and-everything.com/").toURL();
-        Replic withUrl = new Replic(
-                new BaseReplic(UUID.randomUUID(), Instant.now(), specialUrl, MediaMode.ALL, ReplicState.ACTIVE, null, null, null, null),
-                42
-        );
+        ReplicBaseData withUrl = ReplicBaseDataImpl.builder()
+                .originalUrl(specialUrl).build();
         replics.add(withDescription);
         replics.add(withUrl);
         Collections.shuffle(replics);
@@ -280,8 +281,8 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
         List<Replic> filtered = subject.getReplics(null, null, null, null, "the-universe-life-and-everything");
 
         Assertions.assertEquals(2, filtered.size());
-        Assertions.assertTrue(filtered.contains(withDescription));
-        Assertions.assertTrue(filtered.contains(withUrl));
+        Assertions.assertTrue(filtered.stream().anyMatch(replic -> replic.getId().equals(withDescription.getId())));
+        Assertions.assertTrue(filtered.stream().anyMatch(replic -> replic.getId().equals(withUrl.getId())));
     }
 
     @Test
@@ -294,12 +295,11 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
         List<UUID> shuffled = new ArrayList<>(idList);
         Collections.shuffle(shuffled);
 
-        List<Replic> replics = new ArrayList<>();
+        List<ReplicBaseData> replics = new ArrayList<>();
         for (UUID id : shuffled) {
-            replics.add(new Replic(
-                    new BaseReplic(id, Instant.now(), URL, MediaMode.ALL, ReplicState.ACTIVE, null, null, null, null),
-                    42
-            ));
+            ReplicBaseData baseData = ReplicBaseDataImpl.builder()
+                    .id(id).build();
+            replics.add(baseData);
         }
 
         when(replicRepo.getAll()).thenReturn(replics);
@@ -316,12 +316,8 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
     @Test
     void setReplicStateThrowsIfNotFound() {
         UUID specialId = UUID.randomUUID();
-        List<Replic> replics = new ArrayList<>();
-        for (int i = 0; i < 15; i++) {
-            replics.add(createReplic(null, null, null));
-        }
 
-        when(replicRepo.getAll()).thenReturn(replics);
+        when(replicRepo.getById(specialId)).thenReturn(Optional.empty());
 
         NotFoundException ex = Assertions.assertThrows(NotFoundException.class, () -> subject.setReplicState(specialId, ReplicState.ACTIVE));
         Assertions.assertEquals(NotFoundSubject.REPLIC, ex.getSubject());
@@ -329,17 +325,16 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
     }
 
     @Test
-    void setReplicCallsSaveWithUpdatedStateAndReturns() throws DomainException {
-        List<Replic> replics = new ArrayList<>();
-        Replic original = createReplic(null, null, ReplicState.ACTIVE);
-        replics.add(original);
+    void setReplicStateCallsSaveWithUpdatedStateAndReturns() throws DomainException {
+        ReplicBaseData original = ReplicBaseDataImpl.builder()
+                .state(ReplicState.ACTIVE).build();
 
-        when(replicRepo.getAll()).thenReturn(replics);
+        when(replicRepo.getById(original.getId())).thenReturn(Optional.of(original));
         when(replicRepo.save(any())).thenAnswer(i -> i.getArguments()[0]);
 
         Replic returned = subject.setReplicState(original.getId(), ReplicState.REMOVED);
 
-        ArgumentCaptor<Replic> replicCaptor = ArgumentCaptor.forClass(Replic.class);
+        ArgumentCaptor<Replic> replicCaptor = ArgumentCaptor.captor();
         verify(replicRepo, times(1)).save(replicCaptor.capture());
 
         Assertions.assertEquals(returned, replicCaptor.getValue());
@@ -352,7 +347,8 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
         UUID replicNoNExistId = UUID.randomUUID();
         UUID accountNoExistId = UUID.randomUUID();
 
-        Replic replic = createReplic(replicExistId);
+        ReplicBaseData replic = ReplicBaseDataImpl.builder()
+                .id(replicExistId).build();
 
         when(replicRepo.getById(replicExistId)).thenReturn(Optional.of(replic));
         when(replicRepo.getById(replicNoNExistId)).thenReturn(Optional.empty());
@@ -372,7 +368,8 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
     @Test
     void visitReplicWorksWithAnonymousAccount() throws DomainException {
         UUID replicId = UUID.randomUUID();
-        Replic replic = createReplic(replicId);
+        ReplicBaseData replic = ReplicBaseDataImpl.builder()
+                .id(replicId).build();
 
         when(replicRepo.getById(replicId)).thenReturn(Optional.of(replic));
 
@@ -380,20 +377,22 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
 
         ReplicAccess returned = subject.visitReplic(replicId, null);
 
-        ArgumentCaptor<ReplicAccess> accessCaptor = ArgumentCaptor.forClass(ReplicAccess.class);
+        ArgumentCaptor<ReplicAccess> accessCaptor = ArgumentCaptor.captor();
         verify(accessRepo, times(1)).save(accessCaptor.capture());
 
         Assertions.assertEquals(returned, accessCaptor.getValue());
-        Assertions.assertEquals(returned.replic(), replic);
-        Assertions.assertNull(returned.visitor());
+        Assertions.assertEquals(returned.getReplicId(), replic.getId());
+        Assertions.assertNull(returned.getVisitorId());
     }
 
     @Test
     void visitReplicCreatesAndSavesAccessAndReturns() throws DomainException {
         UUID replicId = UUID.randomUUID();
         UUID accountId = UUID.randomUUID();
-        Replic replic = createReplic(replicId);
-        Account account = createAccount(accountId);
+        ReplicBaseData replic = ReplicBaseDataImpl.builder()
+                .id(replicId).build();
+        Account account = AccountImpl.builder()
+                .id(accountId).build();
 
         when(replicRepo.getById(replicId)).thenReturn(Optional.of(replic));
         when(accountRepo.getById(accountId)).thenReturn(Optional.of(account));
@@ -402,12 +401,12 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
 
         ReplicAccess returned = subject.visitReplic(replicId, accountId);
 
-        ArgumentCaptor<ReplicAccess> accessCaptor = ArgumentCaptor.forClass(ReplicAccess.class);
+        ArgumentCaptor<ReplicAccess> accessCaptor = ArgumentCaptor.captor();
         verify(accessRepo, times(1)).save(accessCaptor.capture());
 
         Assertions.assertEquals(returned, accessCaptor.getValue());
-        Assertions.assertEquals(returned.replic(), replic);
-        Assertions.assertEquals(returned.visitor(), account);
+        Assertions.assertEquals(returned.getReplicId(), replic.getId());
+        Assertions.assertEquals(returned.getVisitorId(), account.getId());
     }
 
     @Test
@@ -426,10 +425,9 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
     void receiveContentThrowsForBadPassword() {
         UUID id = UUID.randomUUID();
 
-        Replic replic = new Replic(
-                new BaseReplic(id, Instant.now(), URL, MediaMode.ALL, ReplicState.ACTIVE, null, null, "hash", null),
-                42
-        );
+        ReplicBaseData replic = ReplicBaseDataImpl.builder()
+                .id(id)
+                .passwordHash("hash").build();
 
         when(replicRepo.getById(id)).thenReturn(Optional.of(replic));
         when(passwordEncoder.matches(any(), any())).thenReturn(false);
@@ -442,21 +440,23 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
     void receiveAllowsGoodPasswordAndReturns() throws DomainException {
         UUID id = UUID.randomUUID();
 
-        Replic replic = new Replic(
-                new BaseReplic(id, Instant.now(), URL, MediaMode.ALL, ReplicState.ACTIVE, null, null, "hash", null),
-                42
-        );
+        ReplicBaseData replic = ReplicBaseDataImpl.builder()
+                .id(id)
+                .passwordHash("hash").build();
 
         when(replicRepo.getById(id)).thenReturn(Optional.of(replic));
         when(passwordEncoder.matches(any(), any())).thenReturn(true);
 
         byte[] buffer = new byte[]{1, 2, 3, 4};
         InputStream dataStream = new ByteArrayInputStream(buffer);
-        when(fileAccessor.getDataStream(id)).thenReturn(dataStream);
+        ReplicFileData fileData = ReplicFileDataImpl.builder()
+                .size(42)
+                .contentStream(dataStream).build();
+        when(fileAccessor.getFileData(id)).thenReturn(fileData);
 
         InputStream returned = subject.receiveContent(id, "password");
 
-        verify(fileAccessor, times(1)).getDataStream(id);
+        verify(fileAccessor, times(1)).getFileData(id);
         Assertions.assertEquals(dataStream, returned);
     }
 
