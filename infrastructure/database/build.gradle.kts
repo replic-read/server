@@ -5,5 +5,9 @@ plugins {
 }
 
 dependencies {
+    implementation(libs.lombok)
+    annotationProcessor(libs.lombok)
     implementation(libs.starter.data)
+    implementation(project(":domain:model"))
+    implementation(project(":domain:repository"))
 }
