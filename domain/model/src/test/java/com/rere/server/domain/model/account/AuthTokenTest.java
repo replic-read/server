@@ -1,26 +1,17 @@
 package com.rere.server.domain.model.account;
 
+import com.rere.server.domain.model.impl.AuthTokenImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.Instant;
-import java.util.UUID;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Tests for the {@link AuthToken} class.
  */
 class AuthTokenTest {
-
-    private static Account createAccount(UUID id) {
-        Account account = mock(Account.class);
-        when(account.getId()).thenReturn(id);
-        return account;
-    }
 
     @ParameterizedTest
     @ValueSource(longs = {
@@ -31,8 +22,9 @@ class AuthTokenTest {
     void isValidFailsForExpired(long instant) {
         Instant now = Instant.ofEpochSecond(75847300);
 
-        Account account = createAccount(UUID.randomUUID());
-        AuthToken token = new AuthToken(UUID.randomUUID(), Instant.now(), UUID.randomUUID(), Instant.ofEpochSecond(instant), account, AuthTokenType.REFRESH_TOKEN, "", false);
+        AuthToken token = AuthTokenImpl.builder()
+                .expirationTimestamp(Instant.ofEpochSecond(instant))
+                .build();
 
         Assertions.assertFalse(token.isValid(AuthTokenType.REFRESH_TOKEN, now));
     }
@@ -46,19 +38,26 @@ class AuthTokenTest {
     void isValidWorksForNonExpired(long instant) {
         Instant now = Instant.ofEpochSecond(75847300);
 
-        AuthToken token = new AuthToken(UUID.randomUUID(), Instant.now(), UUID.randomUUID(), Instant.ofEpochSecond(instant), createAccount(UUID.randomUUID()), AuthTokenType.REFRESH_TOKEN, "", false);
+        AuthToken token = AuthTokenImpl.builder()
+                .expirationTimestamp(Instant.ofEpochSecond(instant))
+                .build();
 
         Assertions.assertTrue(token.isValid(AuthTokenType.REFRESH_TOKEN, now));
     }
 
     @Test
     void isValidUsesInvalidation() {
-        Account account = createAccount(UUID.randomUUID());
         Instant now = Instant.ofEpochSecond(75847300);
         Instant expiration = now.plusSeconds(1000);
 
-        AuthToken invalidatedToken = new AuthToken(UUID.randomUUID(), Instant.now(), UUID.randomUUID(), expiration, account, AuthTokenType.REFRESH_TOKEN, null, true);
-        AuthToken notInvalidatedToken = new AuthToken(UUID.randomUUID(), Instant.now(), UUID.randomUUID(), expiration, account, AuthTokenType.REFRESH_TOKEN, null, false);
+        AuthToken invalidatedToken = AuthTokenImpl.builder()
+                .expirationTimestamp(expiration)
+                .invalidated(true)
+                .build();
+        AuthToken notInvalidatedToken = AuthTokenImpl.builder()
+                .expirationTimestamp(expiration)
+                .invalidated(false)
+                .build();
 
         Assertions.assertFalse(invalidatedToken.isValid(AuthTokenType.REFRESH_TOKEN, now));
         Assertions.assertTrue(notInvalidatedToken.isValid(AuthTokenType.REFRESH_TOKEN, now));
@@ -68,9 +67,12 @@ class AuthTokenTest {
     void isValidUsesType() {
         Instant now = Instant.ofEpochSecond(75847300);
         Instant expiration = now.plusSeconds(1000);
-        Account account = createAccount(UUID.randomUUID());
 
-        AuthToken tokenForRefresh = new AuthToken(UUID.randomUUID(), Instant.now(), UUID.randomUUID(), expiration, account, AuthTokenType.REFRESH_TOKEN, "", false);
+        AuthToken tokenForRefresh = AuthTokenImpl.builder()
+                .expirationTimestamp(expiration)
+                .invalidated(false)
+                .type(AuthTokenType.REFRESH_TOKEN)
+                .build();
 
         Assertions.assertTrue(tokenForRefresh.isValid(AuthTokenType.REFRESH_TOKEN, now));
         Assertions.assertFalse(tokenForRefresh.isValid(AuthTokenType.EMAIL_VERIFICATION, now));
