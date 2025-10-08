@@ -17,6 +17,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -58,6 +59,14 @@ public interface ReplicService {
      */
     @NonNull
     List<Replic> getReplics(Comparator<Replic> sort, UUID replicId, UUID accountId, Set<ReplicState> stateFilter, String query);
+
+    /**
+     * Gets a replic by id.
+     * @param id The id of the replic.
+     * @return The replic.
+     * @throws NotFoundException If the replic wasn't found.
+     */
+    Optional<Replic> getReplicById(UUID id);
 
     /**
      * Sets the state of a specific replic.
