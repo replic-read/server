@@ -16,7 +16,12 @@ public enum NotFoundSubject {
     /**
      * An account was not found.
      */
-    ACCOUNT("account");
+    ACCOUNT("account"),
+
+    /**
+     * A file of a replic was not found.
+     */
+    REPLIC_FILE("replic file");
 
     private final String name;
 
