@@ -1,7 +1,7 @@
 package com.rere.server.infrastructure.database.mapper;
 
 import com.rere.server.domain.model.account.AuthToken;
-import com.rere.server.infrastructure.database.repository.jpa.JpaRepositories;
+import com.rere.server.infrastructure.database.repository.jpa.AccountCrudRepository;
 import com.rere.server.infrastructure.database.table.AuthTokenEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthTokenMapper implements EntityMapper<AuthTokenEntity, AuthToken> {
 
-    private final JpaRepositories.Account accountRepository;
+    private final AccountCrudRepository accountRepository;
 
     @Autowired
-    AuthTokenMapper(JpaRepositories.Account accountRepository) {
+    AuthTokenMapper(AccountCrudRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 

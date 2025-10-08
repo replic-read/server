@@ -1,7 +1,8 @@
 package com.rere.server.infrastructure.database.mapper;
 
 import com.rere.server.domain.model.report.Report;
-import com.rere.server.infrastructure.database.repository.jpa.JpaRepositories;
+import com.rere.server.infrastructure.database.repository.jpa.AccountCrudRepository;
+import com.rere.server.infrastructure.database.repository.jpa.ReplicCrudRepository;
 import com.rere.server.infrastructure.database.table.ReportEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,11 +10,11 @@ import org.springframework.stereotype.Component;
 @Component
 class ReportMapper implements EntityMapper<ReportEntity, Report> {
 
-    private final JpaRepositories.Account accountRepo;
-    private final JpaRepositories.Replic replicRepo;
+    private final AccountCrudRepository accountRepo;
+    private final ReplicCrudRepository replicRepo;
 
     @Autowired
-    ReportMapper(JpaRepositories.Account accountRepo, JpaRepositories.Replic replicRepo) {
+    ReportMapper(AccountCrudRepository accountRepo, ReplicCrudRepository replicRepo) {
         this.accountRepo = accountRepo;
         this.replicRepo = replicRepo;
     }
