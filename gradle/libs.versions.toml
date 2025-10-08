@@ -4,6 +4,7 @@ lombok = "1.18.36"
 mockito = "5.20.0"
 jwt = "4.5.0"
 assertj = "4.0.0-M1"
+h2 = "2.4.240"
 
 sonarcube_plugin = "6.3.1.5724"
 
@@ -17,6 +18,7 @@ mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito
 mockito-junit = { group = "org.mockito", name = "mockito-junit-jupiter", version.ref = "mockito" }
 jwt = { group = "com.auth0", name = "java-jwt", version.ref = "jwt" }
 assertj = { group = "org.assertj", name = "assertj-core", version.ref = "assertj" }
+h2 = { group = "com.h2database", name = "h2", version.ref = "h2" }
 
 [plugins]
 sonarqube = { id = "org.sonarqube", version.ref = "sonarcube_plugin" }
