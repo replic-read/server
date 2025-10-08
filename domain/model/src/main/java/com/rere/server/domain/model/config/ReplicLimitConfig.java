@@ -1,7 +1,5 @@
 package com.rere.server.domain.model.config;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NonNull;
 
 import java.time.Instant;
@@ -10,25 +8,41 @@ import java.time.Period;
 /**
  * Models the configuration for the replic-limit imposed on a user-basis.
  */
-@Data
-@AllArgsConstructor
-public class ReplicLimitConfig {
+public interface ReplicLimitConfig {
 
     /**
      * The time period over which a specific amount of replics can be created.
      */
     @NonNull
-    private Period period;
+    Period getPeriod();
+
+    /**
+     * Sets the new period.
+     * @param period The new period.
+     */
+    void setPeriod(@NonNull Period period);
 
     /**
      * The count of replics that can be created
      */
-    private int count;
+    int getCount();
+
+    /**
+     * Sets the new count.
+     * @param count The new count.
+     */
+    void setCount(int count);
 
     /**
      * The timestamp on which the current period settings were started.
      */
     @NonNull
-    private Instant periodStart;
+    Instant getPeriodStart();
+
+    /**
+     * Sets the period start.
+     * @param periodStart The period start.
+     */
+    void setPeriodStart(@NonNull Instant periodStart);
 
 }
