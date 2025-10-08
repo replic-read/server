@@ -1,6 +1,7 @@
 package com.rere.server.infrastructure.database.repository;
 
 import com.rere.server.domain.model.report.Report;
+import com.rere.server.domain.repository.ReportRepository;
 import com.rere.server.infrastructure.database.mapper.EntityMapper;
 import com.rere.server.infrastructure.database.table.ReportEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,8 @@ import java.util.UUID;
  * {@link CrudRepository} for the {@link ReportEntity} table.
  */
 @Component
-public class ReportRepositoryAdapter extends BaseJpaRepositoryAdapter<Report, ReportEntity> {
+public class ReportRepositoryAdapter extends BaseJpaRepositoryAdapter<Report, ReportEntity>
+        implements ReportRepository {
     @Autowired
     protected ReportRepositoryAdapter(CrudRepository<ReportEntity, UUID> delegate, EntityMapper<ReportEntity, Report> mapper) {
         super(delegate, mapper);
