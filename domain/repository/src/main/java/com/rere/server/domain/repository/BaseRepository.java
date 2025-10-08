@@ -38,4 +38,9 @@ public interface BaseRepository<M> {
      */
     Optional<M> delete(UUID id);
 
+    /**
+     * Deletes all records.
+     */
+    void clear();
+
 }

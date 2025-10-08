@@ -53,4 +53,9 @@ public class BaseJpaRepositoryAdapter<M, E extends M>
         }
         return m;
     }
+
+    @Override
+    public void clear() {
+        delegate.deleteAll();
+    }
 }
