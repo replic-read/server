@@ -52,23 +52,18 @@ public class ReplicEntity extends BaseEntity implements ReplicBaseData {
     @Column(
             name = "description"
     )
-    @Enumerated(EnumType.STRING)
     private String description;
     @Column(
-            name = "expiration",
-            nullable = false
+            name = "expiration"
     )
     private Instant expirationTimestamp;
     @Column(
             name = "password_hash"
     )
     private String passwordHash;
-    @ManyToOne(
-            optional = false
-    )
+    @ManyToOne
     @JoinColumn(
-            name = "author_id",
-            nullable = false
+            name = "author_id"
     )
     private AccountEntity owner;
 
@@ -82,7 +77,7 @@ public class ReplicEntity extends BaseEntity implements ReplicBaseData {
 
     @Override
     public UUID getOwnerId() {
-        return owner.getId();
+        return owner != null ? owner.getId() : null;
     }
 
 }

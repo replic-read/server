@@ -25,8 +25,8 @@ public class ReplicMapper implements EntityMapper<ReplicEntity, ReplicBaseData> 
                 model.getDescription(),
                 model.getExpirationTimestamp(),
                 model.getPasswordHash(),
-                accountRepo.findById(model.getOwnerId())
-                        .orElseThrow()
+                model.getOwnerId() != null ? accountRepo.findById(model.getOwnerId())
+                        .orElseThrow() : null
         );
         entity.setId(model.getId());
         entity.setCreationTimestamp(model.getCreationTimestamp());

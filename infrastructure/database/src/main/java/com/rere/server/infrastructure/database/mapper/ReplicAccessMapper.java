@@ -28,8 +28,8 @@ public class ReplicAccessMapper implements EntityMapper<ReplicAccessEntity, Repl
                 replicRepo.findById(model.getReplicId())
                         .orElseThrow()
         );
-        entity.setId(entity.getId());
-        entity.setCreationTimestamp(entity.getCreationTimestamp());
+        entity.setId(model.getId());
+        entity.setCreationTimestamp(model.getCreationTimestamp());
         return entity;
     }
 }

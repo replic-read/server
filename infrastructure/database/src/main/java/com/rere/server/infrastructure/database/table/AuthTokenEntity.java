@@ -61,7 +61,6 @@ public class AuthTokenEntity extends BaseEntity implements AuthToken {
     @Enumerated(EnumType.STRING)
     private AuthTokenType type;
     @Column(name = "data")
-    @Enumerated(EnumType.STRING)
     private String data;
 
     public UUID getAccountId() {
