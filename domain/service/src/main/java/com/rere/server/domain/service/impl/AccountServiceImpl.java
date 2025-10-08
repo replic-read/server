@@ -4,10 +4,13 @@ import com.rere.server.domain.model.account.Account;
 import com.rere.server.domain.model.account.AccountState;
 import com.rere.server.domain.repository.AccountRepository;
 import com.rere.server.domain.service.AccountService;
+import jakarta.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -15,6 +18,7 @@ import java.util.stream.Stream;
 /**
  * Implementation of the {@link AccountService} backed by an {@link AccountRepository}.
  */
+@Component
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepo;
@@ -37,5 +41,13 @@ public class AccountServiceImpl implements AccountService {
         }
 
         return accStream.toList();
+    }
+
+    @Nonnull
+    @Override
+    public Optional<Account> getAccountById(@Nonnull UUID accountId) {
+        return getAccounts(null, accountId, null, null)
+                .stream()
+                .findFirst();
     }
 }

@@ -10,10 +10,14 @@ import com.rere.server.domain.model.exception.NotFoundException;
 import com.rere.server.domain.model.exception.NotFoundSubject;
 import com.rere.server.domain.model.exception.ReplicContentWriteException;
 import com.rere.server.domain.model.exception.ReplicQuotaMetException;
-import com.rere.server.domain.model.replic.BaseReplic;
+import com.rere.server.domain.model.impl.ReplicAccessImpl;
+import com.rere.server.domain.model.impl.ReplicBaseDataImpl;
+import com.rere.server.domain.model.impl.ReplicImpl;
 import com.rere.server.domain.model.replic.MediaMode;
 import com.rere.server.domain.model.replic.Replic;
 import com.rere.server.domain.model.replic.ReplicAccess;
+import com.rere.server.domain.model.replic.ReplicBaseData;
+import com.rere.server.domain.model.replic.ReplicFileData;
 import com.rere.server.domain.model.replic.ReplicState;
 import com.rere.server.domain.repository.AccountRepository;
 import com.rere.server.domain.repository.ReplicAccessRepository;
@@ -23,6 +27,7 @@ import com.rere.server.domain.service.ReplicService;
 import com.rere.server.domain.service.ServerConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.InputStream;
@@ -32,6 +37,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -39,6 +45,7 @@ import java.util.stream.Stream;
 /**
  * Implementation of the replic service.
  */
+@Component
 public class ReplicServiceImpl implements ReplicService {
 
     private final ReplicRepository replicRepo;
@@ -63,7 +70,7 @@ public class ReplicServiceImpl implements ReplicService {
         this.encoder = encoder;
     }
 
-    private static boolean replicMatchesQuery(Replic replic, String query) {
+    private static boolean replicMatchesQuery(ReplicBaseData replic, String query) {
         return (replic.getDescription() != null && replic.getDescription().contains(query)) ||
                (replic.getOriginalUrl().toString().contains(query));
     }
@@ -85,19 +92,27 @@ public class ReplicServiceImpl implements ReplicService {
             throw new ReplicContentWriteException();
         }
 
-        long fileSize;
+        ReplicFileData fileData;
         try {
-            fileSize = fileAccessor.getDataSize(replicId);
+            fileData = fileAccessor.getFileData(replicId);
         } catch (NotFoundException e) {
             throw new IllegalStateException(e);
         }
 
-        BaseReplic baseReplic = new BaseReplic(replicId, Instant.now(), originalUrl, mediaMode,
-                ReplicState.ACTIVE, description, expiration, encoder.encode(password), account);
-        Replic replic = new Replic(baseReplic, fileSize);
-        replic = replicRepo.save(replic);
+        ReplicBaseData baseData = ReplicBaseDataImpl.builder()
+                .id(replicId)
+                .originalUrl(originalUrl)
+                .mediaMode(mediaMode)
+                .state(ReplicState.ACTIVE)
+                .description(description)
+                .expirationTimestamp(expiration)
+                .passwordHash(encoder.encode(password))
+                .ownerId(account != null ? account.getId() : null)
+                .build();
 
-        return replic;
+        baseData = replicRepo.save(baseData);
+
+        return ReplicImpl.of(fileData, baseData);
     }
 
     private void checkAccountQuotaLimit(Account account, ReplicLimitConfig limit) throws ReplicQuotaMetException {
@@ -125,18 +140,29 @@ public class ReplicServiceImpl implements ReplicService {
 
     private long getCreatedReplicCountForUser(Account account, Instant start) {
         return replicRepo.getAll().stream()
-                .filter(replic -> replic.getOwner() != null && replic.getOwner().getId().equals(account.getId()))
+                .filter(replic -> replic.getOwnerId() != null && replic.getOwnerId().equals(account.getId()))
                 .filter(access -> access.getCreationTimestamp().isAfter(start))
                 .count();
+    }
+
+    private Replic populateBaseData(ReplicBaseData baseData) {
+        ReplicFileData fileData;
+        try {
+            fileData = fileAccessor.getFileData(baseData.getId());
+        } catch (NotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+        return ReplicImpl.of(fileData, baseData);
     }
 
     @Override
     public List<Replic> getReplics(Comparator<Replic> sort, UUID replicId, UUID accountId, Set<ReplicState> stateFilter, String query) {
         Stream<Replic> stream = replicRepo.getAll().stream()
-                .filter(replic -> accountId == null || (replic.getOwner() != null && replic.getOwner().getId().equals(accountId)))
+                .filter(replic -> accountId == null || (replic.getOwnerId() != null && replic.getOwnerId().equals(accountId)))
                 .filter(replic -> replicId == null || replic.getId().equals(replicId))
                 .filter(replic -> stateFilter == null || stateFilter.contains(replic.getState()))
-                .filter(replic -> query == null || replicMatchesQuery(replic, query));
+                .filter(replic -> query == null || replicMatchesQuery(replic, query))
+                .map(this::populateBaseData);
 
         if (sort != null) {
             stream = stream.sorted(sort);
@@ -146,35 +172,43 @@ public class ReplicServiceImpl implements ReplicService {
     }
 
     @Override
+    public Optional<Replic> getReplicById(UUID id) {
+        return replicRepo.getById(id)
+                .map(this::populateBaseData);
+    }
+
+    @Override
     public Replic setReplicState(UUID replicId, ReplicState state) throws NotFoundException {
-        Replic replic = replicRepo.getAll().stream()
-                .filter(r -> r.getId().equals(replicId))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException(NotFoundSubject.REPLIC, replicId));
+        Replic replic = getReplicById(replicId)
+                .orElseThrow(() -> NotFoundException.replic(replicId));
 
         replic.setState(state);
-        return replicRepo.save(replic);
+        replicRepo.save(replic);
+        return replic;
     }
 
     @Override
     public ReplicAccess visitReplic(UUID replicId, UUID visitorId) throws NotFoundException {
-        Replic replic = replicRepo.getById(replicId)
+        Replic replic = getReplicById(replicId)
                 .orElseThrow(() -> new NotFoundException(NotFoundSubject.REPLIC, replicId));
 
         Account account = visitorId == null ? null :
                 accountRepo.getById(visitorId)
-                        .orElseThrow(() -> new NotFoundException(NotFoundSubject.ACCOUNT, visitorId));
+                        .orElseThrow(() -> NotFoundException.account(visitorId));
 
-        ReplicAccess access = new ReplicAccess(UUID.randomUUID(), Instant.now(), replic, account);
+        ReplicAccess access = ReplicAccessImpl.builder()
+                .replicId(replic.getId())
+                .visitorId(account != null ? account.getId() : null)
+                .build();
 
-        return accessRepo.save(access);
+        accessRepo.save(access);
+        return access;
     }
 
     @Override
     public InputStream receiveContent(UUID replicId, String password) throws NotFoundException, InvalidPasswordException {
-        Replic replic = replicRepo
-                .getById(replicId)
-                .orElseThrow(() -> new NotFoundException(NotFoundSubject.REPLIC, replicId));
+        Replic replic = getReplicById(replicId)
+                .orElseThrow(() -> NotFoundException.replic(replicId));
 
         if(replic.requiresPassword()) {
             boolean matches = encoder.matches(password, replic.getPasswordHash());
@@ -183,6 +217,6 @@ public class ReplicServiceImpl implements ReplicService {
             }
         }
 
-        return fileAccessor.getDataStream(replicId);
+        return replic.getContentStream();
     }
 }
