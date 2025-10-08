@@ -68,6 +68,6 @@ public class ReportServiceImpl implements ReportService {
                 .description(description)
                 .state(ReportState.OPEN).build();
 
-        return reportRepo.save(report);
+        return reportRepo.saveModel(report);
     }
 }

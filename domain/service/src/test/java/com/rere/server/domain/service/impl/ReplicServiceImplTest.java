@@ -177,13 +177,13 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
         // Attempt to create replic that expires 6 days in the future, but 5 is maximum allowed
         when(fileAccessor.getFileData(any())).thenReturn(ReplicFileDataImpl.builder()
                 .size(42).build());
-        when(replicRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(replicRepo.saveModel(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(passwordEncoder.encode(any())).thenReturn("hash");
 
         Replic createdReplic = subject.createReplic(URL, MediaMode.ALL, null, null, null, null, file -> true);
 
         ArgumentCaptor<ReplicBaseData> replicCaptor = ArgumentCaptor.captor();
-        verify(replicRepo, times(1)).save(replicCaptor.capture());
+        verify(replicRepo, times(1)).saveModel(replicCaptor.capture());
 
         Assertions.assertEquals(createdReplic.getId(), replicCaptor.getValue().getId());
         Assertions.assertEquals(URL, replicCaptor.getValue().getOriginalUrl());
@@ -330,12 +330,12 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
                 .state(ReplicState.ACTIVE).build();
 
         when(replicRepo.getById(original.getId())).thenReturn(Optional.of(original));
-        when(replicRepo.save(any())).thenAnswer(i -> i.getArguments()[0]);
+        when(replicRepo.saveModel(any())).thenAnswer(i -> i.getArguments()[0]);
 
         Replic returned = subject.setReplicState(original.getId(), ReplicState.REMOVED);
 
         ArgumentCaptor<Replic> replicCaptor = ArgumentCaptor.captor();
-        verify(replicRepo, times(1)).save(replicCaptor.capture());
+        verify(replicRepo, times(1)).saveModel(replicCaptor.capture());
 
         Assertions.assertEquals(returned, replicCaptor.getValue());
         Assertions.assertEquals(ReplicState.REMOVED, returned.getState());
@@ -373,12 +373,12 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
 
         when(replicRepo.getById(replicId)).thenReturn(Optional.of(replic));
 
-        when(accessRepo.save(any())).thenAnswer(i -> i.getArguments()[0]);
+        when(accessRepo.saveModel(any())).thenAnswer(i -> i.getArguments()[0]);
 
         ReplicAccess returned = subject.visitReplic(replicId, null);
 
         ArgumentCaptor<ReplicAccess> accessCaptor = ArgumentCaptor.captor();
-        verify(accessRepo, times(1)).save(accessCaptor.capture());
+        verify(accessRepo, times(1)).saveModel(accessCaptor.capture());
 
         Assertions.assertEquals(returned, accessCaptor.getValue());
         Assertions.assertEquals(returned.getReplicId(), replic.getId());
@@ -397,12 +397,12 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
         when(replicRepo.getById(replicId)).thenReturn(Optional.of(replic));
         when(accountRepo.getById(accountId)).thenReturn(Optional.of(account));
 
-        when(accessRepo.save(any())).thenAnswer(i -> i.getArguments()[0]);
+        when(accessRepo.saveModel(any())).thenAnswer(i -> i.getArguments()[0]);
 
         ReplicAccess returned = subject.visitReplic(replicId, accountId);
 
         ArgumentCaptor<ReplicAccess> accessCaptor = ArgumentCaptor.captor();
-        verify(accessRepo, times(1)).save(accessCaptor.capture());
+        verify(accessRepo, times(1)).saveModel(accessCaptor.capture());
 
         Assertions.assertEquals(returned, accessCaptor.getValue());
         Assertions.assertEquals(returned.getReplicId(), replic.getId());

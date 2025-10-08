@@ -192,7 +192,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .type(AuthTokenType.REFRESH_TOKEN)
                 .build();
 
-        return tokenRepo.save(token).getToken();
+        return tokenRepo.saveModel(token).getToken();
     }
 
     @Nonnull
@@ -230,7 +230,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .accountState(AccountState.UNVERIFIED)
                 .profileColor(profileColor)
                 .build();
-        account = accountRepo.save(account);
+        account = accountRepo.saveModel(account);
 
         if (sendEmail) {
             try {
@@ -283,7 +283,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } else { // The accounts are equal and not null.
             unAdminifyAllAdminAccounts();
             emailMatchingAccount.setAdmin(true);
-            return accountRepo.save(emailMatchingAccount);
+            return accountRepo.saveModel(emailMatchingAccount);
         }
     }
 
@@ -294,7 +294,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .filter(Account::isAdmin)
                 .forEach(account -> {
                     account.setAdmin(false);
-                    accountRepo.save(account);
+                    accountRepo.saveModel(account);
                 });
     }
 
@@ -312,7 +312,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .type(AuthTokenType.EMAIL_VERIFICATION)
                 .build();
 
-        emailToken = tokenRepo.save(emailToken);
+        emailToken = tokenRepo.saveModel(emailToken);
 
         emailSender.sendVerificationToken(account, emailToken, true);
     }

@@ -316,12 +316,12 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         Account account = AccountImpl.builder().build();
 
         when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
-        when(tokenRepo.save(any())).thenAnswer(inv -> inv.getArguments()[0]);
+        when(tokenRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
 
         UUID returned = subject.createRefreshToken(account.getId());
 
         ArgumentCaptor<AuthToken> tokenCaptor = ArgumentCaptor.forClass(AuthToken.class);
-        verify(tokenRepo, times(1)).save(tokenCaptor.capture());
+        verify(tokenRepo, times(1)).saveModel(tokenCaptor.capture());
 
         assertEquals(returned, tokenCaptor.getValue().getToken());
         assertEquals(AuthTokenType.REFRESH_TOKEN, tokenCaptor.getValue().getType());
@@ -357,7 +357,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         Account account = AccountImpl.builder().build();
 
         when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
-        when(tokenRepo.save(any())).thenAnswer(inv -> inv.getArguments()[0]);
+        when(tokenRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(emailSender.sendVerificationToken(any(), any(), anyBoolean())).thenReturn(true);
 
         subject.requestEmailVerification(account.getId());
@@ -365,7 +365,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         ArgumentCaptor<AuthToken> repoCaptor = ArgumentCaptor.captor();
         ArgumentCaptor<AuthToken> emailCaptor = ArgumentCaptor.captor();
 
-        verify(tokenRepo, times(1)).save(repoCaptor.capture());
+        verify(tokenRepo, times(1)).saveModel(repoCaptor.capture());
         verify(emailSender, times(1)).sendVerificationToken(any(), emailCaptor.capture(), anyBoolean());
 
         assertEquals(repoCaptor.getValue(), emailCaptor.getValue());
@@ -388,7 +388,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         ServerConfig config = new ServerConfigImpl(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, true, null, Period.of(1, 0, 0));
 
         when(configService.get()).thenReturn(config);
-        when(accountRepo.save(any())).thenAnswer(inv -> inv.getArguments()[0]);
+        when(accountRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(encoder.encode("password")).thenReturn("passwordhash");
         when(accountService.getAccountById(any())).thenReturn(Optional.of(AccountImpl.builder().build()));
 
@@ -444,7 +444,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         ServerConfig config = new ServerConfigImpl(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, true, null, Period.of(1, 0, 0));
 
         when(accountService.getAccounts(null, null, null, null)).thenReturn(accounts);
-        when(accountRepo.save(any())).thenAnswer(inv -> inv.getArguments()[0]);
+        when(accountRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(encoder.encode(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(configService.get()).thenReturn(config);
 
@@ -452,7 +452,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         Account newAdminAccount = subject.ensureSingletonAdmin();
 
         ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
-        verify(accountRepo, times(2)).save(accountCaptor.capture());
+        verify(accountRepo, times(2)).saveModel(accountCaptor.capture());
 
         // First call to accountRepo.save() is making the old admin account non-admin.
         assertEquals(oldAdminAccount.getId(), accountCaptor.getAllValues().getFirst().getId());
@@ -511,7 +511,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         subject.ensureSingletonAdmin();
 
         ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
-        verify(accountRepo, times(2)).save(accountCaptor.capture());
+        verify(accountRepo, times(2)).saveModel(accountCaptor.capture());
 
         // First call to accountRepo.save() is to make old admin not admin anymore.
         assertEquals(oldAdminAccount.getId(), accountCaptor.getAllValues().getFirst().getId());

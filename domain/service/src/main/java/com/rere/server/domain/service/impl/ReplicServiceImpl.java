@@ -110,7 +110,7 @@ public class ReplicServiceImpl implements ReplicService {
                 .ownerId(account != null ? account.getId() : null)
                 .build();
 
-        baseData = replicRepo.save(baseData);
+        baseData = replicRepo.saveModel(baseData);
 
         return ReplicImpl.of(fileData, baseData);
     }
@@ -183,7 +183,7 @@ public class ReplicServiceImpl implements ReplicService {
                 .orElseThrow(() -> NotFoundException.replic(replicId));
 
         replic.setState(state);
-        replicRepo.save(replic);
+        replicRepo.saveModel(replic);
         return replic;
     }
 
@@ -201,7 +201,7 @@ public class ReplicServiceImpl implements ReplicService {
                 .visitorId(account != null ? account.getId() : null)
                 .build();
 
-        accessRepo.save(access);
+        accessRepo.saveModel(access);
         return access;
     }
 

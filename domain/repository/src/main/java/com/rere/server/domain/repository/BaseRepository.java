@@ -29,7 +29,7 @@ public interface BaseRepository<M> {
      * @param m The model to save.
      * @return The model, because it might have been changed in the process of saving.
      */
-    M save(M m);
+    M saveModel(M m);
 
     /**
      * Deletes a model.

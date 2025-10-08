@@ -121,12 +121,12 @@ class ReportServiceImplTest extends BaseDomainServiceTest {
                 .id(replicId).build();
 
         when(replicService.getReplicById(replicId)).thenReturn(Optional.of(replic));
-        when(reportRepo.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
+        when(reportRepo.saveModel(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
 
         Report returned = subject.reportReplic(replicId, null, "description");
 
         ArgumentCaptor<Report> reportCaptor = ArgumentCaptor.forClass(Report.class);
-        verify(reportRepo, times((1))).save(reportCaptor.capture());
+        verify(reportRepo, times((1))).saveModel(reportCaptor.capture());
 
         assertEquals(returned, reportCaptor.getValue());
         assertNull(returned.getAuthorId());
