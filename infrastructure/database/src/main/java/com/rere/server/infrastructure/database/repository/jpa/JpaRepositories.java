@@ -20,42 +20,42 @@ public final class JpaRepositories {
      * The account crud interface.
      */
     @Repository
-    public interface AccountCrudRepository extends CrudRepository<AccountEntity, UUID> {
+    public interface Account extends CrudRepository<AccountEntity, UUID> {
     }
 
     /**
      * The auth-token crud interface.
      */
     @Repository
-    public interface AuthTokenCrudRepository extends CrudRepository<AuthTokenEntity, UUID> {
+    public interface AuthToken extends CrudRepository<AuthTokenEntity, UUID> {
     }
 
     /**
      * The replic-access crud interface.
      */
     @Repository
-    public interface ReplicAccessCrudRepository extends CrudRepository<ReplicAccessEntity, UUID> {
+    public interface ReplicAccess extends CrudRepository<ReplicAccessEntity, UUID> {
     }
 
     /**
      * The replic crud interface.
      */
     @Repository
-    public interface ReplicCrudRepository extends CrudRepository<ReplicEntity, UUID> {
+    public interface Replic extends CrudRepository<ReplicEntity, UUID> {
     }
 
     /**
      * The report crud interface.
      */
     @Repository
-    public interface ReportCrudRepository extends CrudRepository<ReportEntity, UUID> {
+    public interface Report extends CrudRepository<ReportEntity, UUID> {
     }
 
     /**
      * The server-config crud interface.
      */
     @Repository
-    public interface ServerConfigCrudRepository extends CrudRepository<ServerConfigEntity, UUID> {
+    public interface ServerConfig extends CrudRepository<ServerConfigEntity, UUID> {
     }
 
 }

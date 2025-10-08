@@ -1,8 +1,7 @@
 package com.rere.server.infrastructure.database.mapper;
 
 import com.rere.server.domain.model.replic.ReplicAccess;
-import com.rere.server.infrastructure.database.repository.jpa.AccountCrudRepository;
-import com.rere.server.infrastructure.database.repository.jpa.ReplicCrudRepository;
+import com.rere.server.infrastructure.database.repository.jpa.JpaRepositories;
 import com.rere.server.infrastructure.database.table.ReplicAccessEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,11 +9,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReplicAccessMapper implements EntityMapper<ReplicAccessEntity, ReplicAccess> {
 
-    private final ReplicCrudRepository replicRepo;
-    private final AccountCrudRepository accountRepo;
+    private final JpaRepositories.Replic replicRepo;
+    private final JpaRepositories.Account accountRepo;
 
     @Autowired
-    ReplicAccessMapper(ReplicCrudRepository replicRepo, AccountCrudRepository accountRepo) {
+    ReplicAccessMapper(JpaRepositories.Replic replicRepo, JpaRepositories.Account accountRepo) {
         this.replicRepo = replicRepo;
         this.accountRepo = accountRepo;
     }
@@ -25,7 +24,8 @@ public class ReplicAccessMapper implements EntityMapper<ReplicAccessEntity, Repl
                 model.getVisitorId() != null ?
                         accountRepo.findById(model.getVisitorId())
                                 .orElseThrow() : null,
-                replicRepo.findById(model.getReplicId()).orElseThrow()
+                replicRepo.findById(model.getReplicId())
+                        .orElseThrow()
         );
         entity.setId(entity.getId());
         entity.setCreationTimestamp(entity.getCreationTimestamp());

@@ -1,7 +1,7 @@
 package com.rere.server.infrastructure.database.mapper;
 
 import com.rere.server.domain.model.replic.ReplicBaseData;
-import com.rere.server.infrastructure.database.repository.jpa.AccountCrudRepository;
+import com.rere.server.infrastructure.database.repository.jpa.JpaRepositories;
 import com.rere.server.infrastructure.database.table.ReplicEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReplicMapper implements EntityMapper<ReplicEntity, ReplicBaseData> {
 
-    private final AccountCrudRepository accountRepo;
+    private final JpaRepositories.Account accountRepo;
 
     @Autowired
-    ReplicMapper(AccountCrudRepository accountRepo) {
+    ReplicMapper(JpaRepositories.Account accountRepo) {
         this.accountRepo = accountRepo;
     }
 
@@ -25,7 +25,8 @@ public class ReplicMapper implements EntityMapper<ReplicEntity, ReplicBaseData> 
                 model.getDescription(),
                 model.getExpirationTimestamp(),
                 model.getPasswordHash(),
-                accountRepo.findById(model.getOwnerId()).orElseThrow()
+                accountRepo.findById(model.getOwnerId())
+                        .orElseThrow()
         );
         entity.setId(model.getId());
         entity.setCreationTimestamp(model.getCreationTimestamp());
