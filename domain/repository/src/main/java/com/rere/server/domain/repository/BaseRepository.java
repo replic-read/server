@@ -33,9 +33,9 @@ public interface BaseRepository<M> {
 
     /**
      * Deletes a model.
-     * @param m The model to delete.
+     * @param id The id of the model to delete.
      * @return The model, if it has been deleted, or an empty optional.
      */
-    Optional<M> delete(M m);
+    Optional<M> delete(UUID id);
 
 }
