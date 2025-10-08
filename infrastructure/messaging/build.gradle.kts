@@ -7,4 +7,5 @@ plugins {
 dependencies {
     implementation(project(":domain:model"))
     implementation(project(":domain:messaging"))
+    implementation(libs.starter.mail)
 }
