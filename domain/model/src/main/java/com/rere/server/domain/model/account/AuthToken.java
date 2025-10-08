@@ -1,64 +1,58 @@
 package com.rere.server.domain.model.account;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NonNull;
-
 import java.time.Instant;
 import java.util.UUID;
 
 /**
  * Models an authentication token.
  */
-@Data
-@AllArgsConstructor
-public class AuthToken {
+public interface AuthToken {
 
     /**
      * The id of the token.
      */
-    @NonNull
-    private final UUID id;
+    UUID getId();
 
     /**
      * The timestamp of creation of the token.
      */
-    @NonNull
-    private final Instant creationTimestamp;
+    Instant getCreationTimestamp();
 
     /**
      * The actual token that is exposed.
      */
-    @NonNull
-    private final UUID token;
+    UUID getToken();
 
     /**
      * The expiration of the token.
      */
-    @NonNull
-    private final Instant expirationTimestamp;
+    Instant getExpirationTimestamp();
 
     /**
      * The account the token is referenced by.
      */
-    @NonNull
-    private final Account account;
+    UUID getAccountId();
 
     /**
      * The type of token.
      */
-    @NonNull
-    private final AuthTokenType type;
+    AuthTokenType getType();
 
     /**
      * The optional data that is stored along the token.
      */
-    private final String data;
+    String getData();
 
     /**
      * Whether the token has been actively invalidated.
      */
-    private boolean invalidated;
+    boolean isInvalidated();
+
+    /**
+     * Sets the invalidated state.
+     * @param invalidated The new invalidated state.
+     */
+    void setInvalidated(boolean invalidated);
 
     /**
      * Checks whether the token is valid for a given set of expectations, as well regarding expiration and invalidation.
@@ -66,10 +60,10 @@ public class AuthToken {
      * @param expectedType  The expected token type.
      * @return True if the token is valid.
      */
-    public boolean isValid(AuthTokenType expectedType, Instant now) {
+    default boolean isValid(AuthTokenType expectedType, Instant now) {
         boolean expired = getExpirationTimestamp().isBefore(now);
         boolean notInvalidated = !isInvalidated();
-        boolean typeMatches = type.equals(expectedType);
+        boolean typeMatches = getType().equals(expectedType);
 
         return !expired && notInvalidated && typeMatches;
     }

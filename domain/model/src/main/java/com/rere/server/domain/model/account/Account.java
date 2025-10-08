@@ -1,63 +1,63 @@
 package com.rere.server.domain.model.account;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NonNull;
-
 import java.time.Instant;
 import java.util.UUID;
 
 /**
  * Models an account of a user.
  */
-@Data
-@AllArgsConstructor
-public class Account {
+public interface Account {
 
     /**
      * The id of the account.
      */
-    @NonNull
-    private final UUID id;
+    UUID getId();
 
     /**
      * The timestamp when the account was created.
      */
-    @NonNull
-    private final Instant creationTimestamp;
+    Instant getCreationTimestamp();
 
     /**
      * The email of the account.
      */
-    @NonNull
-    private String email;
+    String getEmail();
+
+    void setEmail(String email);
 
     /**
      * The username of the account.
      */
-    @NonNull
-    private String username;
+    String getUsername();
+
+    void setUsername(String username);
 
     /**
      * The hashed password of the account.
      */
-    @NonNull
-    private String passwordHash;
+    String getPasswordHash();
+
+    void setPasswordHash(String passwordHash);
 
     /**
      * Whether the account is an admin account.
      */
-    private boolean isAdmin;
+    boolean isAdmin();
+
+    void setAdmin(boolean admin);
 
     /**
      * The current state of the account.
      */
-    @NonNull
-    private AccountState accountState;
+    AccountState getAccountState();
+
+    void setAccountState(AccountState accountState);
 
     /**
      * The profile color of the account.
      */
-    private int profileColor;
+    int getProfileColor();
+
+    void setProfileColor(int profileColor);
 
 }

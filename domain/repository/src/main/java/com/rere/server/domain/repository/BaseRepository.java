@@ -29,13 +29,18 @@ public interface BaseRepository<M> {
      * @param m The model to save.
      * @return The model, because it might have been changed in the process of saving.
      */
-    M save(M m);
+    M saveModel(M m);
 
     /**
      * Deletes a model.
-     * @param m The model to delete.
+     * @param id The id of the model to delete.
      * @return The model, if it has been deleted, or an empty optional.
      */
-    Optional<M> delete(M m);
+    Optional<M> delete(UUID id);
+
+    /**
+     * Deletes all records.
+     */
+    void clear();
 
 }

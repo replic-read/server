@@ -18,6 +18,8 @@ import com.rere.server.domain.model.exception.NotUniqueException;
 import com.rere.server.domain.model.exception.NotUniqueSubject;
 import com.rere.server.domain.model.exception.OperationDisabledException;
 import com.rere.server.domain.model.exception.OperationDisabledOperation;
+import com.rere.server.domain.model.impl.AccountImpl;
+import com.rere.server.domain.model.impl.AuthTokenImpl;
 import com.rere.server.domain.repository.AccountRepository;
 import com.rere.server.domain.repository.AuthTokenRepository;
 import com.rere.server.domain.service.AccountService;
@@ -27,6 +29,7 @@ import jakarta.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -35,6 +38,7 @@ import java.util.UUID;
 /**
  * Implementation of the authentication service.
  */
+@Component
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private static final String JWT_ISSUER = "replic-read-server";
@@ -137,9 +141,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return Optional.empty();
         }
 
-        return accountService
-                .getAccounts(null, accountId, null, null)
-                .stream().findFirst();
+        return accountService.getAccountById(accountId);
     }
 
     @Nonnull
@@ -152,23 +154,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElse(null);
 
         if (token == null ||
-            !token.getType().equals(AuthTokenType.REFRESH_TOKEN) ||
-            token.getExpirationTimestamp().isBefore(Instant.now()) ||
-            token.isInvalidated()
+            !token.isValid(AuthTokenType.REFRESH_TOKEN, Instant.now())
         ) {
             return Optional.empty();
         }
 
-        return Optional.of(token.getAccount());
+        return accountService
+                .getAccountById(token.getAccountId());
     }
 
     @Nonnull
     @Override
     public String createAccessToken(@Nonnull UUID accountId) throws NotFoundException {
         Account account = accountService
-                .getAccounts(null, accountId, null, null)
-                .stream()
-                .findFirst()
+                .getAccountById(accountId)
                 .orElseThrow(() -> new NotFoundException(NotFoundSubject.ACCOUNT, accountId));
 
         return JWT.create()
@@ -182,24 +181,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public UUID createRefreshToken(@Nonnull UUID accountId) throws NotFoundException {
         Account account = accountService
-                .getAccounts(null, accountId, null, null)
-                .stream()
-                .findFirst()
+                .getAccountById(accountId)
                 .orElseThrow(() -> new NotFoundException(NotFoundSubject.ACCOUNT, accountId));
 
         Instant now = Instant.now();
-        AuthToken token = new AuthToken(
-                UUID.randomUUID(),
-                now,
-                UUID.randomUUID(),
-                now.plusMillis(refreshTokenExpiration),
-                account,
-                AuthTokenType.REFRESH_TOKEN,
-                null,
-                false
-        );
+        AuthToken token = AuthTokenImpl.builder()
+                .creationTimestamp(now)
+                .expirationTimestamp(now.plusMillis(refreshTokenExpiration))
+                .accountId(account.getId())
+                .type(AuthTokenType.REFRESH_TOKEN)
+                .build();
 
-        return tokenRepo.save(token).getToken();
+        return tokenRepo.saveModel(token).getToken();
     }
 
     @Nonnull
@@ -229,17 +222,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new NotUniqueException(NotUniqueSubject.USERNAME);
         }
 
-        Account account = new Account(
-                UUID.randomUUID(),
-                Instant.now(),
-                email,
-                username,
-                encoder.encode(password),
-                isAdmin,
-                AccountState.UNVERIFIED,
-                profileColor
-        );
-        account = accountRepo.save(account);
+        Account account = AccountImpl.builder()
+                .email(email)
+                .username(username)
+                .passwordHash(encoder.encode(password))
+                .isAdmin(isAdmin)
+                .accountState(AccountState.UNVERIFIED)
+                .profileColor(profileColor)
+                .build();
+        account = accountRepo.saveModel(account);
 
         if (sendEmail) {
             try {
@@ -292,7 +283,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } else { // The accounts are equal and not null.
             unAdminifyAllAdminAccounts();
             emailMatchingAccount.setAdmin(true);
-            return accountRepo.save(emailMatchingAccount);
+            return accountRepo.saveModel(emailMatchingAccount);
         }
     }
 
@@ -303,30 +294,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .filter(Account::isAdmin)
                 .forEach(account -> {
                     account.setAdmin(false);
-                    accountRepo.save(account);
+                    accountRepo.saveModel(account);
                 });
     }
 
     @Override
     public void requestEmailVerification(@Nonnull UUID accountId) throws NotFoundException {
         Account account = accountService
-                .getAccounts(null, accountId, null, null)
-                .stream()
-                .findFirst()
+                .getAccountById(accountId)
                 .orElseThrow(() -> new NotFoundException(NotFoundSubject.ACCOUNT, accountId));
 
         Instant now = Instant.now();
-        AuthToken emailToken = new AuthToken(
-                UUID.randomUUID(),
-                now,
-                UUID.randomUUID(),
-                now.plusMillis(emailTokenExpiration),
-                account,
-                AuthTokenType.EMAIL_VERIFICATION,
-                null,
-                false
-        );
-        emailToken = tokenRepo.save(emailToken);
+        AuthToken emailToken = AuthTokenImpl.builder()
+                .creationTimestamp(now)
+                .expirationTimestamp(now.plusMillis(emailTokenExpiration))
+                .accountId(account.getId())
+                .type(AuthTokenType.EMAIL_VERIFICATION)
+                .build();
+
+        emailToken = tokenRepo.saveModel(emailToken);
 
         emailSender.sendVerificationToken(account, emailToken, true);
     }
@@ -340,7 +326,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .filter(t -> t.getToken().equals(authToken))
                 .findFirst()
                 .flatMap(t -> t.isValid(AuthTokenType.EMAIL_VERIFICATION, Instant.now()) ? Optional.of(t) : Optional.empty())
-                .map(AuthToken::getAccount)
+                .map(AuthToken::getAccountId)
+                .flatMap(accountService::getAccountById)
                 .orElseThrow(InvalidTokenException::new);
     }
 }

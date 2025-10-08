@@ -13,12 +13,12 @@ public interface ServerConfigRepository {
      * Gets the saved {@link ServerConfig} or an empty optional if it doesnt exist yet.
      * @return The config, or empty if it doesn#t exist yet.
      */
-    Optional<ServerConfig> get();
+    Optional<ServerConfig> getConfig();
 
     /**
      * Saves a {@link ServerConfig}.
      * @param serverConfig The config to save.
      */
-    void save(ServerConfig serverConfig);
+    void saveConfig(ServerConfig serverConfig);
 
 }

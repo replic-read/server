@@ -1,57 +1,61 @@
 package com.rere.server.domain.model.config;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NonNull;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.Period;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 
 /**
  * Models the configuration that can be made by admins on the server.
  */
-@Data
-@AllArgsConstructor
-public class ServerConfig {
+public interface ServerConfig {
 
     /**
      * User group that is allowed to create replics.
      */
     @NonNull
-    private AuthUserGroup createReplicsGroup;
+    AuthUserGroup getCreateReplicsGroup();
+
+    void setCreateReplicsGroup(@NonNull AuthUserGroup createReplicsGroup);
 
     /**
      * User group that is allowed to access the content of replics.
      */
     @NonNull
-    private AuthUserGroup accessReplicsGroup;
+    AuthUserGroup getAccessReplicsGroup();
+
+    void setAccessReplicsGroup(@NonNull AuthUserGroup accessReplicsGroup);
 
     /**
      * User group that is allowed to report replics.
      */
     @NonNull
-    private AuthUserGroup createReportsGroup;
+    AuthUserGroup getCreateReportsGroup();
+
+    void setCreateReportsGroup(@NonNull AuthUserGroup createReportsGroup);
 
     /**
      * Whether accounts can freely be generated.
      */
-    private boolean allowAccountCreation;
+    boolean isAllowAccountCreation();
+
+    void setAllowAccountCreation(boolean allowAccountCreation);
 
     /**
      * The configuration of the replic-limit.
      */
-    private ReplicLimitConfig limit;
+    ReplicLimitConfig getLimit();
+
+    void setLimit(@NonNull ReplicLimitConfig limit);
 
     /**
      * The maximum timespan between a replics creation and expiration.
      */
-    private Period maximumActivePeriod;
+    Period getMaximumActivePeriod();
+
+    void setMaximumActivePeriod(@NonNull Period maximumActivePeriod);
 
     /**
      * Checks whether the current server configuration allows the specific expiration timestamp.
@@ -59,7 +63,7 @@ public class ServerConfig {
      * @param expirationTimestamp The timestamp that should be checked.
      * @return Whether the timestamp is allowed.
      */
-    public boolean allowsExpiration(LocalDate now, Instant expirationTimestamp, ZoneId zone) {
+    default boolean allowsExpiration(LocalDate now, Instant expirationTimestamp, ZoneId zone) {
         if(getMaximumActivePeriod() == null) {
             return true;
         }

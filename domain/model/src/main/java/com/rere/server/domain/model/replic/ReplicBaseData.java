@@ -1,78 +1,77 @@
 package com.rere.server.domain.model.replic;
 
-import com.rere.server.domain.model.account.Account;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NonNull;
-import lombok.Value;
-import lombok.experimental.NonFinal;
 
 import java.net.URL;
 import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Models a base replic, i.e. a replic without associated file data.
+ * Models the base data of a replic.
  */
-@Data
-@AllArgsConstructor
-public class BaseReplic {
+public interface ReplicBaseData {
 
     /**
      * The id of the replic.
      */
     @NonNull
-    private final UUID id;
+    UUID getId();
 
     /**
      * The creation timestamp of the replic.
      */
     @NonNull
-    private final Instant creationTimestamp;
+    Instant getCreationTimestamp();
 
     /**
      * The url of the resource that was replicated-
      */
     @NonNull
-    private final URL originalUrl;
+    URL getOriginalUrl();
 
     /**
      * The media mode of te replic.
      */
     @NonNull
-    private final MediaMode mediaMode;
+    MediaMode getMediaMode();
 
     /**
      * The current state of the replic.
      */
     @NonNull
-    private ReplicState state;
+    ReplicState getState();
+
+    /**
+     * Sets the state of the replic.
+     * @param state The new state.
+     */
+    void setState(@NonNull ReplicState state);
 
     /**
      * The description of the replic, if it exists.
      */
-    private final String description;
+    String getDescription();
 
     /**
      * The timestamp of expiration of this replic, if it has one.
      */
-    private final Instant expirationTimestamp;
+    Instant getExpirationTimestamp();
 
     /**
      * The hashed password of the replic, if it exists.
      */
-    private final String passwordHash;
+    String getPasswordHash();
 
     /**
      * The account owner of the replic, if it exists.
      */
-    private final Account owner;
+    UUID getOwnerId();
 
     /**
      * Checks whether a password is required to access this replic.
      * @return True if a password is required.
      */
-    public boolean requiresPassword() {
+    default boolean requiresPassword() {
         return getPasswordHash() != null;
     }
 
@@ -81,7 +80,7 @@ public class BaseReplic {
      * @param now The current reference timestamp.
      * @return True if the replic is expired.
      */
-    public boolean isExpired(Instant now) {
+    default boolean isExpired(Instant now) {
         return getExpirationTimestamp() != null && getExpirationTimestamp().isBefore(now);
     }
 

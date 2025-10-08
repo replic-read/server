@@ -17,6 +17,9 @@ import com.rere.server.domain.model.exception.NotUniqueException;
 import com.rere.server.domain.model.exception.NotUniqueSubject;
 import com.rere.server.domain.model.exception.OperationDisabledException;
 import com.rere.server.domain.model.exception.OperationDisabledOperation;
+import com.rere.server.domain.model.impl.AccountImpl;
+import com.rere.server.domain.model.impl.AuthTokenImpl;
+import com.rere.server.domain.model.impl.ServerConfigImpl;
 import com.rere.server.domain.repository.AccountRepository;
 import com.rere.server.domain.repository.AuthTokenRepository;
 import com.rere.server.domain.service.AccountService;
@@ -73,21 +76,9 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
     @InjectMocks
     private AuthenticationServiceImpl subject;
 
-    private static Account createAccount(String email, String username, String password) {
-        return new Account(UUID.randomUUID(), Instant.now(), email, username, password, false, AccountState.ACTIVE, 0);
-    }
-
-    private static Account createAccount(UUID id) {
-        return new Account(id, Instant.now(), "email", "username", "password", false, AccountState.ACTIVE, 0);
-    }
-
-    private static AuthToken createToken(UUID token, Instant expiration, AuthTokenType type, Account account, Boolean invalidated) {
-        return new AuthToken(UUID.randomUUID(), Instant.now(), token != null ? token : UUID.randomUUID(), expiration != null ? expiration : Instant.now(), account != null ? account : createAccount(UUID.randomUUID()), type != null ? type : AuthTokenType.REFRESH_TOKEN, null, invalidated != null ? invalidated : false);
-    }
-
     private void throwsForAccountNotFoundTest(ThrowingConsumer<UUID> runnable) {
         UUID specialId = UUID.randomUUID();
-        when(accountService.getAccounts(null, specialId, null, null)).thenReturn(List.of());
+        when(accountService.getAccountById(specialId)).thenReturn(Optional.empty());
 
         NotFoundException ex = assertThrows(NotFoundException.class, () -> runnable.acceptThrows(specialId));
         assertEquals(NotFoundSubject.ACCOUNT, ex.getSubject());
@@ -137,7 +128,11 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
     void authenticateWithCredentialsReturnsOnlyMatchingAccount() {
         List<Account> accounts = new ArrayList<>();
         for (int i = 1; i <= 15; i++) {
-            Account account = createAccount("user%d@gmail.com".formatted(i), "user%d".formatted(i), "password%d".formatted(i));
+            Account account = AccountImpl.builder()
+                    .email("user%d@gmail.com".formatted(i))
+                    .username("user%d".formatted(i))
+                    .passwordHash("password%d".formatted(i))
+                    .build();
             accounts.add(account);
         }
 
@@ -217,15 +212,14 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
     @Test
     void authenticateWithJwtCallsAccountServiceAndReturnsFirst() {
         Algorithm algorithm = Algorithm.HMAC256(ACCESS_SECRET);
-        UUID accountUUID = UUID.randomUUID();
-        Account account = createAccount(accountUUID);
+        Account account = AccountImpl.builder().build();
         String token = JWT.create()
                 .withIssuer("replic-read-server")
                 .withExpiresAt(Instant.now().plusSeconds(60))
-                .withSubject(accountUUID.toString())
+                .withSubject(account.getId().toString())
                 .sign(algorithm);
 
-        when(accountService.getAccounts(null, accountUUID, null, null)).thenReturn(List.of(account));
+        when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
 
         Optional<Account> returned = subject.authenticateWithJwt(token);
 
@@ -237,7 +231,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
     void authenticateWithRefreshTokenFailsForNonexistent() {
         List<AuthToken> tokens = new ArrayList<>();
         for (int i = 0; i < 15; i++) {
-            tokens.add(createToken(null, null, null, null, null));
+            tokens.add(AuthTokenImpl.builder().build());
         }
 
         when(tokenRepo.getAll()).thenReturn(tokens);
@@ -250,7 +244,11 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
     @Test
     void authenticateWithRefreshTokenFailsForType() {
         UUID tokenId = UUID.randomUUID();
-        AuthToken token = createToken(tokenId, null, AuthTokenType.EMAIL_VERIFICATION, null, null);
+        AuthToken token = AuthTokenImpl.builder()
+                .id(tokenId)
+                .type(AuthTokenType.EMAIL_VERIFICATION)
+                .build();
+
         when(tokenRepo.getAll()).thenReturn(List.of(token));
 
         Optional<Account> returned = subject.authenticateWithRefreshToken(tokenId);
@@ -261,7 +259,11 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
     @Test
     void authenticateWithRefreshTokenFailsForExpiration() {
         UUID tokenId = UUID.randomUUID();
-        AuthToken token = createToken(tokenId, Instant.now().minusSeconds(60), AuthTokenType.REFRESH_TOKEN, null, null);
+        AuthToken token = AuthTokenImpl.builder()
+                .id(tokenId)
+                .expirationTimestamp(Instant.now().minusSeconds(60))
+                .type(AuthTokenType.REFRESH_TOKEN)
+                .build();
         when(tokenRepo.getAll()).thenReturn(List.of(token));
 
         Optional<Account> returned = subject.authenticateWithRefreshToken(tokenId);
@@ -272,7 +274,13 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
     @Test
     void authenticateWithRefreshTokenFailsForInvalidation() {
         UUID tokenId = UUID.randomUUID();
-        AuthToken token = createToken(tokenId, Instant.now().plusSeconds(60), AuthTokenType.REFRESH_TOKEN, null, true);
+        AuthToken token = AuthTokenImpl.builder()
+                .id(tokenId)
+                .expirationTimestamp(Instant.now().plusSeconds(60))
+                .type(AuthTokenType.REFRESH_TOKEN)
+                .invalidated(true)
+                .build();
+
         when(tokenRepo.getAll()).thenReturn(List.of(token));
 
         Optional<Account> returned = subject.authenticateWithRefreshToken(tokenId);
@@ -282,12 +290,17 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void authenticateWithRefreshTokenReturnsAccount() {
-        Account account = createAccount(UUID.randomUUID());
-        UUID tokenId = UUID.randomUUID();
-        AuthToken token = createToken(tokenId, Instant.now().plusSeconds(60), AuthTokenType.REFRESH_TOKEN, account, false);
-        when(tokenRepo.getAll()).thenReturn(List.of(token));
+        Account account = AccountImpl.builder().build();
+        AuthToken token = AuthTokenImpl.builder()
+                .expirationTimestamp(Instant.now().plusSeconds(60))
+                .type(AuthTokenType.REFRESH_TOKEN)
+                .accountId(account.getId())
+                .build();
 
-        Optional<Account> returned = subject.authenticateWithRefreshToken(tokenId);
+        when(tokenRepo.getAll()).thenReturn(List.of(token));
+        when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
+
+        Optional<Account> returned = subject.authenticateWithRefreshToken(token.getToken());
 
         assertTrue(returned.isPresent());
         assertEquals(account, returned.get());
@@ -300,16 +313,15 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void createRefreshTokenCallsRepoWithGoodToken() throws DomainException {
-        UUID accountId = UUID.randomUUID();
-        Account account = createAccount(accountId);
+        Account account = AccountImpl.builder().build();
 
-        when(accountService.getAccounts(null, accountId, null, null)).thenReturn(List.of(account));
-        when(tokenRepo.save(any())).thenAnswer(inv -> inv.getArguments()[0]);
+        when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
+        when(tokenRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
 
-        UUID returned = subject.createRefreshToken(accountId);
+        UUID returned = subject.createRefreshToken(account.getId());
 
         ArgumentCaptor<AuthToken> tokenCaptor = ArgumentCaptor.forClass(AuthToken.class);
-        verify(tokenRepo, times(1)).save(tokenCaptor.capture());
+        verify(tokenRepo, times(1)).saveModel(tokenCaptor.capture());
 
         assertEquals(returned, tokenCaptor.getValue().getToken());
         assertEquals(AuthTokenType.REFRESH_TOKEN, tokenCaptor.getValue().getType());
@@ -323,11 +335,11 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void createAccessTokenReturnsValidToken() throws DomainException {
-        UUID accountId = UUID.randomUUID();
-        Account account = createAccount(accountId);
-        when(accountService.getAccounts(null, accountId, null, null)).thenReturn(List.of(account));
+        Account account = AccountImpl.builder().build();
 
-        String token = subject.createAccessToken(accountId);
+        when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
+
+        String token = subject.createAccessToken(account.getId());
 
         Optional<Account> returned = subject.authenticateWithJwt(token);
 
@@ -342,19 +354,18 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void requestEmailVerificationSavesTokenAndSendsEmail() throws DomainException {
-        UUID accountId = UUID.randomUUID();
-        Account account = createAccount(accountId);
+        Account account = AccountImpl.builder().build();
 
-        when(accountService.getAccounts(null, accountId, null, null)).thenReturn(List.of(account));
-        when(tokenRepo.save(any())).thenAnswer(inv -> inv.getArguments()[0]);
+        when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
+        when(tokenRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(emailSender.sendVerificationToken(any(), any(), anyBoolean())).thenReturn(true);
 
-        subject.requestEmailVerification(accountId);
+        subject.requestEmailVerification(account.getId());
 
-        ArgumentCaptor<AuthToken> repoCaptor = ArgumentCaptor.forClass(AuthToken.class);
-        ArgumentCaptor<AuthToken> emailCaptor = ArgumentCaptor.forClass(AuthToken.class);
+        ArgumentCaptor<AuthToken> repoCaptor = ArgumentCaptor.captor();
+        ArgumentCaptor<AuthToken> emailCaptor = ArgumentCaptor.captor();
 
-        verify(tokenRepo, times(1)).save(repoCaptor.capture());
+        verify(tokenRepo, times(1)).saveModel(repoCaptor.capture());
         verify(emailSender, times(1)).sendVerificationToken(any(), emailCaptor.capture(), anyBoolean());
 
         assertEquals(repoCaptor.getValue(), emailCaptor.getValue());
@@ -365,7 +376,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void createAccountThrowsIfNotAllowedOrBypassed() {
-        ServerConfig config = new ServerConfig(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, false, null, Period.of(1, 0, 0));
+        ServerConfig config = new ServerConfigImpl(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, false, null, Period.of(1, 0, 0));
         when(configService.get()).thenReturn(config);
 
         OperationDisabledException ex = assertThrows(OperationDisabledException.class, () -> subject.createAccount("", "", "", 0, false, false, false));
@@ -374,12 +385,12 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void createAccountSavesAccountAndSendsEmailIfRequested() throws DomainException {
-        ServerConfig config = new ServerConfig(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, true, null, Period.of(1, 0, 0));
+        ServerConfig config = new ServerConfigImpl(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, true, null, Period.of(1, 0, 0));
 
         when(configService.get()).thenReturn(config);
-        when(accountRepo.save(any())).thenAnswer(inv -> inv.getArguments()[0]);
+        when(accountRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(encoder.encode("password")).thenReturn("passwordhash");
-        when(accountService.getAccounts(any(), any(), any(), any())).thenReturn(List.of(createAccount(UUID.randomUUID())));
+        when(accountService.getAccountById(any())).thenReturn(Optional.of(AccountImpl.builder().build()));
 
         Account returned1 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, false, false);
         Account returned2 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, true, false);
@@ -397,9 +408,13 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
     @Test
     void createAccountThrowsForNonUniqueEmailOrUsername() {
         when(accountService.getAccounts(null, null, null, null))
-                .thenReturn(List.of(createAccount("email1", "username2", "password3")));
+                .thenReturn(List.of(AccountImpl.builder()
+                        .email("email1")
+                        .username("username2")
+                        .passwordHash("password3")
+                        .build()));
         when(configService.get()).thenReturn(
-                new ServerConfig(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL,
+                new ServerConfigImpl(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL,
                         true, null, Period.of(1, 0, 0))
         );
 
@@ -417,14 +432,19 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         // Premise: We have one admin account in the system
         List<Account> accounts = new ArrayList<>();
         for (int i = 0; i < 15; i++) {
-            accounts.add(createAccount("user%d@gmail.com".formatted(i), "user%d".formatted(i), "password%d".formatted(i)));
+            Account account = AccountImpl.builder()
+                    .email("user%d@gmail.com".formatted(i))
+                    .username("user%d".formatted(i))
+                    .passwordHash("password%d".formatted(i))
+                    .build();
+            accounts.add(account);
         }
-        Account oldAdminAccount = new Account(UUID.randomUUID(), Instant.now(), "admin.old@gmail.com", "old-admin", "old-password-hash", true, AccountState.ACTIVE, 0);
+        Account oldAdminAccount = new AccountImpl(UUID.randomUUID(), Instant.now(), "admin.old@gmail.com", "old-admin", "old-password-hash", true, AccountState.ACTIVE, 0);
         accounts.add(oldAdminAccount);
-        ServerConfig config = new ServerConfig(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, true, null, Period.of(1, 0, 0));
+        ServerConfig config = new ServerConfigImpl(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, true, null, Period.of(1, 0, 0));
 
         when(accountService.getAccounts(null, null, null, null)).thenReturn(accounts);
-        when(accountRepo.save(any())).thenAnswer(inv -> inv.getArguments()[0]);
+        when(accountRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(encoder.encode(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(configService.get()).thenReturn(config);
 
@@ -432,7 +452,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         Account newAdminAccount = subject.ensureSingletonAdmin();
 
         ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
-        verify(accountRepo, times(2)).save(accountCaptor.capture());
+        verify(accountRepo, times(2)).saveModel(accountCaptor.capture());
 
         // First call to accountRepo.save() is making the old admin account non-admin.
         assertEquals(oldAdminAccount.getId(), accountCaptor.getAllValues().getFirst().getId());
@@ -448,8 +468,8 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
     @Test
     void ensureSingletonAdminThrowsForNotUnique() {
         List<Account> accounts = List.of(
-                createAccount("1@gmail.com", "1", "1"),
-                createAccount("2@gmail.com", "2", "2")
+                AccountImpl.builder().email("1@gmail.com").username("1").passwordHash("1").build(),
+                AccountImpl.builder().email("2@gmail.com").username("2").passwordHash("2").build()
         );
 
         when(accountService.getAccounts(null, null, null, null)).thenReturn(accounts);
@@ -475,9 +495,14 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         // Premise: We have one admin account in the system
         List<Account> accounts = new ArrayList<>();
         for (int i = 0; i < 15; i++) {
-            accounts.add(createAccount("user%d@gmail.com".formatted(i), "user%d".formatted(i), "password%d".formatted(i)));
+            Account account = AccountImpl.builder()
+                    .email("user%d@gmail.com".formatted(i))
+                    .username("user%d".formatted(i))
+                    .passwordHash("password%d".formatted(i))
+                    .build();
+            accounts.add(account);
         }
-        Account oldAdminAccount = new Account(UUID.randomUUID(), Instant.now(), "admin.old@gmail.com", "old-admin", "old-password-hash", true, AccountState.ACTIVE, 0);
+        Account oldAdminAccount = new AccountImpl(UUID.randomUUID(), Instant.now(), "admin.old@gmail.com", "old-admin", "old-password-hash", true, AccountState.ACTIVE, 0);
         accounts.add(oldAdminAccount);
 
         when(accountService.getAccounts(null, null, null, null)).thenReturn(accounts);
@@ -486,7 +511,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         subject.ensureSingletonAdmin();
 
         ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
-        verify(accountRepo, times(2)).save(accountCaptor.capture());
+        verify(accountRepo, times(2)).saveModel(accountCaptor.capture());
 
         // First call to accountRepo.save() is to make old admin not admin anymore.
         assertEquals(oldAdminAccount.getId(), accountCaptor.getAllValues().getFirst().getId());
@@ -501,45 +526,45 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void validateEmailWorks() throws DomainException {
-        Account account = createAccount(UUID.randomUUID());
-        UUID expiredTokenToken = UUID.randomUUID();
-        AuthToken expiredToken = new AuthToken(
-                UUID.randomUUID(), Instant.now(), expiredTokenToken,
-                Instant.now().minusSeconds(60), account,
-                AuthTokenType.EMAIL_VERIFICATION, null, false
-        );
+        Account account = AccountImpl.builder().build();
+        AuthToken expiredToken = AuthTokenImpl.builder()
+                .expirationTimestamp(Instant.now().minusSeconds(60))
+                .accountId(account.getId())
+                .type(AuthTokenType.EMAIL_VERIFICATION)
+                .build();
 
-        UUID invalidatedTokenToken = UUID.randomUUID();
-        AuthToken invalidatedToken = new AuthToken(
-                UUID.randomUUID(), Instant.now(), invalidatedTokenToken,
-                Instant.now().plusSeconds(60), account,
-                AuthTokenType.EMAIL_VERIFICATION, null, true
-        );
+        AuthToken invalidatedToken = AuthTokenImpl.builder()
+                .expirationTimestamp(Instant.now().plusSeconds(60))
+                .accountId(account.getId())
+                .type(AuthTokenType.EMAIL_VERIFICATION)
+                .invalidated(true)
+                .build();
 
-        UUID wrongTypeTokenToken = UUID.randomUUID();
-        AuthToken wrongTypeToken = new AuthToken(
-                UUID.randomUUID(), Instant.now(), wrongTypeTokenToken,
-                Instant.now().plusSeconds(60), account,
-                AuthTokenType.REFRESH_TOKEN, null, false
-        );
+        AuthToken wrongTypeToken = AuthTokenImpl.builder()
+                .expirationTimestamp(Instant.now().plusSeconds(60))
+                .accountId(account.getId())
+                .type(AuthTokenType.REFRESH_TOKEN)
+                .invalidated(false)
+                .build();
 
         UUID nonExistingTokenToken = UUID.randomUUID();
 
-        UUID validTokenToken = UUID.randomUUID();
-        AuthToken validToken = new AuthToken(
-                UUID.randomUUID(), Instant.now(), validTokenToken,
-                Instant.now().plusSeconds(60), account,
-                AuthTokenType.EMAIL_VERIFICATION, null, false
-        );
+        AuthToken validToken = AuthTokenImpl.builder()
+                .expirationTimestamp(Instant.now().plusSeconds(60))
+                .accountId(account.getId())
+                .type(AuthTokenType.EMAIL_VERIFICATION)
+                .invalidated(false)
+                .build();
 
         when(tokenRepo.getAll()).thenReturn(List.of(expiredToken, invalidatedToken, wrongTypeToken, validToken));
+        when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
 
-        assertThrows(InvalidTokenException.class, () -> subject.validateEmail(expiredTokenToken));
-        assertThrows(InvalidTokenException.class, () -> subject.validateEmail(invalidatedTokenToken));
-        assertThrows(InvalidTokenException.class, () -> subject.validateEmail(wrongTypeTokenToken));
+        assertThrows(InvalidTokenException.class, () -> subject.validateEmail(expiredToken.getToken()));
+        assertThrows(InvalidTokenException.class, () -> subject.validateEmail(invalidatedToken.getToken()));
+        assertThrows(InvalidTokenException.class, () -> subject.validateEmail(wrongTypeToken.getToken()));
         assertThrows(InvalidTokenException.class, () -> subject.validateEmail(nonExistingTokenToken));
 
-        Account accountForExistingToken = subject.validateEmail(validTokenToken);
+        Account accountForExistingToken = subject.validateEmail(validToken.getToken());
         assertEquals(account, accountForExistingToken);
     }
 

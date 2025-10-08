@@ -1,50 +1,51 @@
 package com.rere.server.domain.model.report;
 
-import com.rere.server.domain.model.account.Account;
-import com.rere.server.domain.model.replic.Replic;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NonNull;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
-public class Report {
+/**
+ * Models a report.
+ *
+ * @param <R> The replic type.
+ */
+public interface Report {
 
     /**
      * The id of the report.
      */
     @NonNull
-    private final UUID id;
+    UUID getId();
 
     /**
      * The creation timestamp of the report.
      */
     @NonNull
-    private final Instant creationTimestamp;
+    Instant getCreationTimestamp();
 
     /**
      * The report for which the report was created.
      */
     @NonNull
-    private final Replic replic;
+    UUID getReplicId();
 
     /**
      * The description of the report.
      */
-    private final String description;
+    String getDescription();
 
     /**
      * The account the report was created by, if it exists.
      */
-    private final Account author;
+    UUID getAuthorId();
 
     /**
      * The state the report currently is in.
      */
     @NonNull
-    private ReportState state;
+    ReportState getState();
+
+    void setState(@NonNull ReportState state);
 
 }

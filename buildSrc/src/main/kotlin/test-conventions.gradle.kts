@@ -13,6 +13,7 @@ dependencies {
     add("testRuntimeOnly", "org.junit.platform:junit-platform-launcher")
     add("testImplementation", lib("mockito"))
     add("testImplementation", lib("mockito.junit"))
+    add("testImplementation", lib("assertj"))
 }
 
 tasks.named<Test>("test") {
