@@ -13,7 +13,7 @@ import java.util.UUID;
  * {@link CrudRepository} for the {@link ServerConfigEntity} table.
  */
 @Component
-public abstract class ServerConfigRepositoryAdapter extends BaseJpaRepositoryAdapter<ServerConfig, ServerConfigEntity> {
+public class ServerConfigRepositoryAdapter extends BaseJpaRepositoryAdapter<ServerConfig, ServerConfigEntity> {
     @Autowired
     protected ServerConfigRepositoryAdapter(CrudRepository<ServerConfigEntity, UUID> delegate, EntityMapper<ServerConfigEntity, ServerConfig> mapper) {
         super(delegate, mapper);

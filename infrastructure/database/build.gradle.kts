@@ -10,4 +10,5 @@ dependencies {
     implementation(libs.starter.data)
     implementation(project(":domain:model"))
     implementation(project(":domain:repository"))
+    implementation(libs.h2)
 }

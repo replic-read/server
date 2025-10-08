@@ -13,7 +13,7 @@ import java.util.UUID;
  * {@link CrudRepository} for the {@link ReportEntity} table.
  */
 @Component
-public abstract class ReportRepositoryAdapter extends BaseJpaRepositoryAdapter<Report, ReportEntity> {
+public class ReportRepositoryAdapter extends BaseJpaRepositoryAdapter<Report, ReportEntity> {
     @Autowired
     protected ReportRepositoryAdapter(CrudRepository<ReportEntity, UUID> delegate, EntityMapper<ReportEntity, Report> mapper) {
         super(delegate, mapper);

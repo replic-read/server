@@ -13,7 +13,7 @@ import java.util.UUID;
  * {@link CrudRepository} for the {@link AuthTokenEntity} table.
  */
 @Component
-public abstract class AuthTokenRepositoryAdapter extends BaseJpaRepositoryAdapter<AuthToken, AuthTokenEntity> {
+public class AuthTokenRepositoryAdapter extends BaseJpaRepositoryAdapter<AuthToken, AuthTokenEntity> {
     @Autowired
     protected AuthTokenRepositoryAdapter(CrudRepository<AuthTokenEntity, UUID> delegate, EntityMapper<AuthTokenEntity, AuthToken> mapper) {
         super(delegate, mapper);

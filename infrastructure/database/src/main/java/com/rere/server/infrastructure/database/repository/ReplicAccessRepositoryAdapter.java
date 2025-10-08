@@ -13,7 +13,7 @@ import java.util.UUID;
  * {@link CrudRepository} for the {@link ReplicAccessEntity} table.
  */
 @Component
-public abstract class ReplicAccessRepositoryAdapter extends BaseJpaRepositoryAdapter<ReplicAccess, ReplicAccessEntity> {
+public class ReplicAccessRepositoryAdapter extends BaseJpaRepositoryAdapter<ReplicAccess, ReplicAccessEntity> {
     @Autowired
     protected ReplicAccessRepositoryAdapter(CrudRepository<ReplicAccessEntity, UUID> delegate, EntityMapper<ReplicAccessEntity, ReplicAccess> mapper) {
         super(delegate, mapper);
