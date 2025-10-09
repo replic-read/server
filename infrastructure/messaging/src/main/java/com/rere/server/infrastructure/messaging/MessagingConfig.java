@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -24,11 +25,11 @@ public class MessagingConfig {
      */
     @Bean
     public JavaMailSender javaMailSender(
-            @Value(("${rere.mail.username}")) String username,
-            @Value(("${rere.mail.password}")) String password,
-            @Value(("${rere.mail.smtpHost}")) String host,
-            @Value(("${rere.mail.smtpPort}")) int port,
-            @Value(("${rere.mail.ssl}")) boolean ssl
+            @Value("${rere.mail.username}") String username,
+            @Value("${rere.mail.password}") String password,
+            @Value("${rere.mail.smtpHost}") String host,
+            @Value("${rere.mail.smtpPort}") int port,
+            @Value("${rere.mail.ssl}") boolean ssl
     ) {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
@@ -42,7 +43,7 @@ public class MessagingConfig {
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", ssl ? "true" : "false");
+        props.put("mail.smtp.ssl.enable", ssl ? "true" : "false");
         props.put("mail.debug", "true");
 
         return mailSender;
@@ -54,7 +55,7 @@ public class MessagingConfig {
     @Bean
     public ITemplateResolver thymeleafTemplateResolver() {
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setPrefix("mail-templates/");
+        templateResolver.setPrefix("templates/");
         templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode("HTML");
         templateResolver.setCharacterEncoding("UTF-8");
@@ -65,9 +66,10 @@ public class MessagingConfig {
      * The message source for localization.
      */
     @Bean
+    @Primary
     public MessageSource emailMessageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasename("mailMessages");
+        messageSource.setBasename("mail_localization");
         return messageSource;
     }
 
