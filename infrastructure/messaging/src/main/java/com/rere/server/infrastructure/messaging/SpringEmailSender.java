@@ -85,7 +85,7 @@ public class SpringEmailSender implements EmailSender {
             helper.setFrom(emailFrom, DISPLAY_FROM);
             helper.setSubject(subject);
         } catch (MessagingException e) {
-            return false;
+            throw new IllegalStateException("An email could not be sent.", e);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("An error occurred when creating an InternetAddress.", e);
         }
