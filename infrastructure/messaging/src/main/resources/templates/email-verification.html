@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+        <title th:text="#{title}"></title>
+    </head>
+    <body style="margin: 0; font-family: sans-serif;">
+        <nav style="background: #ececec; padding: 16px 0 16px 0; width: 100%">
+            <table style="width: 100%; border-collapse: collapse">
+                <tr>
+                    <th>
+                        <img alt="Replic-Read Logo"
+                             height="64px"
+                             src="https://raw.githubusercontent.com/replic-read/server/a3aff8bbcc678035cd68390b416ceb702b5d3f59/images/Logo-light.svg">
+                    </th>
+                </tr>
+            </table>
+        </nav>
+        <table style="width: 100%; border-collapse: collapse">
+            <tr>
+                <th style="margin: 0; padding: 8px 0 0 0;">
+                    <p
+                            style="margin: 0; padding: 0"
+                            th:utext="#{greeting(${username})}"
+                    >Hey <b>$username</b>,</p>
+                </th>
+            </tr>
+            <tr>
+                <td style="text-align: center; margin: 0; padding: 8px 0 0 0;">
+                    <p
+                            style="margin: 0; padding: 0"
+                            th:utext="#{content.pre(${baseUrl})}"
+                    >You just signed up for a Replic-Read account at <b>$baseUrl</b>.<br>To verify your email address,
+                        click the following button:</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align: center; margin: 0; padding: 24px 0 16px 0;">
+                    <a style="padding: 8px 16px 8px 16px; text-decoration: none; background: #086bcc; border-radius: 16px; cursor: default; margin: 0; color:#ffffff"
+                       th:href="${verification_link}"
+                       th:text="#{verify.label}">
+                        Verify address</a>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align: center; margin: 0; padding: 8px 0 0 0;">
+                    <p style="margin: 0; padding: 0"
+                       th:text="#{content.post}"
+                    >or paste the following link in a browser:</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align: center; margin: 0; padding: 24px 0 0 0;">
+                    <div style="background: #ececec; border-radius: 12px; padding: 8px 16px 8px 16px; margin: 0; display: inline-block;">
+                        <p th:text="${verification_link}">$verification_link</p>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align: center; margin: 0; padding: 8px 0 0 0;">
+                    <p
+                            style="font-size: 12px"
+                            th:text="#{footer_info(${target_email})}"
+                    >This email was automatically sent to $target_email</p>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>
