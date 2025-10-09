@@ -7,3 +7,10 @@ plugins {
 repositories {
     mavenCentral()
 }
+
+dependencies {
+    implementation(libs.lombok)
+    implementation(project(":domain:model"))
+    implementation(project(":domain:service"))
+    annotationProcessor(libs.lombok)
+}
