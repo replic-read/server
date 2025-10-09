@@ -8,4 +8,6 @@ dependencies {
     implementation(project(":domain:model"))
     implementation(project(":domain:messaging"))
     implementation(libs.starter.mail)
+    implementation(libs.thymeleaf)
+    implementation(libs.thymeleaf.spring)
 }
