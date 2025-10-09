@@ -1,10 +1,15 @@
 package com.rere.server.infrastructure.messaging;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import org.thymeleaf.templateresolver.ITemplateResolver;
 
 import java.util.Properties;
 
@@ -41,6 +46,40 @@ public class MessagingConfig {
         props.put("mail.debug", "true");
 
         return mailSender;
+    }
+
+    /**
+     * The thymeleaf template resolver.
+     */
+    @Bean
+    public ITemplateResolver thymeleafTemplateResolver() {
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setPrefix("mail-templates/");
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode("HTML");
+        templateResolver.setCharacterEncoding("UTF-8");
+        return templateResolver;
+    }
+
+    /**
+     * The message source for localization.
+     */
+    @Bean
+    public MessageSource emailMessageSource() {
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        messageSource.setBasename("mailMessages");
+        return messageSource;
+    }
+
+    /**
+     * The template engine spring should use.
+     */
+    @Bean
+    public SpringTemplateEngine thymeleafTemplateEngine(ITemplateResolver templateResolver, MessageSource messageSource) {
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+        templateEngine.setTemplateEngineMessageSource(messageSource);
+        return templateEngine;
     }
 
 }
