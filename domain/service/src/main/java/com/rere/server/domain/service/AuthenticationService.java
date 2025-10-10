@@ -77,7 +77,7 @@ public interface AuthenticationService {
      */
     @Nonnull
     Account createAccount(@Nonnull String email, @Nonnull String username, @Nonnull String password,
-                          int profileColor, boolean isAdmin, boolean sendEmail,
+                          int profileColor, boolean isAdmin, boolean isVerified, boolean sendEmail,
                           boolean bypassConfig) throws NotUniqueException, OperationDisabledException;
 
     /**

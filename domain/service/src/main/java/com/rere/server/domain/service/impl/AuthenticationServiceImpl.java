@@ -197,7 +197,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Nonnull
     @Override
-    public Account createAccount(@Nonnull String email, @Nonnull String username, @Nonnull String password, int profileColor, boolean isAdmin, boolean sendEmail, boolean bypassConfig) throws NotUniqueException, OperationDisabledException {
+    public Account createAccount(@Nonnull String email, @Nonnull String username, @Nonnull String password, int profileColor, boolean isAdmin, boolean isVerified, boolean sendEmail, boolean bypassConfig) throws NotUniqueException, OperationDisabledException {
         ServerConfig config = configService.get();
 
         if (!config.isAllowAccountCreation() && !bypassConfig) {
@@ -214,17 +214,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new NotUniqueException(NotUniqueSubject.USERNAME);
         }
 
+        AccountState initialState = isVerified ? AccountState.ACTIVE : AccountState.UNVERIFIED;
+
         Account account = AccountImpl.builder()
                 .email(email)
                 .username(username)
                 .passwordHash(encoder.encode(password))
                 .isAdmin(isAdmin)
-                .accountState(AccountState.UNVERIFIED)
+                .accountState(initialState)
                 .profileColor(profileColor)
                 .build();
         account = accountRepo.saveModel(account);
 
-        if (sendEmail) {
+        if (!isVerified && sendEmail) {
             try {
                 requestEmailVerification(account.getId());
             } catch (NotFoundException e) {
@@ -259,6 +261,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         adminUsername,
                         encoder.encode(adminPassword),
                         0,
+                        true,
                         true,
                         false,
                         true

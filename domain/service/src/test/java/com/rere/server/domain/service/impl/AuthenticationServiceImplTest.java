@@ -379,7 +379,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         ServerConfig config = new ServerConfigImpl(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, false, null, Period.of(1, 0, 0));
         when(configService.get()).thenReturn(config);
 
-        OperationDisabledException ex = assertThrows(OperationDisabledException.class, () -> subject.createAccount("", "", "", 0, false, false, false));
+        OperationDisabledException ex = assertThrows(OperationDisabledException.class, () -> subject.createAccount("", "", "", 0, false, false, false, false));
         assertEquals(OperationDisabledOperation.SIGNUP, ex.getOperation());
     }
 
@@ -394,8 +394,8 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         when(accountService.getByEmail(any())).thenReturn(Optional.empty());
         when(accountService.getByUsername(any())).thenReturn(Optional.empty());
 
-        Account returned1 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, false, false);
-        Account returned2 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, true, false);
+        Account returned1 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, false, false, false);
+        Account returned2 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, false, true, false);
 
         verify(emailSender, times(1)).sendVerificationToken(any(), any(), anyBoolean());
 
@@ -421,11 +421,11 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         );
 
         NotUniqueException ex1 = assertThrows(NotUniqueException.class,
-                () -> subject.createAccount("email1", "username5", "password5", 0, false, false, true));
+                () -> subject.createAccount("email1", "username5", "password5", 0, false, false, false, true));
         assertEquals(NotUniqueSubject.EMAIL, ex1.getSubject());
 
         NotUniqueException ex2 = assertThrows(NotUniqueException.class,
-                () -> subject.createAccount("email5", "username2", "password5", 0, false, false, true));
+                () -> subject.createAccount("email5", "username2", "password5", 0, false, false, false, true));
         assertEquals(NotUniqueSubject.USERNAME, ex2.getSubject());
     }
 
