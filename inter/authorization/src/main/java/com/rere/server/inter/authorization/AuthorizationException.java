@@ -59,4 +59,12 @@ public class AuthorizationException extends RuntimeException {
         return new AuthorizationException(null, 403);
     }
 
+    /**
+     * Created a generic AuthorizationException with status 401.
+     * @return The new exception.
+     */
+    public static AuthorizationException genericUnauthorized() {
+        return new AuthorizationException(null, 401);
+    }
+
 }
