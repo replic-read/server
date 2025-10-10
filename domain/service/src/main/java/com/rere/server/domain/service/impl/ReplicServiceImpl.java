@@ -2,7 +2,6 @@ package com.rere.server.domain.service.impl;
 
 import com.rere.server.domain.io.ReplicFileAccessor;
 import com.rere.server.domain.model.account.Account;
-import com.rere.server.domain.model.config.ReplicLimitConfig;
 import com.rere.server.domain.model.config.ServerConfig;
 import com.rere.server.domain.model.exception.InvalidExpirationException;
 import com.rere.server.domain.model.exception.InvalidPasswordException;
@@ -19,10 +18,11 @@ import com.rere.server.domain.model.replic.ReplicAccess;
 import com.rere.server.domain.model.replic.ReplicBaseData;
 import com.rere.server.domain.model.replic.ReplicFileData;
 import com.rere.server.domain.model.replic.ReplicState;
-import com.rere.server.domain.repository.AccountRepository;
 import com.rere.server.domain.repository.ReplicAccessRepository;
 import com.rere.server.domain.repository.ReplicRepository;
+import com.rere.server.domain.service.AccountService;
 import com.rere.server.domain.service.FileWriterCallback;
+import com.rere.server.domain.service.QuotaService;
 import com.rere.server.domain.service.ReplicService;
 import com.rere.server.domain.service.ServerConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class ReplicServiceImpl implements ReplicService {
 
     private final ReplicRepository replicRepo;
 
-    private final AccountRepository accountRepo;
+    private final AccountService accountService;
 
     private final ReplicAccessRepository accessRepo;
 
@@ -60,14 +60,17 @@ public class ReplicServiceImpl implements ReplicService {
 
     private final PasswordEncoder encoder;
 
+    private final QuotaService quotaService;
+
     @Autowired
-    public ReplicServiceImpl(ReplicRepository replicRepo, AccountRepository accountRepo, ReplicAccessRepository accessRepo, ReplicFileAccessor fileAccessor, ServerConfigService configService, PasswordEncoder encoder) {
+    public ReplicServiceImpl(ReplicRepository replicRepo, AccountService accountService, ReplicAccessRepository accessRepo, ReplicFileAccessor fileAccessor, ServerConfigService configService, PasswordEncoder encoder, QuotaService quotaService) {
         this.replicRepo = replicRepo;
-        this.accountRepo = accountRepo;
+        this.accountService = accountService;
         this.accessRepo = accessRepo;
         this.fileAccessor = fileAccessor;
         this.configService = configService;
         this.encoder = encoder;
+        this.quotaService = quotaService;
     }
 
     private static boolean replicMatchesQuery(ReplicBaseData replic, String query) {
@@ -77,9 +80,10 @@ public class ReplicServiceImpl implements ReplicService {
 
     @Override
     public Replic createReplic(URL originalUrl, MediaMode mediaMode, String description, Instant expiration, String password, Account account, FileWriterCallback fileWriterCallback) throws ReplicQuotaMetException, ReplicContentWriteException, InvalidExpirationException {
+        if (account != null) {
+            quotaService.checkAccountQuota(account.getId());
+        }
         ServerConfig config = configService.get();
-        ReplicLimitConfig limit = config.getLimit();
-        checkAccountQuotaLimit(account, limit);
 
         if (!config.allowsExpiration(LocalDate.now(), expiration, ZoneId.systemDefault())) {
             Instant maximumExpiration = Instant.now().atZone(ZoneId.systemDefault()).plus(config.getMaximumActivePeriod()).toInstant();
@@ -113,36 +117,6 @@ public class ReplicServiceImpl implements ReplicService {
         baseData = replicRepo.saveModel(baseData);
 
         return ReplicImpl.of(fileData, baseData);
-    }
-
-    private void checkAccountQuotaLimit(Account account, ReplicLimitConfig limit) throws ReplicQuotaMetException {
-        if (account != null && limit != null) {
-            Instant periodStart = getCurrentPeriodStart(limit);
-            long userReplicCount = getCreatedReplicCountForUser(account, periodStart);
-            if (userReplicCount == limit.getCount()) {
-                throw new ReplicQuotaMetException(account);
-            }
-        }
-    }
-
-    private Instant getCurrentPeriodStart(ReplicLimitConfig limit) {
-        if (limit == null) {
-            return null;
-        }
-
-        Instant periodStart = limit.getPeriodStart();
-        while (periodStart.plus(limit.getPeriod()).isBefore(Instant.now())) {
-            periodStart = periodStart.plus(limit.getPeriod());
-        }
-
-        return periodStart;
-    }
-
-    private long getCreatedReplicCountForUser(Account account, Instant start) {
-        return replicRepo.getAll().stream()
-                .filter(replic -> replic.getOwnerId() != null && replic.getOwnerId().equals(account.getId()))
-                .filter(access -> access.getCreationTimestamp().isAfter(start))
-                .count();
     }
 
     private Replic populateBaseData(ReplicBaseData baseData) {
@@ -193,7 +167,7 @@ public class ReplicServiceImpl implements ReplicService {
                 .orElseThrow(() -> new NotFoundException(NotFoundSubject.REPLIC, replicId));
 
         Account account = visitorId == null ? null :
-                accountRepo.getById(visitorId)
+                accountService.getAccountById(visitorId)
                         .orElseThrow(() -> NotFoundException.account(visitorId));
 
         ReplicAccess access = ReplicAccessImpl.builder()
