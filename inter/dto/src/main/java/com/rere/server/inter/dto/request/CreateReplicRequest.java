@@ -1,4 +1,4 @@
-package com.rere.server.inter.execution.dto.request;
+package com.rere.server.inter.dto.request;
 
 /**
  * Requests body with information to create a replic.

@@ -1,4 +1,4 @@
-package com.rere.server.inter.execution.dto.response;
+package com.rere.server.inter.dto.response;
 
 /**
  * Response body that contains information about a replic.

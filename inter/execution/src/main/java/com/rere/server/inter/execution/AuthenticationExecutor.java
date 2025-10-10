@@ -1,10 +1,10 @@
 package com.rere.server.inter.execution;
 
-import com.rere.server.inter.execution.dto.request.CreateAccountRequest;
-import com.rere.server.inter.execution.dto.request.CredentialsRequest;
-import com.rere.server.inter.execution.dto.request.RefreshRequest;
-import com.rere.server.inter.execution.dto.request.SubmitEmailVerificationRequest;
-import com.rere.server.inter.execution.dto.response.AccountWithTokensReponse;
+import com.rere.server.inter.dto.request.CreateAccountRequest;
+import com.rere.server.inter.dto.request.CredentialsRequest;
+import com.rere.server.inter.dto.request.RefreshRequest;
+import com.rere.server.inter.dto.request.SubmitEmailVerificationRequest;
+import com.rere.server.inter.dto.response.AccountWithTokensReponse;
 
 /**
  * Executor for authentication matters.

@@ -1,8 +1,8 @@
 package com.rere.server.inter.execution;
 
-import com.rere.server.inter.execution.dto.request.UpdateAccountRequest;
-import com.rere.server.inter.execution.dto.response.AccountResponse;
-import com.rere.server.inter.execution.dto.response.QuotaProgressResponse;
+import com.rere.server.inter.dto.request.UpdateAccountRequest;
+import com.rere.server.inter.dto.response.AccountResponse;
+import com.rere.server.inter.dto.response.QuotaProgressResponse;
 
 /**
  * Request executor for requests for the account of the client.

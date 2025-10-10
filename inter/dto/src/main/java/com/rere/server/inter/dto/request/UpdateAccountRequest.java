@@ -1,4 +1,4 @@
-package com.rere.server.inter.execution.dto.request;
+package com.rere.server.inter.dto.request;
 
 /**
  * Request body with information to update an account.

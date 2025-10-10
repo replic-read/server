@@ -1,4 +1,4 @@
-package com.rere.server.inter.execution.dto.response;
+package com.rere.server.inter.dto.response;
 
 /**
  * Response body with partial information about an account.

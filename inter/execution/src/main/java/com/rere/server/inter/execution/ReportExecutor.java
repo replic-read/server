@@ -1,7 +1,7 @@
 package com.rere.server.inter.execution;
 
-import com.rere.server.inter.execution.dto.request.CreateReportRequest;
-import com.rere.server.inter.execution.dto.response.ReportResponse;
+import com.rere.server.inter.dto.request.CreateReportRequest;
+import com.rere.server.inter.dto.response.ReportResponse;
 
 import java.util.List;
 

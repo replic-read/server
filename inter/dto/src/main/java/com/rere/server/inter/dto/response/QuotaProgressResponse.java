@@ -1,4 +1,4 @@
-package com.rere.server.inter.execution.dto.response;
+package com.rere.server.inter.dto.response;
 
 /**
  * Response body with information about the quota progress of a user.
