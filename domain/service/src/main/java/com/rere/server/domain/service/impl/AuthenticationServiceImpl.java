@@ -204,16 +204,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new OperationDisabledException(OperationDisabledOperation.SIGNUP);
         }
 
-        boolean isEmailUnique = accountService
-                .getAccounts(null, null, null, null)
-                .stream()
-                .filter(account -> account.getEmail().equals(email))
-                .toList().isEmpty();
-        boolean isAccountUnique = accountService
-                .getAccounts(null, null, null, null)
-                .stream()
-                .filter(account -> account.getUsername().equals(username))
-                .toList().isEmpty();
+        boolean isEmailUnique = accountService.getByEmail(email).isEmpty();
+        boolean isAccountUnique = accountService.getByUsername(username).isEmpty();
 
         if (!isEmailUnique) {
             throw new NotUniqueException(NotUniqueSubject.EMAIL);

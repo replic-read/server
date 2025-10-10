@@ -391,6 +391,8 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         when(accountRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(encoder.encode("password")).thenReturn("passwordhash");
         when(accountService.getAccountById(any())).thenReturn(Optional.of(AccountImpl.builder().build()));
+        when(accountService.getByEmail(any())).thenReturn(Optional.empty());
+        when(accountService.getByUsername(any())).thenReturn(Optional.empty());
 
         Account returned1 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, false, false);
         Account returned2 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, true, false);
@@ -407,12 +409,12 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void createAccountThrowsForNonUniqueEmailOrUsername() {
-        when(accountService.getAccounts(null, null, null, null))
-                .thenReturn(List.of(AccountImpl.builder()
-                        .email("email1")
-                        .username("username2")
-                        .passwordHash("password3")
-                        .build()));
+        Account acc = AccountImpl.builder().build();
+        when(accountService.getByEmail("email1")).thenReturn(Optional.of(acc));
+        when(accountService.getByEmail("email5")).thenReturn(Optional.empty());
+        when(accountService.getByUsername("username5")).thenReturn(Optional.empty());
+        when(accountService.getByUsername("username2")).thenReturn(Optional.of(acc));
+
         when(configService.get()).thenReturn(
                 new ServerConfigImpl(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL,
                         true, null, Period.of(1, 0, 0))
@@ -444,6 +446,8 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         ServerConfig config = new ServerConfigImpl(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, true, null, Period.of(1, 0, 0));
 
         when(accountService.getAccounts(null, null, null, null)).thenReturn(accounts);
+        when(accountService.getByEmail(any())).thenReturn(Optional.empty());
+        when(accountService.getByUsername(any())).thenReturn(Optional.empty());
         when(accountRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(encoder.encode(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(configService.get()).thenReturn(config);
