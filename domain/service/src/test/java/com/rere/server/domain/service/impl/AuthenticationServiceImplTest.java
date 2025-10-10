@@ -349,7 +349,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void requestEmailVerificationThrowsForAccountNotFound() {
-        throwsForAccountNotFoundTest(id -> subject.requestEmailVerification(id));
+        throwsForAccountNotFoundTest(id -> subject.requestEmailVerification(id, false));
     }
 
     @Test
@@ -360,7 +360,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         when(tokenRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(emailSender.sendVerificationToken(any(), any(), anyBoolean())).thenReturn(true);
 
-        subject.requestEmailVerification(account.getId());
+        subject.requestEmailVerification(account.getId(), true);
 
         ArgumentCaptor<AuthToken> repoCaptor = ArgumentCaptor.captor();
         ArgumentCaptor<AuthToken> emailCaptor = ArgumentCaptor.captor();

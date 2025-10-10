@@ -228,7 +228,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         if (!isVerified && sendEmail) {
             try {
-                requestEmailVerification(account.getId());
+                requestEmailVerification(account.getId(), true);
             } catch (NotFoundException e) {
                 throw new IllegalStateException(e);
             }
@@ -294,7 +294,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void requestEmailVerification(@Nonnull UUID accountId) throws NotFoundException {
+    public void requestEmailVerification(@Nonnull UUID accountId, boolean html) throws NotFoundException {
         Account account = accountService
                 .getAccountById(accountId)
                 .orElseThrow(() -> new NotFoundException(NotFoundSubject.ACCOUNT, accountId));
@@ -309,7 +309,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         emailToken = tokenRepo.saveModel(emailToken);
 
-        emailSender.sendVerificationToken(account, emailToken, true);
+        emailSender.sendVerificationToken(account, emailToken, html);
     }
 
     @Nonnull

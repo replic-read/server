@@ -94,9 +94,10 @@ public interface AuthenticationService {
     /**
      * Requests a verification message to be sent to the account.
      * @param accountId The id of the account.
+     * @param html Whether to send an html email.
      * @throws NotFoundException If the account was not found.
      */
-    void requestEmailVerification(@Nonnull UUID accountId) throws NotFoundException;
+    void requestEmailVerification(@Nonnull UUID accountId, boolean html) throws NotFoundException;
 
     /**
      * Validates an email based off an email-verification-token.
