@@ -1,6 +1,7 @@
 package com.rere.server.domain.service.impl;
 
 import com.rere.server.domain.model.config.ServerConfig;
+import com.rere.server.domain.model.impl.ReplicLimitConfigImpl;
 import com.rere.server.domain.model.impl.ServerConfigImpl;
 import com.rere.server.domain.repository.ServerConfigRepository;
 import com.rere.server.domain.service.BaseDomainServiceTest;
@@ -10,8 +11,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.Period;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,6 +28,8 @@ class ServerConfigServiceImplTest extends BaseDomainServiceTest {
 
     @Mock
     private ServerConfigRepository configRepo;
+    @Mock
+    private Clock clock;
 
     @InjectMocks
     private ServerConfigServiceImpl subject;
@@ -36,7 +43,66 @@ class ServerConfigServiceImplTest extends BaseDomainServiceTest {
         ArgumentCaptor<ServerConfig> configCaptor = ArgumentCaptor.forClass(ServerConfig.class);
         verify(configRepo, times(1)).saveConfig(configCaptor.capture());
 
-        Assertions.assertEquals(config, configCaptor.getValue());
+        assertEquals(config, configCaptor.getValue());
+    }
+
+    @Test
+    void saveSetsPeriodWhenLimitAdded() {
+        Instant now = Instant.now();
+
+        ServerConfig current = ServerConfigImpl.builder()
+                .limit(null).build();
+
+        when(clock.instant()).thenReturn(now);
+        when(configRepo.getConfig()).thenReturn(Optional.ofNullable(current));
+
+        ServerConfig newConfig = ServerConfigImpl.builder()
+                .limit(ReplicLimitConfigImpl.builder()
+                        .count(10)
+                        .period(Period.of(1, 0, 0))
+                        .build())
+                .build();
+
+        subject.save(newConfig);
+
+        ArgumentCaptor<ServerConfig> configCaptor = ArgumentCaptor.captor();
+
+        verify(configRepo, times(1)).saveConfig(configCaptor.capture());
+
+        assertEquals(now, configCaptor.getValue().getLimit().getPeriodStart());
+        assertEquals(10, configCaptor.getValue().getLimit().getCount());
+        assertEquals(Period.of(1, 0, 0), configCaptor.getValue().getLimit().getPeriod());
+    }
+
+    @Test
+    void saveSetsPeriodWhenLimitChanged() {
+        Instant now = Instant.now();
+
+        ServerConfig current = ServerConfigImpl.builder()
+                .limit(ReplicLimitConfigImpl.builder()
+                        .count(10)
+                        .period(Period.of(1, 0, 0))
+                        .build()).build();
+
+        when(clock.instant()).thenReturn(now);
+        when(configRepo.getConfig()).thenReturn(Optional.ofNullable(current));
+
+        ServerConfig newConfig = ServerConfigImpl.builder()
+                .limit(ReplicLimitConfigImpl.builder()
+                        .count(10)
+                        .period(Period.of(1, 0, 1))
+                        .build())
+                .build();
+
+        subject.save(newConfig);
+
+        ArgumentCaptor<ServerConfig> configCaptor = ArgumentCaptor.captor();
+
+        verify(configRepo, times(1)).saveConfig(configCaptor.capture());
+
+        assertEquals(now, configCaptor.getValue().getLimit().getPeriodStart());
+        assertEquals(10, configCaptor.getValue().getLimit().getCount());
+        assertEquals(Period.of(1, 0, 1), configCaptor.getValue().getLimit().getPeriod());
     }
 
     @Test
@@ -55,7 +121,7 @@ class ServerConfigServiceImplTest extends BaseDomainServiceTest {
 
         ServerConfig returned = subject.get();
 
-        Assertions.assertEquals(config, returned);
+        assertEquals(config, returned);
     }
 
 }
