@@ -3,6 +3,7 @@ package com.rere.server.domain.service;
 import com.rere.server.domain.model.exception.NotFoundException;
 import com.rere.server.domain.model.exception.OperationDisabledException;
 import com.rere.server.domain.model.report.Report;
+import com.rere.server.domain.model.report.ReportState;
 import jakarta.annotation.Nonnull;
 
 import java.util.Comparator;
@@ -35,5 +36,13 @@ public interface ReportService {
     @Nonnull
     Report reportReplic(@Nonnull UUID replicId, UUID accountId, String description) throws
             NotFoundException, OperationDisabledException;
+
+    /**
+     * Updates the state of a report.
+     * @param reportId The id of the report.
+     * @param state The new state of the report.
+     * @throws NotFoundException If the report was not found.
+     */
+    Report updateReportState(UUID reportId, ReportState state) throws NotFoundException;
 
 }

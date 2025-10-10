@@ -21,7 +21,12 @@ public enum NotFoundSubject {
     /**
      * A file of a replic was not found.
      */
-    REPLIC_FILE("replic file");
+    REPLIC_FILE("replic file"),
+
+    /**
+     * A report was not found.
+     */
+    REPORT("report");
 
     private final String name;
 

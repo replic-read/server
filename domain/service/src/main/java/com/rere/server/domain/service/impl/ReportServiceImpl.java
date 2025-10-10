@@ -2,6 +2,7 @@ package com.rere.server.domain.service.impl;
 
 import com.rere.server.domain.model.account.Account;
 import com.rere.server.domain.model.exception.NotFoundException;
+import com.rere.server.domain.model.exception.NotFoundSubject;
 import com.rere.server.domain.model.impl.ReportImpl;
 import com.rere.server.domain.model.replic.Replic;
 import com.rere.server.domain.model.report.Report;
@@ -69,5 +70,15 @@ public class ReportServiceImpl implements ReportService {
                 .state(ReportState.OPEN).build();
 
         return reportRepo.saveModel(report);
+    }
+
+    @Override
+    public Report updateReportState(UUID reportId, ReportState state) throws NotFoundException {
+        return reportRepo.getById(reportId)
+                .map(report -> {
+                    report.setState(state);
+                    return reportRepo.saveModel(report);
+                })
+                .orElseThrow(() -> new NotFoundException(NotFoundSubject.REPORT, reportId));
     }
 }
