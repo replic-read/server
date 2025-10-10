@@ -1,4 +1,4 @@
-package com.rere.server.inter.execution.dto.parameter;
+package com.rere.server.inter.execution.parameter;
 
 import com.rere.server.domain.model.report.Report;
 

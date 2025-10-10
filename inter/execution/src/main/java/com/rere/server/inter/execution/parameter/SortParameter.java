@@ -1,4 +1,4 @@
-package com.rere.server.inter.execution.dto.parameter;
+package com.rere.server.inter.execution.parameter;
 
 import java.util.Comparator;
 
