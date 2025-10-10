@@ -2,6 +2,8 @@ package com.rere.server.domain.service;
 
 import com.rere.server.domain.model.account.Account;
 import com.rere.server.domain.model.account.AccountState;
+import com.rere.server.domain.model.exception.NotFoundException;
+import com.rere.server.domain.model.exception.NotUniqueException;
 import jakarta.annotation.Nonnull;
 
 import java.util.Comparator;
@@ -33,5 +35,32 @@ public interface AccountService {
      */
     @Nonnull
     Optional<Account> getAccountById(@Nonnull UUID accountId);
+
+    /**
+     * Gets a user by email.
+     * @param email The email.
+     * @return The account, or empty.
+     */
+    Optional<Account> getByEmail(String email);
+
+    /**
+     * Gets a user by username.
+     * @param username The username.
+     * @return The account, or empty.
+     */
+    Optional<Account> getByUsername(String username);
+
+    /**
+     * Updates selected values of the account.
+     * @param accountId The id of the account to update.
+     * @param email The new email of the account.
+     * @param username The new username of the account.
+     * @param profileColor The new profile color of the account.
+     * @return The updated account, or empty if the account was not found.
+     * @throws NotUniqueException If email or username were not unique.
+     * @throws NotFoundException If the account was not found.
+     */
+    @Nonnull
+    Account updateAccount(@Nonnull UUID accountId, @Nonnull String email, @Nonnull String username, int profileColor) throws NotUniqueException, NotFoundException;
 
 }

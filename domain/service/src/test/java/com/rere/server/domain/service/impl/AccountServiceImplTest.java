@@ -2,11 +2,15 @@ package com.rere.server.domain.service.impl;
 
 import com.rere.server.domain.model.account.Account;
 import com.rere.server.domain.model.account.AccountState;
+import com.rere.server.domain.model.exception.DomainException;
+import com.rere.server.domain.model.exception.NotFoundException;
+import com.rere.server.domain.model.exception.NotUniqueException;
 import com.rere.server.domain.model.impl.AccountImpl;
 import com.rere.server.domain.repository.AccountRepository;
 import com.rere.server.domain.service.BaseDomainServiceTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -17,7 +21,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -104,7 +115,7 @@ class AccountServiceImplTest extends BaseDomainServiceTest {
         List<Account> filtered2 = subject.getAccounts(null, null, filter2, null);
 
         for (Account account : filtered1) {
-            Assertions.assertTrue(filter1.contains(account.getAccountState()));
+            assertTrue(filter1.contains(account.getAccountState()));
         }
         Assertions.assertEquals(0, filtered2.size());
     }
@@ -126,8 +137,83 @@ class AccountServiceImplTest extends BaseDomainServiceTest {
 
         List<Account> queriedAccounts = subject.getAccounts(null, null, null, query);
         Assertions.assertEquals(2, queriedAccounts.size());
-        Assertions.assertTrue(queriedAccounts.contains(account1));
-        Assertions.assertTrue(queriedAccounts.contains(account2));
+        assertTrue(queriedAccounts.contains(account1));
+        assertTrue(queriedAccounts.contains(account2));
+    }
+
+    @Test
+    void getByEmailWorks() {
+        List<Account> accounts = IntStream
+                .range(0, 10)
+                .mapToObj(i -> AccountImpl.builder().email("user%d@gmail.com".formatted(i)).build())
+                .map(Account.class::cast)
+                .toList();
+
+        when(accountRepo.getAll()).thenReturn(accounts);
+
+        assertTrue(subject.getByEmail("user5@gmail.com").isPresent());
+        assertTrue(subject.getByEmail("user55@gmail.com").isEmpty());
+    }
+
+    @Test
+    void updateAccountThrowsForUnknownAccount() {
+        when(accountRepo.getAll()).thenReturn(List.of());
+
+        assertThrows(NotFoundException.class,
+                () -> subject.updateAccount(UUID.randomUUID(), null, null, 0));
+    }
+
+    @Test
+    void updateAccountThrowsForNotUnique() {
+        UUID id = UUID.randomUUID();
+        List<Account> accounts = List.of(
+                AccountImpl.builder().id(id).build(),
+                AccountImpl.builder().email("email1").username("username1").build(),
+                AccountImpl.builder().email("email2").username("username2").build()
+        );
+        when(accountRepo.getAll()).thenReturn(accounts);
+
+        assertThrows(NotUniqueException.class,
+                () -> subject.updateAccount(id, "email1", null, 0));
+
+        assertThrows(NotUniqueException.class,
+                () -> subject.updateAccount(id, "email3", "username2", 0));
+    }
+
+    @Test
+    void updateAccountUpdatesPropertiesAndState() throws DomainException {
+        UUID id = UUID.randomUUID();
+
+        when(accountRepo.getAll()).thenReturn(List.of(AccountImpl.builder()
+                .id(id)
+                .accountState(AccountState.ACTIVE).build()));
+        when(accountRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
+
+        subject.updateAccount(id, "email1", "username1", 3);
+
+        ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.captor();
+
+        verify(accountRepo, times(1)).saveModel(accountCaptor.capture());
+
+        assertEquals(id, accountCaptor.getValue().getId());
+        assertEquals(3, accountCaptor.getValue().getProfileColor());
+        assertEquals("email1", accountCaptor.getValue().getEmail());
+        assertEquals("username1", accountCaptor.getValue().getUsername());
+        assertEquals(AccountState.UNVERIFIED, accountCaptor.getValue().getAccountState());
+    }
+
+    @Test
+    void getByUsernameWorks() {
+        List<Account> accounts = IntStream
+                .range(0, 10)
+                .mapToObj(i -> AccountImpl.builder().username("user%d".formatted(i)).build())
+                .map(Account.class::cast)
+                .toList();
+
+        when(accountRepo.getAll()).thenReturn(accounts);
+
+        assertTrue(subject.getByUsername("user5").isPresent());
+        assertTrue(subject.getByUsername("user55").isEmpty());
     }
 
 }
