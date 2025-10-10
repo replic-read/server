@@ -197,23 +197,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Nonnull
     @Override
-    public Account createAccount(@Nonnull String email, @Nonnull String username, @Nonnull String password, int profileColor, boolean isAdmin, boolean sendEmail, boolean bypassConfig) throws NotUniqueException, OperationDisabledException {
+    public Account createAccount(@Nonnull String email, @Nonnull String username, @Nonnull String password, int profileColor, boolean isAdmin, boolean isVerified, boolean sendEmail, boolean bypassConfig) throws NotUniqueException, OperationDisabledException {
         ServerConfig config = configService.get();
 
         if (!config.isAllowAccountCreation() && !bypassConfig) {
             throw new OperationDisabledException(OperationDisabledOperation.SIGNUP);
         }
 
-        boolean isEmailUnique = accountService
-                .getAccounts(null, null, null, null)
-                .stream()
-                .filter(account -> account.getEmail().equals(email))
-                .toList().isEmpty();
-        boolean isAccountUnique = accountService
-                .getAccounts(null, null, null, null)
-                .stream()
-                .filter(account -> account.getUsername().equals(username))
-                .toList().isEmpty();
+        boolean isEmailUnique = accountService.getByEmail(email).isEmpty();
+        boolean isAccountUnique = accountService.getByUsername(username).isEmpty();
 
         if (!isEmailUnique) {
             throw new NotUniqueException(NotUniqueSubject.EMAIL);
@@ -222,19 +214,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new NotUniqueException(NotUniqueSubject.USERNAME);
         }
 
+        AccountState initialState = isVerified ? AccountState.ACTIVE : AccountState.UNVERIFIED;
+
         Account account = AccountImpl.builder()
                 .email(email)
                 .username(username)
                 .passwordHash(encoder.encode(password))
                 .isAdmin(isAdmin)
-                .accountState(AccountState.UNVERIFIED)
+                .accountState(initialState)
                 .profileColor(profileColor)
                 .build();
         account = accountRepo.saveModel(account);
 
-        if (sendEmail) {
+        if (!isVerified && sendEmail) {
             try {
-                requestEmailVerification(account.getId());
+                requestEmailVerification(account.getId(), true);
             } catch (NotFoundException e) {
                 throw new IllegalStateException(e);
             }
@@ -268,6 +262,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         encoder.encode(adminPassword),
                         0,
                         true,
+                        true,
                         false,
                         true
                 );
@@ -299,7 +294,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void requestEmailVerification(@Nonnull UUID accountId) throws NotFoundException {
+    public void requestEmailVerification(@Nonnull UUID accountId, boolean html) throws NotFoundException {
         Account account = accountService
                 .getAccountById(accountId)
                 .orElseThrow(() -> new NotFoundException(NotFoundSubject.ACCOUNT, accountId));
@@ -314,7 +309,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         emailToken = tokenRepo.saveModel(emailToken);
 
-        emailSender.sendVerificationToken(account, emailToken, true);
+        emailSender.sendVerificationToken(account, emailToken, html);
     }
 
     @Nonnull

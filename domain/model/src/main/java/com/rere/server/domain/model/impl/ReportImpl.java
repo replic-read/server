@@ -20,7 +20,8 @@ public class ReportImpl implements Report {
     @Builder.Default
     private Instant creationTimestamp = Instant.now();
 
-    private UUID replicId;
+    @Builder.Default
+    private UUID replicId = UUID.randomUUID();
 
     @Builder.Default
     private UUID authorId = null;

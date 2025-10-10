@@ -16,7 +16,12 @@ public enum OperationDisabledOperation {
     /**
      * If reporting a replic is disabled for a specific author.
      */
-    REPORT("report a replic");
+    REPORT("report a replic"),
+
+    /**
+     * If no quota is set up.
+     */
+    QUOTA_INFO("info about quota");
 
     private final String name;
 

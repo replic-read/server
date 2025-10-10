@@ -349,7 +349,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void requestEmailVerificationThrowsForAccountNotFound() {
-        throwsForAccountNotFoundTest(id -> subject.requestEmailVerification(id));
+        throwsForAccountNotFoundTest(id -> subject.requestEmailVerification(id, false));
     }
 
     @Test
@@ -360,7 +360,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         when(tokenRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(emailSender.sendVerificationToken(any(), any(), anyBoolean())).thenReturn(true);
 
-        subject.requestEmailVerification(account.getId());
+        subject.requestEmailVerification(account.getId(), true);
 
         ArgumentCaptor<AuthToken> repoCaptor = ArgumentCaptor.captor();
         ArgumentCaptor<AuthToken> emailCaptor = ArgumentCaptor.captor();
@@ -379,7 +379,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         ServerConfig config = new ServerConfigImpl(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, false, null, Period.of(1, 0, 0));
         when(configService.get()).thenReturn(config);
 
-        OperationDisabledException ex = assertThrows(OperationDisabledException.class, () -> subject.createAccount("", "", "", 0, false, false, false));
+        OperationDisabledException ex = assertThrows(OperationDisabledException.class, () -> subject.createAccount("", "", "", 0, false, false, false, false));
         assertEquals(OperationDisabledOperation.SIGNUP, ex.getOperation());
     }
 
@@ -391,9 +391,11 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         when(accountRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(encoder.encode("password")).thenReturn("passwordhash");
         when(accountService.getAccountById(any())).thenReturn(Optional.of(AccountImpl.builder().build()));
+        when(accountService.getByEmail(any())).thenReturn(Optional.empty());
+        when(accountService.getByUsername(any())).thenReturn(Optional.empty());
 
-        Account returned1 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, false, false);
-        Account returned2 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, true, false);
+        Account returned1 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, false, false, false);
+        Account returned2 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, false, true, false);
 
         verify(emailSender, times(1)).sendVerificationToken(any(), any(), anyBoolean());
 
@@ -407,23 +409,23 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
     @Test
     void createAccountThrowsForNonUniqueEmailOrUsername() {
-        when(accountService.getAccounts(null, null, null, null))
-                .thenReturn(List.of(AccountImpl.builder()
-                        .email("email1")
-                        .username("username2")
-                        .passwordHash("password3")
-                        .build()));
+        Account acc = AccountImpl.builder().build();
+        when(accountService.getByEmail("email1")).thenReturn(Optional.of(acc));
+        when(accountService.getByEmail("email5")).thenReturn(Optional.empty());
+        when(accountService.getByUsername("username5")).thenReturn(Optional.empty());
+        when(accountService.getByUsername("username2")).thenReturn(Optional.of(acc));
+
         when(configService.get()).thenReturn(
                 new ServerConfigImpl(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL,
                         true, null, Period.of(1, 0, 0))
         );
 
         NotUniqueException ex1 = assertThrows(NotUniqueException.class,
-                () -> subject.createAccount("email1", "username5", "password5", 0, false, false, true));
+                () -> subject.createAccount("email1", "username5", "password5", 0, false, false, false, true));
         assertEquals(NotUniqueSubject.EMAIL, ex1.getSubject());
 
         NotUniqueException ex2 = assertThrows(NotUniqueException.class,
-                () -> subject.createAccount("email5", "username2", "password5", 0, false, false, true));
+                () -> subject.createAccount("email5", "username2", "password5", 0, false, false, false, true));
         assertEquals(NotUniqueSubject.USERNAME, ex2.getSubject());
     }
 
@@ -444,6 +446,8 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         ServerConfig config = new ServerConfigImpl(AuthUserGroup.ALL, AuthUserGroup.ALL, AuthUserGroup.ALL, true, null, Period.of(1, 0, 0));
 
         when(accountService.getAccounts(null, null, null, null)).thenReturn(accounts);
+        when(accountService.getByEmail(any())).thenReturn(Optional.empty());
+        when(accountService.getByUsername(any())).thenReturn(Optional.empty());
         when(accountRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(encoder.encode(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(configService.get()).thenReturn(config);

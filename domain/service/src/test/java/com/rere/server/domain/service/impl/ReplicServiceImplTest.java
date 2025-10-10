@@ -2,7 +2,6 @@ package com.rere.server.domain.service.impl;
 
 import com.rere.server.domain.io.ReplicFileAccessor;
 import com.rere.server.domain.model.account.Account;
-import com.rere.server.domain.model.config.ReplicLimitConfig;
 import com.rere.server.domain.model.config.ServerConfig;
 import com.rere.server.domain.model.exception.DomainException;
 import com.rere.server.domain.model.exception.InvalidExpirationException;
@@ -15,7 +14,6 @@ import com.rere.server.domain.model.impl.AccountImpl;
 import com.rere.server.domain.model.impl.ReplicBaseDataImpl;
 import com.rere.server.domain.model.impl.ReplicFileDataImpl;
 import com.rere.server.domain.model.impl.ReplicImpl;
-import com.rere.server.domain.model.impl.ReplicLimitConfigImpl;
 import com.rere.server.domain.model.impl.ServerConfigImpl;
 import com.rere.server.domain.model.replic.MediaMode;
 import com.rere.server.domain.model.replic.Replic;
@@ -23,10 +21,11 @@ import com.rere.server.domain.model.replic.ReplicAccess;
 import com.rere.server.domain.model.replic.ReplicBaseData;
 import com.rere.server.domain.model.replic.ReplicFileData;
 import com.rere.server.domain.model.replic.ReplicState;
-import com.rere.server.domain.repository.AccountRepository;
 import com.rere.server.domain.repository.ReplicAccessRepository;
 import com.rere.server.domain.repository.ReplicRepository;
+import com.rere.server.domain.service.AccountService;
 import com.rere.server.domain.service.BaseDomainServiceTest;
+import com.rere.server.domain.service.QuotaService;
 import com.rere.server.domain.service.ServerConfigService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -53,6 +52,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -75,58 +75,27 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
     @Mock
     private ReplicRepository replicRepo;
     @Mock
-    private ReplicAccessRepository accessRepo;
+    private AccountService accountService;
     @Mock
-    private AccountRepository accountRepo;
+    private ReplicAccessRepository accessRepo;
     @Mock
     private ReplicFileAccessor fileAccessor;
     @Mock
     private ServerConfigService configService;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private QuotaService quotaService;
     @InjectMocks
     private ReplicServiceImpl subject;
 
     @Test
-    void createReplicThrowsForQuotaViolation() {
-        /*
-         * Period start was 12 days ago and lasts 5 days, so it looks like:
-         * | . . . . . | . . . . . / . . !
-         * where '.' is a passed day and '!' is today. '|' is the start of a new period, and '/' is the start of the current period.
-         */
-        Instant now = Instant.now();
-        Instant periodStart = now.minus(12, ChronoUnit.DAYS);
-        ReplicLimitConfig limit = ReplicLimitConfigImpl.builder()
-                .count(3)
-                .periodStart(periodStart)
-                .period(Period.of(0, 0, 5)).build();
-        ServerConfig config = ServerConfigImpl.builder()
-                .limit(limit).build();
-        when(configService.get()).thenReturn(config);
-
+    void createReplicThrowsForQuotaViolation() throws DomainException {
         Account account = AccountImpl.builder().build();
-        Account accountFake = AccountImpl.builder().build();
+        doThrow(new ReplicQuotaMetException(account.getId())).when(quotaService).checkAccountQuota(account.getId());
 
-        // There are three replics in the current period created by 'account'. The last one is a fake to test the filtering.
-        Replic replic1 = ReplicImpl.builder()
-                .ownerId(account.getId())
-                .expirationTimestamp(now.minusSeconds(300)).build();
-        Replic replic2 = ReplicImpl.builder()
-                .ownerId(account.getId())
-                .expirationTimestamp(now.minusSeconds(600)).build();
-        Replic replic3 = ReplicImpl.builder()
-                .ownerId(account.getId())
-                .expirationTimestamp(now.minusSeconds(900)).build();
-        Replic replic4 = ReplicImpl.builder()
-                .ownerId(accountFake.getId())
-                .expirationTimestamp(now.minusSeconds(1200)).build();
-
-        when(replicRepo.getAll()).thenReturn(List.of(replic1, replic2, replic3, replic4));
-
-        ReplicQuotaMetException ex = Assertions.assertThrows(ReplicQuotaMetException.class, () -> {
-            subject.createReplic(URL, MediaMode.ALL, null, null, null, account, file -> false);
-        });
-        Assertions.assertEquals(account, ex.getAccount());
+        ReplicQuotaMetException ex = Assertions.assertThrows(ReplicQuotaMetException.class, () -> subject.createReplic(URL, MediaMode.ALL, null, null, null, account, file -> false));
+        Assertions.assertEquals(account.getId(), ex.getAccountId());
     }
 
     @Test
@@ -352,7 +321,7 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
 
         when(replicRepo.getById(replicExistId)).thenReturn(Optional.of(replic));
         when(replicRepo.getById(replicNoNExistId)).thenReturn(Optional.empty());
-        when(accountRepo.getById(accountNoExistId)).thenReturn(Optional.empty());
+        when(accountService.getAccountById(accountNoExistId)).thenReturn(Optional.empty());
 
         NotFoundException ex1 = Assertions.assertThrows(NotFoundException.class,
                 () -> subject.visitReplic(replicNoNExistId, accountNoExistId));
@@ -395,7 +364,7 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
                 .id(accountId).build();
 
         when(replicRepo.getById(replicId)).thenReturn(Optional.of(replic));
-        when(accountRepo.getById(accountId)).thenReturn(Optional.of(account));
+        when(accountService.getAccountById(accountId)).thenReturn(Optional.of(account));
 
         when(accessRepo.saveModel(any())).thenAnswer(i -> i.getArguments()[0]);
 

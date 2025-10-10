@@ -7,6 +7,7 @@ import com.rere.server.domain.model.impl.ReplicImpl;
 import com.rere.server.domain.model.impl.ReportImpl;
 import com.rere.server.domain.model.replic.Replic;
 import com.rere.server.domain.model.report.Report;
+import com.rere.server.domain.model.report.ReportState;
 import com.rere.server.domain.repository.ReportRepository;
 import com.rere.server.domain.service.AccountService;
 import com.rere.server.domain.service.BaseDomainServiceTest;
@@ -131,6 +132,30 @@ class ReportServiceImplTest extends BaseDomainServiceTest {
         assertEquals(returned, reportCaptor.getValue());
         assertNull(returned.getAuthorId());
         assertEquals("description", returned.getDescription());
+    }
+
+    @Test
+    void updateReportStateThrowsIfNotFound() {
+        when(reportRepo.getById(any())).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class,
+                () -> subject.updateReportState(UUID.randomUUID(), ReportState.OPEN));
+    }
+
+    @Test
+    void updateReportStateUpdatesState() throws DomainException {
+        Report report = ReportImpl.builder().state(ReportState.OPEN).build();
+
+        when(reportRepo.getById(report.getId())).thenReturn(Optional.of(report));
+        when(reportRepo.saveModel(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
+
+        subject.updateReportState(report.getId(), ReportState.CLOSED);
+
+        ArgumentCaptor<Report> reportCaptor = ArgumentCaptor.captor();
+        verify(reportRepo, times(1)).saveModel(reportCaptor.capture());
+
+        assertEquals(report.getId(), reportCaptor.getValue().getId());
+        assertEquals(ReportState.CLOSED, reportCaptor.getValue().getState());
     }
 
 }
