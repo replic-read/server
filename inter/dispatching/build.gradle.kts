@@ -12,5 +12,7 @@ dependencies {
     implementation(libs.lombok)
     implementation(project(":domain:model"))
     implementation(project(":domain:service"))
+    implementation(libs.starter.web)
+
     annotationProcessor(libs.lombok)
 }
