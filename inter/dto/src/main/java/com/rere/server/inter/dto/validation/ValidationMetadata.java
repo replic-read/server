@@ -1,5 +1,8 @@
 package com.rere.server.inter.dto.validation;
 
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -10,6 +13,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
+@Constraint(validatedBy = FieldTypeValidator.class)
 public @interface ValidationMetadata {
 
     /**
@@ -24,5 +28,15 @@ public @interface ValidationMetadata {
      * @return Whether null values are allowed.
      */
     boolean required() default true;
+
+    /*
+     * Unused properties, required by the FieldTypeValidator.class.
+     */
+
+    String message() default "";
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
 
 }
