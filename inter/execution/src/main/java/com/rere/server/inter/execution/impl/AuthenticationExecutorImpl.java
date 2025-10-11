@@ -20,7 +20,7 @@ import com.rere.server.inter.dto.request.SubmitEmailVerificationRequest;
 import com.rere.server.inter.dto.response.AccountWithTokensReponse;
 import com.rere.server.inter.execution.AbstractExecutor;
 import com.rere.server.inter.execution.AuthenticationExecutor;
-import com.rere.server.inter.execution.error.HttpErrorResponseException;
+import com.rere.server.inter.execution.HttpErrorResponseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

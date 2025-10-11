@@ -13,7 +13,7 @@ import com.rere.server.inter.dto.request.CredentialsRequest;
 import com.rere.server.inter.dto.request.RefreshRequest;
 import com.rere.server.inter.dto.request.SubmitEmailVerificationRequest;
 import com.rere.server.inter.dto.response.AccountWithTokensReponse;
-import com.rere.server.inter.execution.error.HttpErrorResponseException;
+import com.rere.server.inter.execution.HttpErrorResponseException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 

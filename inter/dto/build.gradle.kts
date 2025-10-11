@@ -11,6 +11,6 @@ repositories {
 dependencies {
     implementation(libs.lombok)
     implementation(libs.starter.validation)
-
+    implementation(project(":domain:model"))
     annotationProcessor(libs.lombok)
 }

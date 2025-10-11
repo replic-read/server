@@ -1,7 +1,7 @@
-package com.rere.server.inter.execution.error.domain;
+package com.rere.server.inter.dto.error.domain;
 
-import com.rere.server.inter.execution.error.ErrorResponseInfo;
-import com.rere.server.inter.execution.error.ErrorType;
+import com.rere.server.inter.dto.error.ErrorResponseInfo;
+import com.rere.server.inter.dto.error.ErrorType;
 import lombok.Getter;
 
 /**

@@ -21,8 +21,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.Period;
 
-import static com.rere.server.inter.execution.mapper.EnumMapper.mapToEnum;
-import static com.rere.server.inter.execution.mapper.EnumMapper.mapToString;
+import static com.rere.server.inter.dto.mapper.EnumMapper.mapToEnum;
+import static com.rere.server.inter.dto.mapper.EnumMapper.mapToString;
 
 @Component
 public class ServerConfigExecutorImpl extends AbstractExecutor implements ServerConfigExecutor {

@@ -1,4 +1,4 @@
-package com.rere.server.inter.execution.error;
+package com.rere.server.inter.execution;
 
 import com.rere.server.domain.model.exception.DomainException;
 import com.rere.server.domain.model.exception.InvalidExpirationException;
@@ -9,6 +9,7 @@ import com.rere.server.domain.model.exception.NotUniqueException;
 import com.rere.server.domain.model.exception.OperationDisabledException;
 import com.rere.server.domain.model.exception.ReplicContentWriteException;
 import com.rere.server.domain.model.exception.ReplicQuotaMetException;
+import com.rere.server.inter.dto.error.ErrorResponseInfo;
 import lombok.Getter;
 import org.springframework.lang.Nullable;
 

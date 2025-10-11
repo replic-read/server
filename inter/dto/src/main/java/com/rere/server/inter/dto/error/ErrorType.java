@@ -1,4 +1,4 @@
-package com.rere.server.inter.execution.error;
+package com.rere.server.inter.dto.error;
 
 /**
  * Models different types of errors that can occur.

@@ -1,4 +1,4 @@
-package com.rere.server.inter.execution.error;
+package com.rere.server.inter.dto.error;
 
 import com.rere.server.domain.model.exception.DomainException;
 import com.rere.server.domain.model.exception.InvalidExpirationException;
@@ -6,8 +6,8 @@ import com.rere.server.domain.model.exception.InvalidTokenException;
 import com.rere.server.domain.model.exception.NotUniqueException;
 import com.rere.server.domain.model.exception.OperationDisabledException;
 import com.rere.server.domain.model.exception.ReplicQuotaMetException;
-import com.rere.server.inter.execution.error.domain.MessageBasedInfo;
-import com.rere.server.inter.execution.error.domain.NotUniqueInfo;
+import com.rere.server.inter.dto.error.domain.MessageBasedInfo;
+import com.rere.server.inter.dto.error.domain.NotUniqueInfo;
 import lombok.Getter;
 
 import java.io.Serializable;

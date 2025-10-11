@@ -11,7 +11,7 @@ import com.rere.server.domain.model.impl.AccountImpl;
 import com.rere.server.inter.dto.request.UpdateAccountRequest;
 import com.rere.server.inter.dto.response.AccountResponse;
 import com.rere.server.inter.dto.response.QuotaProgressResponse;
-import com.rere.server.inter.execution.error.HttpErrorResponseException;
+import com.rere.server.inter.execution.HttpErrorResponseException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 
