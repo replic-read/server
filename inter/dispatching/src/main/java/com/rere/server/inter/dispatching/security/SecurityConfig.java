@@ -1,0 +1,134 @@
+package com.rere.server.inter.dispatching.security;
+
+import com.rere.server.domain.service.AccountService;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.Collection;
+import java.util.Collections;
+
+/**
+ * Security configuration.
+ */
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    /**
+     * Endpoints that <b>may</b> not require authentication, depending on the config.
+     * <br>
+     * If they do, we check in by manual authorization.
+     */
+    private static final Endpoint[] UNAUTHENTICATED_ENDPOINTS = {
+            new Endpoint("/accounts/partial/", HttpMethod.GET),
+            new Endpoint("/replics/", HttpMethod.GET),
+            new Endpoint("/replics/", HttpMethod.POST),
+            new Endpoint("/reports/", HttpMethod.POST),
+            new Endpoint("/server-config/", HttpMethod.GET)
+    };
+    private final AccessTokenFilter accessTokenFilter;
+
+    @Autowired
+    public SecurityConfig(AccessTokenFilter accessTokenFilter) {
+        this.accessTokenFilter = accessTokenFilter;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider provider) throws Exception {
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(config -> {
+                            config
+                                    .requestMatchers("/**").permitAll();
+                            //        .requestMatchers(HttpMethod.GET, "/auth/request-email-verification/")
+                            //        .authenticated()
+                            //        .requestMatchers("/auth/**")
+                            //        .permitAll();
+
+                            //for (Endpoint endpoint : UNAUTHENTICATED_ENDPOINTS) {
+                            //    config
+                            //            .requestMatchers(endpoint.method(), endpoint.endpoint())
+                            //            .permitAll();
+                            //}
+                        }
+                )
+                .sessionManagement(context -> context
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(provider)
+                .addFilterBefore(accessTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
+
+    /**
+     * Provides the user details service that delegates to our own account service.
+     */
+    @Bean
+    public UserDetailsService userDetailsService(AccountService accountService) {
+        return email -> accountService
+                .getAccounts(null, null, null, null)
+                .stream()
+                .filter(account -> account.getEmail().equals(email))
+                .findFirst()
+                .map(account -> new UserDetailsImpl(account.getPasswordHash(), account.getEmail()))
+                .orElseThrow(() -> new UsernameNotFoundException("Did not find a user with email '" + email + "'"));
+    }
+
+    /**
+     * Creates an AuthenticationProvider.
+     */
+    @Bean
+    public AuthenticationProvider authenticationProvider(PasswordEncoder encoder, UserDetailsService service) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(service);
+        provider.setPasswordEncoder(encoder);
+        return provider;
+    }
+
+    /**
+     * Simple implementation of the UserDetails interface.
+     */
+    @Getter
+    @AllArgsConstructor
+    private static class UserDetailsImpl implements UserDetails {
+
+        /**
+         * The authorities.
+         */
+        private final Collection<? extends GrantedAuthority> authorities = Collections.emptySet();
+
+        /**
+         * The encrypted password.
+         */
+        private final String password;
+
+        /**
+         * The username.
+         */
+        private final String username;
+    }
+
+    /**
+     * A type-static 2-tuple because arrays can't be generic.
+     * @param endpoint The endpoint value.
+     * @param method The method value.
+     */
+    private record Endpoint(String endpoint, HttpMethod method) {
+    }
+
+}

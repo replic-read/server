@@ -11,6 +11,7 @@ repositories {
 dependencies {
     implementation(libs.lombok)
     implementation(libs.starter.web)
+    implementation(libs.starter.security)
     implementation(libs.springdoc.starter)
     implementation(project(":domain:model"))
     implementation(project(":domain:service"))
