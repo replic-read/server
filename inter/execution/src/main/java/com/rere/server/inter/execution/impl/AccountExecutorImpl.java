@@ -20,12 +20,14 @@ import com.rere.server.inter.execution.AbstractExecutor;
 import com.rere.server.inter.execution.AccountExecutor;
 import com.rere.server.inter.execution.HttpErrorResponseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@Primary
 @Component
 public class AccountExecutorImpl extends AbstractExecutor implements AccountExecutor<AccountSortParameter, AccountState, SortDirectionParameter, UUID> {
     @Autowired

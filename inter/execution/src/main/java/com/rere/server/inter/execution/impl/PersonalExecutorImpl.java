@@ -18,8 +18,10 @@ import com.rere.server.inter.execution.AbstractExecutor;
 import com.rere.server.inter.execution.HttpErrorResponseException;
 import com.rere.server.inter.execution.PersonalExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
+@Primary
 @Component
 public class PersonalExecutorImpl extends AbstractExecutor implements PersonalExecutor {
     @Autowired

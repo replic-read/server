@@ -12,8 +12,10 @@ import com.rere.server.inter.execution.AdminPanelExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
+@Primary
 @Component
 public class AdminPanelExecutorImpl extends AbstractExecutor implements AdminPanelExecutor {
 

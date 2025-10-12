@@ -17,6 +17,7 @@ import com.rere.server.inter.dto.response.ServerConfigResponse;
 import com.rere.server.inter.execution.AbstractExecutor;
 import com.rere.server.inter.execution.ServerConfigExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.time.Period;
@@ -24,6 +25,7 @@ import java.time.Period;
 import static com.rere.server.inter.dto.mapper.EnumMapper.mapToEnum;
 import static com.rere.server.inter.dto.mapper.EnumMapper.mapToString;
 
+@Primary
 @Component
 public class ServerConfigExecutorImpl extends AbstractExecutor implements ServerConfigExecutor {
     @Autowired
