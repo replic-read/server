@@ -91,7 +91,7 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
         try {
             URI.create(value.toString()).toURL();
             return true;
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | IllegalArgumentException e) {
             return false;
         }
     }
