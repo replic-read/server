@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.convention.java)
     alias(libs.plugins.convention.test)
+    alias(libs.plugins.convention.spring)
+    alias(libs.plugins.spring.boot)
     alias(libs.plugins.sonarqube)
 }
 
@@ -17,6 +19,12 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.starter)
-    testImplementation(libs.starter.test)
+    // Required for detecting the controllers.
+    implementation(project(":inter:execution"))
+
+    // Required because no other module set a dependency on infrastructure.
+    // Without this, we don't scan the components.
+    implementation(project(":infrastructure:database"))
+    implementation(project(":infrastructure:io"))
+    implementation(project(":infrastructure:messaging"))
 }
