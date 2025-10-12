@@ -4,6 +4,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 /**
  * Models an error info that occurred because a field did not match a specific pattern.
  */
@@ -22,7 +24,7 @@ public class PatternErrorResponse extends ValidationErrorResponse {
      * @param pattern The expected pattern.
      * @param value The value that did not match the pattern.
      */
-    public PatternErrorResponse(String pattern, Object value) {
+    public PatternErrorResponse(String pattern, Serializable value) {
         super(ValidationErrorType.PATTERN, value);
         this.pattern = pattern;
     }

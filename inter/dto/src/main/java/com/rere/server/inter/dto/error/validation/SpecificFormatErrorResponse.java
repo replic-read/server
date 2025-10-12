@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 /**
@@ -25,7 +26,7 @@ public final class SpecificFormatErrorResponse extends ValidationErrorResponse {
      * @param value The value.
      * @param format The specific format.
      */
-    public SpecificFormatErrorResponse(Object value, SpecificFormat format) {
+    public SpecificFormatErrorResponse(Serializable value, SpecificFormat format) {
         super(ValidationErrorType.PATTERN, value);
         this.format = format.name().toLowerCase(Locale.ROOT);
     }

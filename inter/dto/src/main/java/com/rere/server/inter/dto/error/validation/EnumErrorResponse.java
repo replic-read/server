@@ -4,6 +4,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 /**
  * Models an error info that occurred because a field did not match a specific pattern.
  */
@@ -22,7 +24,7 @@ public class EnumErrorResponse extends ValidationErrorResponse {
      * @param allowedValues The allowed values.
      * @param value The actual value.
      */
-    public EnumErrorResponse(String[] allowedValues, Object value) {
+    public EnumErrorResponse(String[] allowedValues, Serializable value) {
         super(ValidationErrorType.ENUM, value);
         this.allowedValues = allowedValues.clone();
     }

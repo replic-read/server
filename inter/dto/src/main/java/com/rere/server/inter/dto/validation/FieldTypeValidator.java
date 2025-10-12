@@ -9,6 +9,7 @@ import com.rere.server.inter.dto.error.validation.SpecificFormatErrorResponse;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.time.Period;
@@ -59,7 +60,7 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
      * @param value The value.
      * @return The error response, or null.
      */
-    private static ErrorResponseInfo validateSpecificFormat(SpecificFormat format, Object value) {
+    private static ErrorResponseInfo validateSpecificFormat(SpecificFormat format, Serializable value) {
         return switch (format) {
             case SpecificFormat.URL -> validateUrl(value) ? null : new SpecificFormatErrorResponse(value, format);
             case SpecificFormat.JAVA_PERIOD ->
@@ -103,10 +104,15 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
     }
 
     @Override
-    public boolean isValid(Object value, ConstraintValidatorContext context) {
-        if ((!metadata.required() && value == null) || !metadata.doValidate()) { // Not required means we allow null values.
+    public boolean isValid(Object object, ConstraintValidatorContext context) {
+        if ((!metadata.required() && object == null) || !metadata.doValidate()) { // Not required means we allow null values.
             return true;
         }
+
+        if (!(object instanceof Serializable || object == null)) {
+            throw new IllegalArgumentException("FieldTypeValidator can only validate serializable fields.");
+        }
+        Serializable value = (Serializable) object;
 
         Set<ErrorResponseInfo> errorInfos = new HashSet<>();
 
