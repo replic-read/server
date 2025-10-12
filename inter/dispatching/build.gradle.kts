@@ -10,11 +10,12 @@ repositories {
 
 dependencies {
     implementation(libs.lombok)
+    implementation(libs.starter.web)
+    implementation(libs.springdoc.starter)
     implementation(project(":domain:model"))
     implementation(project(":domain:service"))
     implementation(project(":inter:execution"))
     implementation(project(":inter:dto"))
-    implementation(libs.starter.web)
 
     annotationProcessor(libs.lombok)
 }

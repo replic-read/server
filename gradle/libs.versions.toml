@@ -1,5 +1,6 @@
 [versions]
 spring_starter = "3.5.6"
+springdoc = "3.0.0-M1"
 lombok = "1.18.36"
 mockito = "5.20.0"
 jwt = "4.5.0"
@@ -17,6 +18,7 @@ starter-data = { group = "org.springframework.boot", name = "spring-boot-starter
 starter-mail = { group = "org.springframework.boot", name = "spring-boot-starter-mail", version.ref = "spring_starter" }
 starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web", version.ref = "spring_starter" }
 starter-validation = { group = "org.springframework.boot", name = "spring-boot-starter-validation", version.ref = "spring_starter" }
+springdoc-starter = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 thymeleaf-spring = { group = "org.thymeleaf", name = "thymeleaf-spring5", version.ref = "thymeleaf" }
 thymeleaf = { group = "org.thymeleaf", name = "thymeleaf", version.ref = "thymeleaf" }
 lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
