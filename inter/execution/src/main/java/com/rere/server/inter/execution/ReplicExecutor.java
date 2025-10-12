@@ -3,14 +3,13 @@ package com.rere.server.inter.execution;
 import com.rere.server.inter.dto.request.CreateReplicRequest;
 import com.rere.server.inter.dto.response.ReplicResponse;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
 /**
  * Executor for the replic class.
  */
-public interface ReplicExecutor<RS, RSP, D, I> {
+public interface ReplicExecutor<RS, RSP, D, I, C> {
 
     /**
      * Executor for GET /replics/.
@@ -31,7 +30,7 @@ public interface ReplicExecutor<RS, RSP, D, I> {
      * @param contentStream The multipart file content.
      * @return The response body.
      */
-    ReplicResponse createReplic(CreateReplicRequest request, InputStream contentStream);
+    ReplicResponse createReplic(CreateReplicRequest request, C contentStream);
 
     /**
      * Executor for GET /replics/{id}/content/
