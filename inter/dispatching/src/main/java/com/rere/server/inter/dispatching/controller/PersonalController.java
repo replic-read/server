@@ -1,6 +1,6 @@
-package com.rere.server.infra.dispatching.controller;
+package com.rere.server.inter.dispatching.controller;
 
-import com.rere.server.infra.dispatching.documentation.endpoint.EndpointMetadata;
+import com.rere.server.inter.dispatching.documentation.endpoint.EndpointMetadata;
 import com.rere.server.inter.dto.request.UpdateAccountRequest;
 import com.rere.server.inter.dto.response.AccountResponse;
 import com.rere.server.inter.dto.response.QuotaProgressResponse;
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.ACCOUNT_UNIQUE;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.BAD_AUTHENTICATION;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
-import static com.rere.server.infra.dispatching.documentation.endpoint.AuthorizationType.LOGGED_IN;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.ACCOUNT_UNIQUE;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.BAD_AUTHENTICATION;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
+import static com.rere.server.inter.dispatching.documentation.endpoint.AuthorizationType.LOGGED_IN;
 
 /**
  * The web-controller for personal matters.

@@ -1,4 +1,4 @@
-package com.rere.server.infra.dispatching.documentation.endpoint;
+package com.rere.server.inter.dispatching.documentation.endpoint;
 
 import com.rere.server.inter.dto.response.AccountWithTokensResponse;
 import lombok.Getter;

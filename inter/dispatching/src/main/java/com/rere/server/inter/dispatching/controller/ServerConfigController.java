@@ -1,6 +1,6 @@
-package com.rere.server.infra.dispatching.controller;
+package com.rere.server.inter.dispatching.controller;
 
-import com.rere.server.infra.dispatching.documentation.endpoint.EndpointMetadata;
+import com.rere.server.inter.dispatching.documentation.endpoint.EndpointMetadata;
 import com.rere.server.inter.dto.request.ServerConfigRequest;
 import com.rere.server.inter.dto.response.ServerConfigResponse;
 import com.rere.server.inter.execution.ServerConfigExecutor;
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.NO_PERMISSION_NO_EXIST;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
-import static com.rere.server.infra.dispatching.documentation.endpoint.AuthorizationType.ADMIN;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.NO_PERMISSION_NO_EXIST;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
+import static com.rere.server.inter.dispatching.documentation.endpoint.AuthorizationType.ADMIN;
 
 /**
  * The web-controller for server-config matters.

@@ -1,8 +1,8 @@
-package com.rere.server.infra.dispatching.controller;
+package com.rere.server.inter.dispatching.controller;
 
 import com.rere.server.domain.model.account.AccountState;
-import com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType;
-import com.rere.server.infra.dispatching.documentation.endpoint.EndpointMetadata;
+import com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType;
+import com.rere.server.inter.dispatching.documentation.endpoint.EndpointMetadata;
 import com.rere.server.inter.dto.parameter.AccountSortParameter;
 import com.rere.server.inter.dto.parameter.SortDirectionParameter;
 import com.rere.server.inter.dto.request.CreateAccountRequest;
@@ -27,11 +27,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.ACCOUNT_UNIQUE;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.BAD_AUTHENTICATION;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.NO_PERMISSION_NO_EXIST;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
-import static com.rere.server.infra.dispatching.documentation.endpoint.AuthorizationType.ADMIN;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.ACCOUNT_UNIQUE;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.BAD_AUTHENTICATION;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.NO_PERMISSION_NO_EXIST;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
+import static com.rere.server.inter.dispatching.documentation.endpoint.AuthorizationType.ADMIN;
 import static com.rere.server.inter.dto.mapper.EnumMapper.mapToEnum;
 import static com.rere.server.inter.dto.validation.FieldType.ACCOUNT_FILTER_STATE;
 import static com.rere.server.inter.dto.validation.FieldType.ACCOUNT_ID;

@@ -1,7 +1,7 @@
-package com.rere.server.infra.dispatching.controller;
+package com.rere.server.inter.dispatching.controller;
 
 import com.rere.server.domain.model.replic.ReplicState;
-import com.rere.server.infra.dispatching.documentation.endpoint.EndpointMetadata;
+import com.rere.server.inter.dispatching.documentation.endpoint.EndpointMetadata;
 import com.rere.server.inter.dto.error.domain.MessageBasedInfo;
 import com.rere.server.inter.dto.parameter.ReplicSortParameter;
 import com.rere.server.inter.dto.parameter.SortDirectionParameter;
@@ -31,13 +31,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.BAD_AUTHENTICATION;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.CREATE_REPLIC_BAD_EXPIRATION;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.CREATE_REPLIC_QUOTA_REACHED;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.NO_PERMISSION_NO_EXIST;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
-import static com.rere.server.infra.dispatching.documentation.endpoint.AuthorizationType.CONFIG_SPECIFIC;
-import static com.rere.server.infra.dispatching.documentation.endpoint.AuthorizationType.REPLIC_STATUS_UPDATE;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.BAD_AUTHENTICATION;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.CREATE_REPLIC_BAD_EXPIRATION;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.CREATE_REPLIC_QUOTA_REACHED;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.NO_PERMISSION_NO_EXIST;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
+import static com.rere.server.inter.dispatching.documentation.endpoint.AuthorizationType.CONFIG_SPECIFIC;
+import static com.rere.server.inter.dispatching.documentation.endpoint.AuthorizationType.REPLIC_STATUS_UPDATE;
 import static com.rere.server.inter.dto.mapper.EnumMapper.mapToEnum;
 import static com.rere.server.inter.dto.validation.FieldType.FILTER_QUERY;
 import static com.rere.server.inter.dto.validation.FieldType.REPLIC_FILTER_STATE;

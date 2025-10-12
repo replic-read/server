@@ -1,7 +1,7 @@
-package com.rere.server.infra.dispatching.controller;
+package com.rere.server.inter.dispatching.controller;
 
 import com.rere.server.domain.model.report.ReportState;
-import com.rere.server.infra.dispatching.documentation.endpoint.EndpointMetadata;
+import com.rere.server.inter.dispatching.documentation.endpoint.EndpointMetadata;
 import com.rere.server.inter.dto.parameter.ReportSortParameter;
 import com.rere.server.inter.dto.parameter.SortDirectionParameter;
 import com.rere.server.inter.dto.request.CreateReportRequest;
@@ -24,11 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.BAD_AUTHENTICATION;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.NO_PERMISSION_NO_EXIST;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
-import static com.rere.server.infra.dispatching.documentation.endpoint.AuthorizationType.ADMIN;
-import static com.rere.server.infra.dispatching.documentation.endpoint.AuthorizationType.CONFIG_SPECIFIC;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.BAD_AUTHENTICATION;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.NO_PERMISSION_NO_EXIST;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
+import static com.rere.server.inter.dispatching.documentation.endpoint.AuthorizationType.ADMIN;
+import static com.rere.server.inter.dispatching.documentation.endpoint.AuthorizationType.CONFIG_SPECIFIC;
 import static com.rere.server.inter.dto.mapper.EnumMapper.mapToEnum;
 import static com.rere.server.inter.dto.validation.FieldType.FILTER_QUERY;
 import static com.rere.server.inter.dto.validation.FieldType.REPLIC_ID;

@@ -1,6 +1,6 @@
-package com.rere.server.infra.dispatching.controller;
+package com.rere.server.inter.dispatching.controller;
 
-import com.rere.server.infra.dispatching.documentation.endpoint.EndpointMetadata;
+import com.rere.server.inter.dispatching.documentation.endpoint.EndpointMetadata;
 import com.rere.server.inter.dto.request.CreateAccountRequest;
 import com.rere.server.inter.dto.request.CredentialsRequest;
 import com.rere.server.inter.dto.request.RefreshRequest;
@@ -20,17 +20,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.ACCOUNT_UNIQUE;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.BAD_AUTHENTICATION;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.LOGIN_MISSING_IDENTIFICATION;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.REQUEST_EMAIL_TOKEN_ALREADY_VERIFIED;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.REQUEST_EMAIL_TOKEN_SUCCESS;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.SIGNUP_ACCOUNT_CREATED;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.SIGNUP_ACCOUNT_CREATED_EMAIL_SENT;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.SIGNUP_DISABLED;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.SUBMIT_EMAIL_TOKEN_BAD_TOKEN;
-import static com.rere.server.infra.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
-import static com.rere.server.infra.dispatching.documentation.endpoint.AuthorizationType.LOGGED_IN;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.ACCOUNT_UNIQUE;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.BAD_AUTHENTICATION;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.LOGIN_MISSING_IDENTIFICATION;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.REQUEST_EMAIL_TOKEN_ALREADY_VERIFIED;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.REQUEST_EMAIL_TOKEN_SUCCESS;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.SIGNUP_ACCOUNT_CREATED;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.SIGNUP_ACCOUNT_CREATED_EMAIL_SENT;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.SIGNUP_DISABLED;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.SUBMIT_EMAIL_TOKEN_BAD_TOKEN;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
+import static com.rere.server.inter.dispatching.documentation.endpoint.AuthorizationType.LOGGED_IN;
 import static com.rere.server.inter.dto.validation.FieldType.HTML_EMAIL;
 
 /**
