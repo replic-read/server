@@ -29,6 +29,12 @@ public @interface ValidationMetadata {
      */
     boolean required() default true;
 
+    /**
+     * Whether the value should be validated.
+     * @return Whether the value should be validated.
+     */
+    boolean doValidate() default true;
+
     /*
      * Unused properties, required by the FieldTypeValidator.class.
      */

@@ -104,7 +104,7 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
 
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
-        if (!metadata.required() && value == null) { // Not required means we allow null values.
+        if ((!metadata.required() && value == null) || !metadata.doValidate()) { // Not required means we allow null values.
             return true;
         }
 
