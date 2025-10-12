@@ -14,6 +14,8 @@ import java.net.URI;
 import java.time.Period;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Constraint-validator that takes the annotation-metadata provided by {@link ValidationMetadata} annotation and does individual validating.
@@ -69,8 +71,7 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
 
     private static boolean validatePositiveInteger(Object value) {
         try {
-            Integer.valueOf(value.toString());
-            return true;
+            return Integer.parseInt(value.toString()) >= 0;
         } catch (NumberFormatException e) {
             return false;
         }
@@ -107,28 +108,31 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
             return true;
         }
 
-        ErrorResponseInfo errorInfo = null;
+        Set<ErrorResponseInfo> errorInfos = new HashSet<>();
 
         if (fieldType.getValues() != null) {
             boolean valid = validateAllowedValues(value, fieldType.getValues().get());
             if (!valid) {
-                errorInfo = new EnumErrorResponse(fieldType.getValues().get(), value);
+                errorInfos.add(new EnumErrorResponse(fieldType.getValues().get(), value));
             }
-        } else if (fieldType.getPattern() != null) {
+        }
+        if (fieldType.getPattern() != null) {
             boolean valid = validatePattern(value, fieldType.getPattern());
             if (!valid) {
-                errorInfo = new PatternErrorResponse(fieldType.getPattern(), value);
+                errorInfos.add(new PatternErrorResponse(fieldType.getPattern(), value));
             }
-        } else if (metadata.required()) {
+        }
+        if (metadata.required()) {
             boolean valid = value != null;
             if (!valid) {
-                errorInfo = new RequiredErrorResponse();
+                errorInfos.add(new RequiredErrorResponse());
             }
-        } else if (fieldType.getSpecificFormat() != null) {
-            errorInfo = validateSpecificFormat(fieldType.getSpecificFormat(), value);
+        }
+        if (fieldType.getSpecificFormat() != null) {
+            errorInfos.add(validateSpecificFormat(fieldType.getSpecificFormat(), value));
         }
 
-        if (errorInfo != null) {
+        if (!errorInfos.isEmpty()) {
             context.disableDefaultConstraintViolation();
 
             /*
@@ -137,10 +141,12 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
              *      the error info object into a string (base 64) and deserialize it when we catch the
              *      exception later on.
              */
-            String errorMessage = SerializationUtils.toBase64(errorInfo);
-            context.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+            for (ErrorResponseInfo errorInfo : errorInfos) {
+                String errorMessage = SerializationUtils.toBase64(errorInfo);
+                context.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+            }
         }
 
-        return errorInfo == null;
+        return errorInfos.isEmpty();
     }
 }

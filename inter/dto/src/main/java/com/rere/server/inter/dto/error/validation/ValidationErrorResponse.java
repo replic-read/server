@@ -4,11 +4,13 @@ import com.rere.server.inter.dto.error.ErrorResponseInfo;
 import com.rere.server.inter.dto.error.ErrorType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Error info about an error that was caused by a failed validation of a field.
  */
 @Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 public abstract class ValidationErrorResponse extends ErrorResponseInfo {
 

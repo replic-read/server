@@ -8,7 +8,7 @@ public final class ValidationPatterns {
     /**
      * Regex for a username.
      */
-    public static final String USERNAME = "^[^\\s]{4,}$";
+    public static final String USERNAME = "^[A-Za-z0-9_]{4,32}$";
 
     /**
      * Regex for an email.
@@ -18,7 +18,7 @@ public final class ValidationPatterns {
     /**
      * Regex for a password.
      */
-    public static final String PASSWORD = "^[^\\s]{4,}$";
+    public static final String PASSWORD = "^[^\\s]{4,32}$";
 
     /**
      * Regex for a uuid.

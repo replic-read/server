@@ -4,11 +4,13 @@ import com.rere.server.inter.dto.error.ErrorResponseInfo;
 import com.rere.server.inter.dto.error.ErrorType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Error info about an error that is only further describes by a message.
  */
 @Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 public class MessageBasedInfo extends ErrorResponseInfo {
 

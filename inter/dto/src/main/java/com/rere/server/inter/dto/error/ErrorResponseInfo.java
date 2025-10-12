@@ -10,6 +10,7 @@ import com.rere.server.inter.dto.error.domain.MessageBasedInfo;
 import com.rere.server.inter.dto.error.domain.NotUniqueInfo;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -17,6 +18,7 @@ import java.io.Serializable;
  * A super class for every object that will later be serialized into an http-error body.
  */
 @Getter
+@ToString
 @EqualsAndHashCode
 public abstract class ErrorResponseInfo implements Serializable {
 

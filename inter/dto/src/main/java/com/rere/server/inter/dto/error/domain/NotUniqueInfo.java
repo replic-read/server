@@ -5,11 +5,13 @@ import com.rere.server.inter.dto.error.ErrorResponseInfo;
 import com.rere.server.inter.dto.error.ErrorType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Error info about an error that was caused by a value not being unique.
  */
 @Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 public class NotUniqueInfo extends ErrorResponseInfo {
 

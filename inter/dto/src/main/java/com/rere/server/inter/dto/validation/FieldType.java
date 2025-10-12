@@ -33,7 +33,7 @@ public enum FieldType {
 
     ACCOUNT_USERNAME("username", ValidationPatterns.USERNAME, "The username of the user."),
     ACCOUNT_EMAIL("email", ValidationPatterns.EMAIL, "The email-address of the user."),
-    ACCOUNT_PROFILE_COLOR("rgb-int", "The color of the users profile."),
+    ACCOUNT_PROFILE_COLOR("rgb-int", "The color of the users profile.", SpecificFormat.POSITIVE_INTEGER),
     ACCOUNT_PASSWORD("password", ValidationPatterns.PASSWORD, "The password of the account."),
     ACCOUNT_ACCOUNT("The account of the user."),
 
