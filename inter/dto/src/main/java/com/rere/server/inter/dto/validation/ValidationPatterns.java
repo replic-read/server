@@ -18,7 +18,7 @@ public final class ValidationPatterns {
     /**
      * Regex for a password.
      */
-    public static final String PASSWORD = "^[^\\s]{4,32}$";
+    public static final String PASSWORD = "^[^\\s]{4,64}$";
 
     /**
      * Regex for a uuid.
