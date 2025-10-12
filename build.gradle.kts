@@ -19,6 +19,8 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.starter.actuator)
+
     // Required for detecting the controllers.
     implementation(project(":inter:dispatching"))
 

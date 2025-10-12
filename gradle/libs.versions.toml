@@ -19,6 +19,7 @@ starter-data = { group = "org.springframework.boot", name = "spring-boot-starter
 starter-mail = { group = "org.springframework.boot", name = "spring-boot-starter-mail", version.ref = "spring_starter" }
 starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web", version.ref = "spring_starter" }
 starter-validation = { group = "org.springframework.boot", name = "spring-boot-starter-validation", version.ref = "spring_starter" }
+starter-actuator = { group = "org.springframework.boot", name = "spring-boot-starter-actuator", version.ref = "spring_starter" }
 springdoc-starter = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 thymeleaf-spring = { group = "org.thymeleaf", name = "thymeleaf-spring5", version.ref = "thymeleaf" }
 thymeleaf = { group = "org.thymeleaf", name = "thymeleaf", version.ref = "thymeleaf" }
