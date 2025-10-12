@@ -6,10 +6,12 @@ plugins {
 
 dependencies {
     implementation(libs.lombok)
+    implementation(libs.postgres)
     implementation(libs.starter.data)
     implementation(project(":domain:model"))
     implementation(project(":domain:repository"))
-    implementation(libs.h2)
+
+    testImplementation(libs.h2)
 
     annotationProcessor(libs.lombok)
 

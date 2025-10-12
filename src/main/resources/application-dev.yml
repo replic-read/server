@@ -52,3 +52,24 @@ rere:
 
     # Password to the admin account
     password: root
+
+# Spring config
+spring:
+
+  # Datasource config:
+  datasource:
+
+    # Database username
+    username: admin
+
+    # Database password
+    password: admin
+
+    # Database url
+    url: 'jdbc:postgresql://localhost:5432/replic-read'
+
+    # Driver class of the database
+    driver-class-name: org.postgresql.Driver
+
+  # SQl dialect of database implementation
+  jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
