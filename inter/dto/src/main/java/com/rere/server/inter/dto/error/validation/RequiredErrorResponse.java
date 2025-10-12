@@ -1,9 +1,12 @@
 package com.rere.server.inter.dto.error.validation;
 
 
+import lombok.EqualsAndHashCode;
+
 /**
  * Models an error info that occurred because a required field was not present.
  */
+@EqualsAndHashCode(callSuper = true)
 public class RequiredErrorResponse extends ValidationErrorResponse {
 
     public RequiredErrorResponse() {

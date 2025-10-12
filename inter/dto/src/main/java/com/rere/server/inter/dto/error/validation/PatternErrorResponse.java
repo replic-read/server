@@ -1,11 +1,13 @@
 package com.rere.server.inter.dto.error.validation;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
  * Models an error info that occurred because a field did not match a specific pattern.
  */
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public class PatternErrorResponse extends ValidationErrorResponse {
 
     /**

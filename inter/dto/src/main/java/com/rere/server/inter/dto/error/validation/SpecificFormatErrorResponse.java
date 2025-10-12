@@ -1,6 +1,7 @@
 package com.rere.server.inter.dto.error.validation;
 
 import com.rere.server.inter.dto.validation.SpecificFormat;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.Locale;
@@ -9,6 +10,7 @@ import java.util.Locale;
  * Models an error info that occurred because a field did not match a specific format.
  */
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public final class SpecificFormatErrorResponse extends ValidationErrorResponse {
 
     /**

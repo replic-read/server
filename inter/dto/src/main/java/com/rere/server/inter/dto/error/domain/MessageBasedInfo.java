@@ -2,12 +2,14 @@ package com.rere.server.inter.dto.error.domain;
 
 import com.rere.server.inter.dto.error.ErrorResponseInfo;
 import com.rere.server.inter.dto.error.ErrorType;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
  * Error info about an error that is only further describes by a message.
  */
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public class MessageBasedInfo extends ErrorResponseInfo {
 
     /**
