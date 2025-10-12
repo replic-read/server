@@ -73,3 +73,6 @@ spring:
 
   # SQl dialect of database implementation
   jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # How hibernate should react to schema differences. We want to update the schema.
+  jpa.hibernate.ddl-auto: update
