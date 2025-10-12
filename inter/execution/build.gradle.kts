@@ -13,5 +13,6 @@ dependencies {
     implementation(project(":domain:model"))
     implementation(project(":domain:service"))
     implementation(project(":inter:authorization"))
+    implementation(project(":inter:dto"))
     annotationProcessor(libs.lombok)
 }

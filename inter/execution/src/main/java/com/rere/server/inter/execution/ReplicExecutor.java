@@ -1,7 +1,7 @@
 package com.rere.server.inter.execution;
 
-import com.rere.server.inter.execution.dto.request.CreateReplicRequest;
-import com.rere.server.inter.execution.dto.response.ReplicResponse;
+import com.rere.server.inter.dto.request.CreateReplicRequest;
+import com.rere.server.inter.dto.response.ReplicResponse;
 
 import java.io.InputStream;
 import java.util.List;

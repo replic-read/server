@@ -1,8 +1,8 @@
 package com.rere.server.inter.execution;
 
-import com.rere.server.inter.execution.dto.request.CreateAccountRequest;
-import com.rere.server.inter.execution.dto.response.AccountResponse;
-import com.rere.server.inter.execution.dto.response.PartialAccountResponse;
+import com.rere.server.inter.dto.request.CreateAccountRequest;
+import com.rere.server.inter.dto.response.AccountResponse;
+import com.rere.server.inter.dto.response.PartialAccountResponse;
 
 import java.util.List;
 import java.util.Set;

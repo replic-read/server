@@ -13,14 +13,14 @@ import com.rere.server.domain.service.ReportService;
 import com.rere.server.domain.service.ServerConfigService;
 import com.rere.server.inter.authorization.AuthorizationException;
 import com.rere.server.inter.authorization.Authorizer;
+import com.rere.server.inter.dto.request.CreateAccountRequest;
+import com.rere.server.inter.dto.request.CredentialsRequest;
+import com.rere.server.inter.dto.request.RefreshRequest;
+import com.rere.server.inter.dto.request.SubmitEmailVerificationRequest;
+import com.rere.server.inter.dto.response.AccountWithTokensResponse;
 import com.rere.server.inter.execution.AbstractExecutor;
 import com.rere.server.inter.execution.AuthenticationExecutor;
-import com.rere.server.inter.execution.dto.request.CreateAccountRequest;
-import com.rere.server.inter.execution.dto.request.CredentialsRequest;
-import com.rere.server.inter.execution.dto.request.RefreshRequest;
-import com.rere.server.inter.execution.dto.request.SubmitEmailVerificationRequest;
-import com.rere.server.inter.execution.dto.response.AccountWithTokensReponse;
-import com.rere.server.inter.execution.error.HttpErrorResponseException;
+import com.rere.server.inter.execution.HttpErrorResponseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +44,7 @@ public class AuthenticationExecutorImpl extends AbstractExecutor implements Auth
     }
 
     @Override
-    public AccountWithTokensReponse signup(CreateAccountRequest request, boolean sendEmail) {
+    public AccountWithTokensResponse signup(CreateAccountRequest request, boolean sendEmail) {
         authorizer.requireCreateAccount(getAuth());
         try {
             Account account = authService.createAccount(request.email(), request.username(), request.password(),
@@ -52,7 +52,7 @@ public class AuthenticationExecutorImpl extends AbstractExecutor implements Auth
             UUID refreshToken = authService.createRefreshToken(account.getId());
             String accessToken = authService.createAccessToken(account.getId());
 
-            return new AccountWithTokensReponse(
+            return new AccountWithTokensResponse(
                     createAccountResponse(account),
                     accessToken,
                     refreshToken.toString()
@@ -66,7 +66,7 @@ public class AuthenticationExecutorImpl extends AbstractExecutor implements Auth
     }
 
     @Override
-    public AccountWithTokensReponse refresh(RefreshRequest request) {
+    public AccountWithTokensResponse refresh(RefreshRequest request) {
         Optional<Account> account = authService.authenticateWithRefreshToken(UUID.fromString(request.refreshToken()));
         if (account.isPresent()) {
             return loginUser(account.get(), request.refreshToken());
@@ -80,12 +80,12 @@ public class AuthenticationExecutorImpl extends AbstractExecutor implements Auth
         }
     }
 
-    private AccountWithTokensReponse loginUser(Account account, String oldRefreshToken) {
+    private AccountWithTokensResponse loginUser(Account account, String oldRefreshToken) {
         String accessToken;
         try {
             String refreshToken = oldRefreshToken != null ? oldRefreshToken : authService.createRefreshToken(account.getId()).toString();
             accessToken = authService.createAccessToken(account.getId());
-            return new AccountWithTokensReponse(
+            return new AccountWithTokensResponse(
                     createAccountResponse(account),
                     accessToken,
                     refreshToken
@@ -97,7 +97,7 @@ public class AuthenticationExecutorImpl extends AbstractExecutor implements Auth
     }
 
     @Override
-    public AccountWithTokensReponse login(CredentialsRequest request) {
+    public AccountWithTokensResponse login(CredentialsRequest request) {
         Optional<Account> account = authService.authenticateWithCredentials(request.email(), request.username(), request.password());
 
         if (account.isPresent()) {

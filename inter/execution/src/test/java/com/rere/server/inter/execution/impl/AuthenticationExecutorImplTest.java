@@ -8,12 +8,12 @@ import com.rere.server.domain.model.exception.NotUniqueException;
 import com.rere.server.domain.model.exception.NotUniqueSubject;
 import com.rere.server.domain.model.impl.AccountImpl;
 import com.rere.server.inter.authorization.AuthorizationException;
-import com.rere.server.inter.execution.dto.request.CreateAccountRequest;
-import com.rere.server.inter.execution.dto.request.CredentialsRequest;
-import com.rere.server.inter.execution.dto.request.RefreshRequest;
-import com.rere.server.inter.execution.dto.request.SubmitEmailVerificationRequest;
-import com.rere.server.inter.execution.dto.response.AccountWithTokensReponse;
-import com.rere.server.inter.execution.error.HttpErrorResponseException;
+import com.rere.server.inter.dto.request.CreateAccountRequest;
+import com.rere.server.inter.dto.request.CredentialsRequest;
+import com.rere.server.inter.dto.request.RefreshRequest;
+import com.rere.server.inter.dto.request.SubmitEmailVerificationRequest;
+import com.rere.server.inter.dto.response.AccountWithTokensResponse;
+import com.rere.server.inter.execution.HttpErrorResponseException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 
@@ -58,7 +58,7 @@ class AuthenticationExecutorImplTest extends BaseExecutorTest {
         when(authService.createRefreshToken(any())).thenReturn(refresh);
         when(authService.createAccessToken(any())).thenReturn("access-token");
 
-        AccountWithTokensReponse response = subject.signup(new CreateAccountRequest("em", "pa", 0, "us"), true);
+        AccountWithTokensResponse response = subject.signup(new CreateAccountRequest("em", "pa", 0, "us"), true);
 
         assertEquals(refresh.toString(), response.refreshToken());
         assertEquals("access-token", response.accessToken());
@@ -91,7 +91,7 @@ class AuthenticationExecutorImplTest extends BaseExecutorTest {
         when(authService.authenticateWithRefreshToken(any())).thenReturn(Optional.of(account));
         when(authService.createAccessToken(any())).thenReturn("access-token");
 
-        AccountWithTokensReponse response = subject.refresh(new RefreshRequest(refreshToken.toString()));
+        AccountWithTokensResponse response = subject.refresh(new RefreshRequest(refreshToken.toString()));
 
         assertEquals(refreshToken.toString(), response.refreshToken());
         assertEquals("access-token", response.accessToken());
@@ -127,7 +127,7 @@ class AuthenticationExecutorImplTest extends BaseExecutorTest {
         when(authService.createAccessToken(any())).thenReturn("access-token");
         when(authService.createRefreshToken(account.getId())).thenReturn(refreshToken);
 
-        AccountWithTokensReponse response = subject.login(new CredentialsRequest("em", "us", "pa"));
+        AccountWithTokensResponse response = subject.login(new CredentialsRequest("em", "us", "pa"));
 
         verify(authService, times(1)).createRefreshToken(account.getId());
 

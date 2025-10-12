@@ -10,18 +10,18 @@ import com.rere.server.domain.service.ReplicService;
 import com.rere.server.domain.service.ReportService;
 import com.rere.server.domain.service.ServerConfigService;
 import com.rere.server.inter.authorization.Authorizer;
-import com.rere.server.inter.execution.dto.parameter.SortDirectionParameter;
-import com.rere.server.inter.execution.dto.parameter.SortParameter;
-import com.rere.server.inter.execution.dto.response.AccountResponse;
-import com.rere.server.inter.execution.dto.response.PartialAccountResponse;
-import com.rere.server.inter.execution.dto.response.ReplicResponse;
-import com.rere.server.inter.execution.dto.response.ReportResponse;
+import com.rere.server.inter.dto.parameter.SortDirectionParameter;
+import com.rere.server.inter.dto.parameter.SortParameter;
+import com.rere.server.inter.dto.response.AccountResponse;
+import com.rere.server.inter.dto.response.PartialAccountResponse;
+import com.rere.server.inter.dto.response.ReplicResponse;
+import com.rere.server.inter.dto.response.ReportResponse;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Comparator;
 
-import static com.rere.server.inter.execution.mapper.EnumMapper.mapToString;
+import static com.rere.server.inter.dto.mapper.EnumMapper.mapToString;
 
 /**
  * Abstract base class for the executors.

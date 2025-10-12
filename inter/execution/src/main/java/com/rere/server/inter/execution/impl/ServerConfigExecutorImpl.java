@@ -12,17 +12,17 @@ import com.rere.server.domain.service.ReplicService;
 import com.rere.server.domain.service.ReportService;
 import com.rere.server.domain.service.ServerConfigService;
 import com.rere.server.inter.authorization.Authorizer;
+import com.rere.server.inter.dto.request.ServerConfigRequest;
+import com.rere.server.inter.dto.response.ServerConfigResponse;
 import com.rere.server.inter.execution.AbstractExecutor;
 import com.rere.server.inter.execution.ServerConfigExecutor;
-import com.rere.server.inter.execution.dto.request.ServerConfigRequest;
-import com.rere.server.inter.execution.dto.response.ServerConfigResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Period;
 
-import static com.rere.server.inter.execution.mapper.EnumMapper.mapToEnum;
-import static com.rere.server.inter.execution.mapper.EnumMapper.mapToString;
+import static com.rere.server.inter.dto.mapper.EnumMapper.mapToEnum;
+import static com.rere.server.inter.dto.mapper.EnumMapper.mapToString;
 
 @Component
 public class ServerConfigExecutorImpl extends AbstractExecutor implements ServerConfigExecutor {
