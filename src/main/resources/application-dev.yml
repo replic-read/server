@@ -1,0 +1,54 @@
+# Application config
+rere:
+  # Base url with schema and no trailing slash.
+  baseurl: 'https://example.com'
+
+  content.root: '~/IdeaProjects/Replic-Read Server/server_content_root/'
+
+  # Config for the authentication
+  auth:
+
+    # Refresh-token expiration in millis
+    refresh.expiration: 2592000000 # 30 days
+
+    # Email-token expiration in millis
+    email.expiration: 900000 # 15 minutes
+
+    # Config for the access-tokens
+    access:
+
+      # Access-token expiration duration in millis
+      expiration: 900000 # 15 minutes
+
+      # Private key for signing JWT's
+      secret: d2cf0591-a08d-4547-8cec-363daee402b0
+
+  # Config for the email messaging
+  mail:
+
+    # Username for authenticating to the smtp server
+    username: <username>
+
+    # Password for authenticating to the smtp server
+    password: <password>
+
+    # Host of the smtp server
+    smtpHost: smtp.example.com
+
+    # Port of the smtp server
+    smtpPort: 465
+
+    # Whether to use ssl encryption
+    ssl: true
+
+  # Config about the admin account
+  admin:
+
+    # Username of the admin account
+    username: root
+
+    # Email of the admin account
+    email: admin@example.com
+
+    # Password to the admin account
+    password: root
