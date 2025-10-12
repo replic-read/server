@@ -139,7 +139,10 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
             }
         }
         if (fieldType.getSpecificFormat() != null) {
-            errorInfos.add(validateSpecificFormat(fieldType.getSpecificFormat(), value));
+            ErrorResponseInfo specificFormatError = validateSpecificFormat(fieldType.getSpecificFormat(), value);
+            if (specificFormatError != null) {
+                errorInfos.add(specificFormatError);
+            }
         }
 
         publishViolations(errorInfos, context);
