@@ -7,6 +7,7 @@ import com.rere.server.inter.dto.error.validation.PatternErrorResponse;
 import com.rere.server.inter.dto.error.validation.SpecificFormatErrorResponse;
 import com.rere.server.inter.dto.mapper.EnumMapper;
 import com.rere.server.inter.dto.validation.AbstractValidationTest;
+import com.rere.server.inter.dto.validation.Pair;
 import com.rere.server.inter.dto.validation.SpecificFormat;
 import com.rere.server.inter.dto.validation.ValidationPatterns;
 
