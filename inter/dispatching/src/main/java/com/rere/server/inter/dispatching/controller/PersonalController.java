@@ -22,9 +22,6 @@ import static com.rere.server.inter.dispatching.documentation.endpoint.Authoriza
 
 /**
  * The web-controller for personal matters.
- * <br>
- * Implements PersonalExecutor as semantic detail.
- * We don't need the polymorphism, but as this class acts as a proxy, it makes sense to implement the interface.
  */
 @Tag(
         name = "Personal",
@@ -32,7 +29,7 @@ import static com.rere.server.inter.dispatching.documentation.endpoint.Authoriza
 )
 @RestController
 @RequestMapping("/me")
-public class PersonalController implements PersonalExecutor {
+public class PersonalController {
 
     private final PersonalExecutor executor;
 
@@ -50,7 +47,6 @@ public class PersonalController implements PersonalExecutor {
             responseTypes = {SUCCESS, BAD_AUTHENTICATION}
     )
     @GetMapping("/")
-    @Override
     public AccountResponse getMe() {
         return executor.getMe();
     }
@@ -66,7 +62,6 @@ public class PersonalController implements PersonalExecutor {
                     ACCOUNT_UNIQUE}
     )
     @PostMapping("/")
-    @Override
     public AccountResponse updateMe(@Valid @RequestBody UpdateAccountRequest request) {
         return executor.updateMe(request);
     }
@@ -81,7 +76,6 @@ public class PersonalController implements PersonalExecutor {
                     BAD_AUTHENTICATION}
     )
     @GetMapping("/quota/")
-    @Override
     public QuotaProgressResponse getQuotaProgress() {
         return executor.getQuotaProgress();
     }

@@ -20,9 +20,6 @@ import static com.rere.server.inter.dispatching.documentation.endpoint.Authoriza
 
 /**
  * The web-controller for server-config matters.
- * <br>
- * Implements ServerConfigExecutor as semantic detail.
- * We don't need the polymorphism, but as this class acts as a proxy, it makes sense to implement the interface.
  */
 @Tag(
         name = "Server configuration",
@@ -30,7 +27,7 @@ import static com.rere.server.inter.dispatching.documentation.endpoint.Authoriza
 )
 @RestController
 @RequestMapping("/server-config")
-public class ServerConfigController implements ServerConfigExecutor {
+public class ServerConfigController {
 
     private final ServerConfigExecutor executor;
 
@@ -42,7 +39,6 @@ public class ServerConfigController implements ServerConfigExecutor {
     @Operation(summary = "Get the server config", description = "Gets the server config.")
     @EndpointMetadata(responseTypes = SUCCESS)
     @GetMapping("/")
-    @Override
     public ServerConfigResponse getServerConfig() {
         return executor.getServerConfig();
     }
@@ -53,7 +49,6 @@ public class ServerConfigController implements ServerConfigExecutor {
             responseTypes = {SUCCESS, NO_PERMISSION_NO_EXIST}
     )
     @PutMapping("/")
-    @Override
     public ServerConfigResponse setServerConfig(@Valid @RequestBody ServerConfigRequest request) {
         return executor.setServerConfig(request);
     }

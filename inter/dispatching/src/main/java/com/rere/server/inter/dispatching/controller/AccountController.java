@@ -41,9 +41,6 @@ import static com.rere.server.inter.dto.validation.FieldType.SORT_DIRECTION;
 
 /**
  * The web-controller for account matters.
- * <br>
- * Implements AccountExecutor as semantic detail.
- * We don't need the polymorphism, but as this class acts as a proxy, it makes sense to implement the interface.
  */
 @Tag(
         name = "Accounts",
@@ -51,7 +48,7 @@ import static com.rere.server.inter.dto.validation.FieldType.SORT_DIRECTION;
 )
 @RestController
 @RequestMapping("/accounts")
-public class AccountController implements AccountExecutor<String, String, String, String> {
+public class AccountController {
 
     private final AccountExecutor<AccountSortParameter, AccountState, SortDirectionParameter, UUID> executor;
 
@@ -72,7 +69,6 @@ public class AccountController implements AccountExecutor<String, String, String
                     BAD_AUTHENTICATION}
     )
     @PostMapping("/")
-    @Override
     public AccountResponse createAccount(
             @Valid @RequestBody CreateAccountRequest request,
             @ValidationMetadata(value = FieldType.SEND_VERIFICATION_EMAIL, required = false) @Valid @RequestParam(name = "send_email", defaultValue = "false") boolean sendVerificationEmail,
@@ -86,7 +82,6 @@ public class AccountController implements AccountExecutor<String, String, String
     )
     @EndpointMetadata(responseTypes = ApiResponseType.SUCCESS)
     @GetMapping("/partial/")
-    @Override
     public List<PartialAccountResponse> getAccountsPartial(
             @ValidationMetadata(value = ACCOUNT_SORT, required = false) @Valid @RequestParam(name = "sort", required = false) String sortMode,
             @ValidationMetadata(value = SORT_DIRECTION, required = false) @Valid @RequestParam(name = "direction", required = false) String sortDirection,
@@ -112,7 +107,6 @@ public class AccountController implements AccountExecutor<String, String, String
                     ApiResponseType.BAD_AUTHENTICATION}
     )
     @GetMapping("/full/")
-    @Override
     public List<AccountResponse> getAccountsFull(
             @ValidationMetadata(value = ACCOUNT_SORT, required = false) @Valid @RequestParam(name = "sort", required = false) String sortMode,
             @ValidationMetadata(value = SORT_DIRECTION, required = false) @Valid @RequestParam(name = "direction", required = false) String sortDirection,

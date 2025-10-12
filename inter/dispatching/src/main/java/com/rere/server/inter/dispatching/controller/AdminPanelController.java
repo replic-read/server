@@ -16,9 +16,6 @@ import static com.rere.server.inter.dispatching.documentation.endpoint.Authoriza
 
 /**
  * The web-controller for admin matters.
- * <br>
- * Implements AdminPanelExecutor as semantic detail.
- * We don't need the polymorphism, but as this class acts as a proxy, it makes sense to implement the interface.
  */
 @Tag(
         name = "Admin panel",
@@ -26,7 +23,7 @@ import static com.rere.server.inter.dispatching.documentation.endpoint.Authoriza
 )
 @RestController
 @RequestMapping("/admin")
-public class AdminPanelController implements AdminPanelExecutor {
+public class AdminPanelController {
 
     private final AdminPanelExecutor executor;
 
@@ -46,7 +43,6 @@ public class AdminPanelController implements AdminPanelExecutor {
                     BAD_AUTHENTICATION}
     )
     @PostMapping("/shutdown/")
-    @Override
     public void shutdown() {
         executor.shutdown();
     }

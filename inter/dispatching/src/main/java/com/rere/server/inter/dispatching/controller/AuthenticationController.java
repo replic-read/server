@@ -35,9 +35,6 @@ import static com.rere.server.inter.dto.validation.FieldType.HTML_EMAIL;
 
 /**
  * The web-controller for authentication matters.
- * <br>
- * Implements AuthenticationExecutor as semantic detail.
- * We don't need the polymorphism, but as this class acts as a proxy, it makes sense to implement the interface.
  */
 @Tag(
         name = "Authentication",
@@ -45,7 +42,7 @@ import static com.rere.server.inter.dto.validation.FieldType.HTML_EMAIL;
 )
 @RestController
 @RequestMapping(path = "/auth")
-public class AuthenticationController implements AuthenticationExecutor {
+public class AuthenticationController {
 
     private final AuthenticationExecutor executor;
 
@@ -62,7 +59,6 @@ public class AuthenticationController implements AuthenticationExecutor {
             responseTypes = {SUCCESS, SUBMIT_EMAIL_TOKEN_BAD_TOKEN}
     )
     @PostMapping("/submit-email-verification/")
-    @Override
     public void submitEmailVerification(@Valid @RequestBody SubmitEmailVerificationRequest request) {
         executor.submitEmailVerification(request);
     }
@@ -79,7 +75,6 @@ public class AuthenticationController implements AuthenticationExecutor {
                     ACCOUNT_UNIQUE}
     )
     @PostMapping("/signup/")
-    @Override
     public AccountWithTokensResponse signup(
             @Valid @RequestBody CreateAccountRequest request,
             @ValidationMetadata(value = FieldType.SEND_VERIFICATION_EMAIL, required = false) @Valid @RequestParam(name = "send_email", defaultValue = "true") boolean sendEmail) {
@@ -94,7 +89,6 @@ public class AuthenticationController implements AuthenticationExecutor {
             responseTypes = {SUCCESS, BAD_AUTHENTICATION}
     )
     @PostMapping("/refresh/")
-    @Override
     public AccountWithTokensResponse refresh(@Valid @RequestBody RefreshRequest request) {
         return executor.refresh(request);
     }
@@ -109,7 +103,6 @@ public class AuthenticationController implements AuthenticationExecutor {
                     LOGIN_MISSING_IDENTIFICATION}
     )
     @PostMapping("/login/")
-    @Override
     public AccountWithTokensResponse login(@Valid @RequestBody CredentialsRequest request) {
         return executor.login(request);
     }
@@ -125,7 +118,6 @@ public class AuthenticationController implements AuthenticationExecutor {
                     BAD_AUTHENTICATION}
     )
     @GetMapping("/request-email-verification/")
-    @Override
     public void requestEmailVerification(@ValidationMetadata(value = HTML_EMAIL, required = false) @Valid @RequestParam(defaultValue = "true") boolean html) {
         executor.requestEmailVerification(html);
     }

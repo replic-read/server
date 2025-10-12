@@ -50,9 +50,6 @@ import static com.rere.server.inter.dto.validation.FieldType.SORT_DIRECTION;
 
 /**
  * The web-controller for replic matters.
- * <br>
- * Implements ReplicExecutor as semantic detail.
- * We don't need the polymorphism, but as this class acts as a proxy, it makes sense to implement the interface.
  */
 @Tag(
         name = "Replics",
@@ -60,7 +57,7 @@ import static com.rere.server.inter.dto.validation.FieldType.SORT_DIRECTION;
 )
 @RestController
 @RequestMapping("/replics")
-public class ReplicController implements ReplicExecutor<String, String, String, String, MultipartFile> {
+public class ReplicController {
 
     private final ReplicExecutor<ReplicState, ReplicSortParameter, SortDirectionParameter, UUID, InputStream> executor;
 
@@ -80,7 +77,6 @@ public class ReplicController implements ReplicExecutor<String, String, String, 
                     BAD_AUTHENTICATION}
     )
     @GetMapping("/")
-    @Override
     public List<ReplicResponse> getReplics(
             @ValidationMetadata(value = REPLIC_SORT, required = false) @Valid @RequestParam(name = "sort", required = false) String sortMode,
             @ValidationMetadata(value = SORT_DIRECTION, required = false) @Valid @RequestParam(name = "direction", required = false) String sortDirection,
@@ -113,7 +109,6 @@ public class ReplicController implements ReplicExecutor<String, String, String, 
                     BAD_AUTHENTICATION}
     )
     @PostMapping("/")
-    @Override
     public ReplicResponse createReplic(
             @Valid @RequestPart CreateReplicRequest requestBody,
             @RequestPart MultipartFile file
@@ -136,7 +131,6 @@ public class ReplicController implements ReplicExecutor<String, String, String, 
                     BAD_AUTHENTICATION}
     )
     @GetMapping("/{id}/content/")
-    @Override
     public String getReplicContent(
             @ValidationMetadata(REPLIC_ID) @Valid @PathVariable(name = "id") String id,
             @ValidationMetadata(value = REPLIC_PASSWORD, required = false) @RequestParam(name = "password", required = false) String password
@@ -158,7 +152,6 @@ public class ReplicController implements ReplicExecutor<String, String, String, 
                     BAD_AUTHENTICATION}
     )
     @PutMapping("/{id}/")
-    @Override
     public void updateReplicState(
             @ValidationMetadata(REPLIC_ID) @Valid @PathVariable String id,
             @ValidationMetadata(REPLIC_STATE) @Valid @RequestParam String state

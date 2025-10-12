@@ -39,9 +39,6 @@ import static com.rere.server.inter.dto.validation.FieldType.SORT_DIRECTION;
 
 /**
  * The web-controller for report matters.
- * <br>
- * Implements ReportExecutor as semantic detail.
- * We don't need the polymorphism, but as this class acts as a proxy, it makes sense to implement the interface.
  */
 @Tag(
         name = "Reports",
@@ -69,7 +66,6 @@ public class ReportController implements ReportExecutor<String, String, String, 
                     BAD_AUTHENTICATION}
     )
     @GetMapping("/")
-    @Override
     public List<ReportResponse> getReports(
             @ValidationMetadata(value = REPORT_SORT, required = false) @Valid @RequestParam(name = "sort", required = false) String sortMode,
             @ValidationMetadata(value = SORT_DIRECTION, required = false) @Valid @RequestParam(name = "direction", required = false) String sortDirection,
@@ -95,7 +91,6 @@ public class ReportController implements ReportExecutor<String, String, String, 
                     NO_PERMISSION_NO_EXIST}
     )
     @PostMapping("/")
-    @Override
     public ReportResponse createReport(
             @Valid @RequestBody CreateReportRequest requestBody,
             @ValidationMetadata(REPLIC_ID) @Valid @RequestParam(name = "replic_id") String replicId
@@ -114,7 +109,6 @@ public class ReportController implements ReportExecutor<String, String, String, 
                     NO_PERMISSION_NO_EXIST}
     )
     @PutMapping("/{id}/")
-    @Override
     public ReportResponse updateReport(
             @ValidationMetadata(REPORT_ID) @Valid @PathVariable String id,
             @ValidationMetadata(REPORT_STATE) @Valid @RequestParam String state
