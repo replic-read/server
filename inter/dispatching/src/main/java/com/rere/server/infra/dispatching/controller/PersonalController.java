@@ -1,4 +1,4 @@
-package com.rere.server.infra.dispatching;
+package com.rere.server.infra.dispatching.controller;
 
 import com.rere.server.infra.dispatching.documentation.endpoint.EndpointMetadata;
 import com.rere.server.inter.dto.request.UpdateAccountRequest;

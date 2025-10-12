@@ -1,4 +1,4 @@
-package com.rere.server.infra.dispatching;
+package com.rere.server.infra.dispatching.controller;
 
 import com.rere.server.domain.model.replic.ReplicState;
 import com.rere.server.infra.dispatching.documentation.endpoint.EndpointMetadata;
