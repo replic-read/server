@@ -32,9 +32,9 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -62,8 +62,10 @@ public class ReplicServiceImpl implements ReplicService {
 
     private final QuotaService quotaService;
 
+    private final Clock clock;
+
     @Autowired
-    public ReplicServiceImpl(ReplicRepository replicRepo, AccountService accountService, ReplicAccessRepository accessRepo, ReplicFileAccessor fileAccessor, ServerConfigService configService, PasswordEncoder encoder, QuotaService quotaService) {
+    public ReplicServiceImpl(ReplicRepository replicRepo, AccountService accountService, ReplicAccessRepository accessRepo, ReplicFileAccessor fileAccessor, ServerConfigService configService, PasswordEncoder encoder, QuotaService quotaService, Clock clock) {
         this.replicRepo = replicRepo;
         this.accountService = accountService;
         this.accessRepo = accessRepo;
@@ -71,6 +73,7 @@ public class ReplicServiceImpl implements ReplicService {
         this.configService = configService;
         this.encoder = encoder;
         this.quotaService = quotaService;
+        this.clock = clock;
     }
 
     private static boolean replicMatchesQuery(ReplicBaseData replic, String query) {
@@ -85,8 +88,8 @@ public class ReplicServiceImpl implements ReplicService {
         }
         ServerConfig config = configService.get();
 
-        if (!config.allowsExpiration(LocalDate.now(), expiration, ZoneId.systemDefault())) {
-            Instant maximumExpiration = Instant.now().atZone(ZoneId.systemDefault()).plus(config.getMaximumActivePeriod()).toInstant();
+        if (!config.allowsExpiration(LocalDate.now(clock.getZone()), expiration, clock.getZone())) {
+            Instant maximumExpiration = clock.instant().atZone(clock.getZone()).plus(config.getMaximumActivePeriod()).toInstant();
             throw new InvalidExpirationException(expiration == null, maximumExpiration, expiration);
         }
 
