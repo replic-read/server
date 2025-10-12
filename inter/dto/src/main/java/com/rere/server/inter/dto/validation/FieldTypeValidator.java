@@ -110,6 +110,16 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
 
         Set<ErrorResponseInfo> errorInfos = new HashSet<>();
 
+        if (metadata.required()) {
+            boolean valid = value != null;
+            if (!valid) {
+                errorInfos.add(new RequiredErrorResponse());
+
+                // We return, so that for missing values we don't run all other validations.
+                publishViolations(errorInfos, context);
+                return false;
+            }
+        }
         if (fieldType.getValues() != null) {
             boolean valid = validateAllowedValues(value, fieldType.getValues().get());
             if (!valid) {
@@ -122,31 +132,24 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
                 errorInfos.add(new PatternErrorResponse(fieldType.getPattern(), value));
             }
         }
-        if (metadata.required()) {
-            boolean valid = value != null;
-            if (!valid) {
-                errorInfos.add(new RequiredErrorResponse());
-            }
-        }
         if (fieldType.getSpecificFormat() != null) {
             errorInfos.add(validateSpecificFormat(fieldType.getSpecificFormat(), value));
         }
 
-        if (!errorInfos.isEmpty()) {
-            context.disableDefaultConstraintViolation();
-
-            /*
-             * Jakarta validation only allows us to pass a custom error message when a validation fails.
-             * Because we want to pass object to the validation exception that is thrown, we serialize
-             *      the error info object into a string (base 64) and deserialize it when we catch the
-             *      exception later on.
-             */
-            for (ErrorResponseInfo errorInfo : errorInfos) {
-                String errorMessage = SerializationUtils.toBase64(errorInfo);
-                context.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
-            }
-        }
-
+        publishViolations(errorInfos, context);
         return errorInfos.isEmpty();
+    }
+
+    private void publishViolations(Set<ErrorResponseInfo> infos, ConstraintValidatorContext context) {
+        /*
+         * Jakarta validation only allows us to pass a custom error message when a validation fails.
+         * Because we want to pass object to the validation exception that is thrown, we serialize
+         *      the error info object into a string (base 64) and deserialize it when we catch the
+         *      exception later on.
+         */
+        for (ErrorResponseInfo errorInfo : infos) {
+            String errorMessage = SerializationUtils.toBase64(errorInfo);
+            context.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+        }
     }
 }
