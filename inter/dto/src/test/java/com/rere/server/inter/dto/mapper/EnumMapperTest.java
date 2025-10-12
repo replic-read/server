@@ -1,12 +1,14 @@
 package com.rere.server.inter.dto.mapper;
 
 import com.rere.server.domain.model.account.AccountState;
+import net.bytebuddy.description.modifier.Visibility;
 import org.junit.jupiter.api.Test;
 
 import static com.rere.server.inter.dto.mapper.EnumMapper.mapToEnum;
 import static com.rere.server.inter.dto.mapper.EnumMapper.mapToString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Contains tests for the {@link EnumMapper} class.
@@ -30,6 +32,18 @@ class EnumMapperTest {
     @Test
     void mapToEnumReturnsNulLForInvalidString() {
         assertNull(mapToEnum("blahh", AccountState.class));
+    }
+
+    @Test
+    void mapToEnumThrowsForInvalidEnum() {
+        assertThrows(IllegalArgumentException.class,
+                () -> mapToEnum("private", Visibility.class));
+    }
+
+    @Test
+    void mapToStringThrowsForInvalidEnum() {
+        assertThrows(IllegalArgumentException.class,
+                () -> mapToString(Visibility.PRIVATE));
     }
 
 }
