@@ -115,7 +115,7 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
                 errorInfo = new EnumErrorResponse(fieldType.getValues().get(), value);
             }
         } else if (fieldType.getPattern() != null) {
-            boolean valid = validatePattern(value, fieldType.getFormat());
+            boolean valid = validatePattern(value, fieldType.getPattern());
             if (!valid) {
                 errorInfo = new PatternErrorResponse(fieldType.getPattern(), value);
             }
