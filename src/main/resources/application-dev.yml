@@ -66,7 +66,7 @@ spring:
     password: admin
 
     # Database url
-    url: 'jdbc:postgresql://localhost:5432/replic-read'
+    url: 'jdbc:postgresql://localhost:5432/replic_read'
 
     # Driver class of the database
     driver-class-name: org.postgresql.Driver
