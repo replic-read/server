@@ -68,7 +68,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Value("${rere.auth.refresh.expiration}")
     private long refreshTokenExpiration;
 
-    @Value("${rere.email.expiration}")
+    @Value("${rere.auth.email.expiration}")
     private long emailTokenExpiration;
 
     @Value("${rere.admin.email}")
