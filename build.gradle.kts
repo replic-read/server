@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     // Required for detecting the controllers.
-    implementation(project(":inter:execution"))
+    implementation(project(":inter:dispatching"))
 
     // Required because no other module set a dependency on infrastructure.
     // Without this, we don't scan the components.
