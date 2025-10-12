@@ -1,7 +1,6 @@
-package com.rere.server.inter.execution.mapper;
+package com.rere.server.inter.dto.mapper;
 
 import com.rere.server.domain.model.account.AccountState;
-import com.rere.server.inter.dto.mapper.EnumMapper;
 import org.junit.jupiter.api.Test;
 
 import static com.rere.server.inter.dto.mapper.EnumMapper.mapToEnum;
