@@ -2,6 +2,7 @@ package com.rere.server.inter.dto.request;
 
 import com.rere.server.inter.dto.error.ErrorResponseInfo;
 import com.rere.server.inter.dto.error.validation.PatternErrorResponse;
+import com.rere.server.inter.dto.error.validation.RequiredErrorResponse;
 import com.rere.server.inter.dto.error.validation.SpecificFormatErrorResponse;
 import com.rere.server.inter.dto.validation.AbstractValidationTest;
 import com.rere.server.inter.dto.validation.SpecificFormat;
@@ -35,6 +36,10 @@ class CreateAccountRequestTest extends AbstractValidationTest<CreateAccountReque
                 new Pair<CreateAccountRequest, ErrorResponseInfo>(
                         new CreateAccountRequest("user@gmail.com", "passw", 57839, "username_illegal_chars_@@←¶ſðſſ"),
                         new PatternErrorResponse(ValidationPatterns.USERNAME, "username_illegal_chars_@@←¶ſðſſ")
+                ),
+                new Pair<CreateAccountRequest, ErrorResponseInfo>(
+                        new CreateAccountRequest("user@gmail.com", "passw", 57839, null),
+                        new RequiredErrorResponse()
                 )
         };
     }
