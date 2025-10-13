@@ -51,6 +51,11 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
      */
     @SuppressWarnings("SuspiciousMethodCalls")
     private static boolean validateAllowedValues(Object value, String[] values) {
+        if (value instanceof Iterable<?>) {
+            for (Object o : (Iterable<?>) value) {
+                return validateAllowedValues(o, values);
+            }
+        }
         return Arrays.asList(values).contains(value);
     }
 
