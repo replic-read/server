@@ -3,6 +3,7 @@ package com.rere.server.inter.dispatching.controller;
 import com.rere.server.domain.model.account.AccountState;
 import com.rere.server.inter.dto.parameter.AccountSortParameter;
 import com.rere.server.inter.dto.parameter.SortDirectionParameter;
+import com.rere.server.inter.dto.request.ResetPasswordRequest;
 import com.rere.server.inter.dto.response.AccountResponse;
 import com.rere.server.inter.dto.response.PartialAccountResponse;
 import org.junit.jupiter.api.Test;
@@ -138,6 +139,41 @@ class AccountControllerTest extends AbstractControllerTest {
         assertEquals(accId, accIdCaptor.getValue());
         assertEquals("<query>", queryCaptor.getValue());
         assertEquals(Set.of(AccountState.ACTIVE, AccountState.UNVERIFIED), filterCaptor.getValue());
+    }
+
+    @Test
+    void resetPasswordCallsExecutorAndReturns() throws Exception {
+        UUID accId = UUID.randomUUID();
+        var response = new AccountResponse(accId.toString(), Instant.now().toString(), "email@server.com", "user123", 33, "inactive");
+        when(accountExecutor.resetAccountPassword(any(), any())).thenReturn(response);
+
+        setupAuth();
+        String content = """
+                {
+                    "password": "new-pass"
+                }
+                """;
+        client.perform(post("/accounts/%s/".formatted(accId)).content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(accId.toString()));
+
+        var reqCaptor = ArgumentCaptor.<ResetPasswordRequest>captor();
+        var idCaptor = ArgumentCaptor.<UUID>captor();
+        verify(accountExecutor).resetAccountPassword(reqCaptor.capture(), idCaptor.capture());
+
+        assertEquals("new-pass", reqCaptor.getValue().password());
+        assertEquals(accId, idCaptor.getValue());
+    }
+
+    @Test
+    void resetPasswordFailsForNoAuth() throws Exception {
+        UUID accId = UUID.randomUUID();
+        String content = """
+                {
+                    "password": "new-pass"
+                }
+                """;
+        assertForbidden(post("/accounts/%s/".formatted(accId)).content(content));
     }
 
 }
