@@ -4,10 +4,12 @@ import com.rere.server.domain.model.exception.DomainException;
 import com.rere.server.domain.model.exception.ExpiredException;
 import com.rere.server.domain.model.exception.InvalidExpirationException;
 import com.rere.server.domain.model.exception.InvalidTokenException;
+import com.rere.server.domain.model.exception.NotFoundException;
 import com.rere.server.domain.model.exception.NotUniqueException;
 import com.rere.server.domain.model.exception.OperationDisabledException;
 import com.rere.server.domain.model.exception.ReplicQuotaMetException;
 import com.rere.server.inter.dto.error.domain.MessageBasedInfo;
+import com.rere.server.inter.dto.error.domain.NotFoundInfo;
 import com.rere.server.inter.dto.error.domain.NotUniqueInfo;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -45,6 +47,8 @@ public abstract class ErrorResponseInfo implements Serializable {
             case InvalidTokenException ignored -> new MessageBasedInfo("The provided token was invalid.");
             case ReplicQuotaMetException ignored -> new MessageBasedInfo("You reached the limit of your replic quota.");
             case ExpiredException ignored -> new MessageBasedInfo("The access to this resource is expired.");
+            case NotFoundException e ->
+                    new NotFoundInfo(e.getSubject(), e.getIdentifier() instanceof Serializable s ? s : null);
             case OperationDisabledException e -> new MessageBasedInfo(switch (e.getOperation()) {
                 case REPORT -> "";
                 case SIGNUP -> "Signing up is disabled.";
