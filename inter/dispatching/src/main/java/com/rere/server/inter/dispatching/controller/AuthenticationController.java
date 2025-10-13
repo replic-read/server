@@ -1,5 +1,6 @@
 package com.rere.server.inter.dispatching.controller;
 
+import com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType;
 import com.rere.server.inter.dispatching.documentation.endpoint.EndpointMetadata;
 import com.rere.server.inter.dto.request.CreateAccountRequest;
 import com.rere.server.inter.dto.request.CredentialsRequest;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.ACCOUNT_UNIQUE;
 import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.BAD_AUTHENTICATION;
 import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.LOGIN_MISSING_IDENTIFICATION;
@@ -32,6 +35,8 @@ import static com.rere.server.inter.dispatching.documentation.endpoint.ApiRespon
 import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
 import static com.rere.server.inter.dispatching.documentation.endpoint.AuthorizationType.LOGGED_IN;
 import static com.rere.server.inter.dto.validation.FieldType.HTML_EMAIL;
+import static com.rere.server.inter.dto.validation.FieldType.LOGOUT_ALL;
+import static com.rere.server.inter.dto.validation.FieldType.LOGOUT_REFRESH_TOKEN;
 
 /**
  * The web-controller for authentication matters.
@@ -120,5 +125,25 @@ public class AuthenticationController {
     @GetMapping("/request-email-verification/")
     public void requestEmailVerification(@ValidationMetadata(value = HTML_EMAIL, required = false) @Valid @RequestParam(defaultValue = "true", name = "html") boolean html) {
         executor.requestEmailVerification(html);
+    }
+
+    @Operation(
+            summary = "Log out",
+            description = "Invalidates refresh tokens. Can configure whether all or only a specific one should be invalidated."
+    )
+    @EndpointMetadata(
+            authorizationType = LOGGED_IN,
+            responseTypes = {SUCCESS,
+                    ApiResponseType.LOGOUT_BAD_TOKEN}
+    )
+    @PostMapping("/logout/")
+    public void logout(
+            @ValidationMetadata(value = LOGOUT_REFRESH_TOKEN, required = false) @Valid @RequestParam(value = "token", required = false) String refreshToken,
+            @ValidationMetadata(LOGOUT_ALL) @Valid @RequestParam(value = "all", defaultValue = "false") boolean all
+    ) {
+        executor.logout(
+                refreshToken != null ? UUID.fromString(refreshToken) : null,
+                all
+        );
     }
 }

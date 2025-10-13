@@ -6,6 +6,7 @@ import com.rere.server.inter.dispatching.documentation.endpoint.EndpointMetadata
 import com.rere.server.inter.dto.parameter.AccountSortParameter;
 import com.rere.server.inter.dto.parameter.SortDirectionParameter;
 import com.rere.server.inter.dto.request.CreateAccountRequest;
+import com.rere.server.inter.dto.request.ResetPasswordRequest;
 import com.rere.server.inter.dto.response.AccountResponse;
 import com.rere.server.inter.dto.response.PartialAccountResponse;
 import com.rere.server.inter.dto.validation.FieldType;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +33,7 @@ import static com.rere.server.inter.dispatching.documentation.endpoint.ApiRespon
 import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.BAD_AUTHENTICATION;
 import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.NO_PERMISSION_NO_EXIST;
 import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.SUCCESS;
+import static com.rere.server.inter.dispatching.documentation.endpoint.ApiResponseType.USER_NOT_FOUND;
 import static com.rere.server.inter.dispatching.documentation.endpoint.AuthorizationType.ADMIN;
 import static com.rere.server.inter.dto.mapper.EnumMapper.mapToEnum;
 import static com.rere.server.inter.dto.validation.FieldType.ACCOUNT_FILTER_STATE;
@@ -121,5 +124,20 @@ public class AccountController {
                 stateFilter != null ? stateFilter.stream().map(state -> mapToEnum(state, AccountState.class)).collect(Collectors.toSet()) : null,
                 query
         );
+    }
+
+    @Operation(
+            summary = "Reset password of user",
+            description = "Resets the password of a user."
+    )
+    @EndpointMetadata(
+            authorizationType = ADMIN,
+            responseTypes = {SUCCESS, USER_NOT_FOUND}
+    )
+    @PostMapping("/{id}/")
+    public AccountResponse resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request,
+            @ValidationMetadata(ACCOUNT_ID) @Valid @PathVariable("id") String accountId) {
+        return executor.resetAccountPassword(request, UUID.fromString(accountId));
     }
 }
