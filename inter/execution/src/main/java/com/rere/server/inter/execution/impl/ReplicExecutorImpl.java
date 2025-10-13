@@ -1,6 +1,7 @@
 package com.rere.server.inter.execution.impl;
 
 import com.rere.server.domain.model.exception.DomainException;
+import com.rere.server.domain.model.exception.ExpiredException;
 import com.rere.server.domain.model.exception.InvalidPasswordException;
 import com.rere.server.domain.model.exception.NotFoundException;
 import com.rere.server.domain.model.replic.MediaMode;
@@ -105,6 +106,8 @@ public class ReplicExecutorImpl extends AbstractExecutor implements ReplicExecut
             contentStream = replicService.receiveContent(id, password);
         } catch (NotFoundException | InvalidPasswordException e) {
             throw AuthorizationException.genericForbidden();
+        } catch (ExpiredException e) {
+            throw HttpErrorResponseException.fromDomainException(e);
         }
 
         InputStreamReader reader = new InputStreamReader(contentStream);

@@ -27,13 +27,13 @@ rere:
   mail:
 
     # Username for authenticating to the smtp server
-    username: <username>
+    username: test@bumiller.me
 
     # Password for authenticating to the smtp server
-    password: <password>
+    password: $7sjsdcMrp&TsE
 
     # Host of the smtp server
-    smtpHost: smtp.example.com
+    smtpHost: smtp.ionos.de
 
     # Port of the smtp server
     smtpPort: 465
