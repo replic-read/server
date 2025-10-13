@@ -20,6 +20,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ReportControllerTest extends AbstractControllerTest {
 
     @Test
+    void getReportsFailsForNoAuth() throws Exception {
+        UUID reportId = UUID.randomUUID();
+        assertForbidden(get("/reports/")
+                .queryParam("sort", "user")
+                .queryParam("direction", "ascending")
+                .queryParam("report_id", reportId.toString())
+                .queryParam("query", "<mock-query>"));
+    }
+
+    @Test
     void getReportsCallsExecutorAndReturns() throws Exception {
         when(reportExecutor.getReports(any(), any(), any(), any()))
                 .thenReturn(IntStream.range(0, 7).mapToObj(i ->
@@ -28,6 +38,7 @@ class ReportControllerTest extends AbstractControllerTest {
                 ).toList());
 
         UUID reportId = UUID.randomUUID();
+        setupAuth();
         client.perform(get("/reports/")
                         .queryParam("sort", "user")
                         .queryParam("direction", "ascending")
@@ -69,11 +80,19 @@ class ReportControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void updateReportFailsForNoAuth() throws Exception {
+        UUID reportId = UUID.randomUUID();
+        assertForbidden(put("/reports/%s/".formatted(reportId))
+                .queryParam("state", "open"));
+    }
+
+    @Test
     void updateReportCallsExecutorAndReturns() throws Exception {
         UUID reportId = UUID.randomUUID();
         when(reportExecutor.updateReport(any(), any()))
                 .thenReturn(new ReportResponse(reportId.toString(), Instant.now().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString()));
 
+        setupAuth();
         client.perform(put("/reports/%s/".formatted(reportId))
                         .queryParam("state", "open"))
                 .andExpect(status().isOk())

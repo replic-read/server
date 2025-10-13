@@ -7,7 +7,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AdminPanelControllerTest extends AbstractControllerTest {
 
     @Test
+    void shutdownFailsForNoAuth() throws Exception {
+        assertForbidden(post("/admin/shutdown/"));
+    }
+
+    @Test
     void shutdownCallsExecutorAndReturns() throws Exception {
+        setupAuth();
         client.perform(post("/admin/shutdown/"))
                 .andExpect(status().isOk());
     }

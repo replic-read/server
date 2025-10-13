@@ -115,7 +115,13 @@ class AuthControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void requestEmailVerificationFailsForNoAuth() throws Exception {
+        assertForbidden(get("/auth/request-email-verification/"));
+    }
+
+    @Test
     void requestEmailVerificationCallsExecutorAndReturns() throws Exception {
+        setupAuth();
         client.perform(get("/auth/request-email-verification/").queryParam("html", "false"))
                 .andExpect(status().isOk());
 
