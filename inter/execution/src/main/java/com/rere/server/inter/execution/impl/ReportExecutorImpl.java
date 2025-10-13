@@ -20,11 +20,13 @@ import com.rere.server.inter.execution.AbstractExecutor;
 import com.rere.server.inter.execution.HttpErrorResponseException;
 import com.rere.server.inter.execution.ReportExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
 
+@Primary
 @Component
 public class ReportExecutorImpl extends AbstractExecutor implements ReportExecutor<ReportState, ReportSortParameter, SortDirectionParameter, UUID> {
     @Autowired

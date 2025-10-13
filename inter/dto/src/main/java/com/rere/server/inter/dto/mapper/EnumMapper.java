@@ -4,6 +4,7 @@ import com.rere.server.domain.model.account.AccountState;
 import com.rere.server.domain.model.config.AuthUserGroup;
 import com.rere.server.domain.model.replic.MediaMode;
 import com.rere.server.domain.model.replic.ReplicState;
+import com.rere.server.domain.model.report.ReportState;
 import com.rere.server.inter.dto.parameter.AccountSortParameter;
 import com.rere.server.inter.dto.parameter.ReplicSortParameter;
 import com.rere.server.inter.dto.parameter.ReportSortParameter;
@@ -19,6 +20,7 @@ public final class EnumMapper {
 
     private static final Map<AccountState, String> ACCOUNT_STATE_MAP = Map.of(AccountState.ACTIVE, "active", AccountState.INACTIVE, "inactive", AccountState.UNVERIFIED, "unverified");
     private static final Map<ReplicState, String> REPLIC_STATE_MAP = Map.of(ReplicState.ACTIVE, "active", ReplicState.INACTIVE, "inactive", ReplicState.REMOVED, "removed");
+    private static final Map<ReportState, String> REPORT_STATE_MAP = Map.of(ReportState.OPEN, "open", ReportState.REVIEWED, "reviewed", ReportState.CLOSED, "closed");
     private static final Map<MediaMode, String> MEDIA_MODE_MAP = Map.of(MediaMode.ALL, "all", MediaMode.NONE, "none", MediaMode.IMAGES, "images");
     private static final Map<AuthUserGroup, String> AUTH_USER_GROUP_MAP = Map.of(AuthUserGroup.ALL, "all", AuthUserGroup.ACCOUNT, "account", AuthUserGroup.VERIFIED, "verified");
     private static final Map<AccountSortParameter, String> ACCOUNT_SORT_PARAMETER_MAP = Map.of(AccountSortParameter.STATUS, "status", AccountSortParameter.CREATION, "creation", AccountSortParameter.USERNAME, "username");
@@ -32,6 +34,7 @@ public final class EnumMapper {
     static {
         MAPS.put(AccountState.class, ACCOUNT_STATE_MAP);
         MAPS.put(ReplicState.class, REPLIC_STATE_MAP);
+        MAPS.put(ReportState.class, REPORT_STATE_MAP);
         MAPS.put(MediaMode.class, MEDIA_MODE_MAP);
         MAPS.put(AuthUserGroup.class, AUTH_USER_GROUP_MAP);
         MAPS.put(AccountSortParameter.class, ACCOUNT_SORT_PARAMETER_MAP);
@@ -82,6 +85,9 @@ public final class EnumMapper {
      */
     public static String[] getAll(Class<?> enumClass) {
         Map<?, String> map = MAPS.get(enumClass);
+        if (map == null) {
+            throw new IllegalArgumentException("No stored enum-values found for class %s".formatted(enumClass));
+        }
         return map.values().toArray(new String[0]);
     }
 

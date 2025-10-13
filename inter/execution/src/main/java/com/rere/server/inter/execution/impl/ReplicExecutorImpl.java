@@ -25,6 +25,7 @@ import com.rere.server.inter.execution.HttpErrorResponseException;
 import com.rere.server.inter.execution.ReplicExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -41,8 +42,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Primary
 @Component
-public class ReplicExecutorImpl extends AbstractExecutor implements ReplicExecutor<ReplicState, ReplicSortParameter, SortDirectionParameter, UUID> {
+public class ReplicExecutorImpl extends AbstractExecutor implements ReplicExecutor<ReplicState, ReplicSortParameter, SortDirectionParameter, UUID, InputStream> {
 
     private static final String HOST_URL_FORMAT = "%s/replics/%s";
 

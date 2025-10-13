@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.ByteArrayInputStream;
@@ -39,6 +40,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
@@ -86,6 +88,8 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
     private PasswordEncoder passwordEncoder;
     @Mock
     private QuotaService quotaService;
+    @Spy
+    private Clock clock = Clock.systemUTC();
     @InjectMocks
     private ReplicServiceImpl subject;
 
