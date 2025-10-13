@@ -17,16 +17,19 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -115,9 +118,14 @@ class ReplicExecutorImplTest extends BaseExecutorTest {
         when(replicService.receiveContent(any(), any()))
                 .thenReturn(isForBytes("the universe, life and everything"));
 
-        String returned = subject.getReplicContent(UUID.randomUUID(), null);
+        InputStream returned = subject.getReplicContent(UUID.randomUUID(), null);
 
-        assertEquals("the universe, life and everything", returned);
+        InputStreamReader reader = new InputStreamReader(returned);
+        BufferedReader bufferedReader = new BufferedReader(reader);
+        String actual = bufferedReader.lines()
+                .collect(Collectors.joining(System.lineSeparator()));
+
+        assertEquals("the universe, life and everything", actual);
     }
 
     @Test
