@@ -46,7 +46,7 @@ import static com.rere.server.inter.dto.validation.FieldType.SORT_DIRECTION;
 )
 @RestController
 @RequestMapping("/reports")
-public class ReportController implements ReportExecutor<String, String, String, String> {
+public class ReportController {
 
     private final ReportExecutor<ReportState, ReportSortParameter, SortDirectionParameter, UUID> executor;
 
@@ -110,8 +110,8 @@ public class ReportController implements ReportExecutor<String, String, String, 
     )
     @PutMapping("/{id}/")
     public ReportResponse updateReport(
-            @ValidationMetadata(REPORT_ID) @Valid @PathVariable String id,
-            @ValidationMetadata(REPORT_STATE) @Valid @RequestParam String state
+            @ValidationMetadata(REPORT_ID) @Valid @PathVariable("id") String id,
+            @ValidationMetadata(REPORT_STATE) @Valid @RequestParam("state") String state
     ) {
         return executor.updateReport(UUID.fromString(id), mapToEnum(state, ReportState.class));
     }

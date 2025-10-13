@@ -110,8 +110,8 @@ public class ReplicController {
     )
     @PostMapping("/")
     public ReplicResponse createReplic(
-            @Valid @RequestPart CreateReplicRequest requestBody,
-            @RequestPart MultipartFile file
+            @Valid @RequestPart("request_body") CreateReplicRequest requestBody,
+            @RequestPart("file") MultipartFile file
     ) {
         try {
             return executor.createReplic(requestBody, file.getInputStream());
@@ -153,8 +153,8 @@ public class ReplicController {
     )
     @PutMapping("/{id}/")
     public void updateReplicState(
-            @ValidationMetadata(REPLIC_ID) @Valid @PathVariable String id,
-            @ValidationMetadata(REPLIC_STATE) @Valid @RequestParam String state
+            @ValidationMetadata(REPLIC_ID) @Valid @PathVariable("id") String id,
+            @ValidationMetadata(REPLIC_STATE) @Valid @RequestParam("state") String state
     ) {
         executor.updateReplicState(UUID.fromString(id), mapToEnum(state, ReplicState.class));
     }

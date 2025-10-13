@@ -118,7 +118,7 @@ public class AccountController {
                 mapToEnum(sortMode, AccountSortParameter.class),
                 mapToEnum(sortDirection, SortDirectionParameter.class),
                 accountId != null ? UUID.fromString(accountId) : null,
-                stateFilter.stream().map(state -> mapToEnum(state, AccountState.class)).collect(Collectors.toSet()),
+                stateFilter != null ? stateFilter.stream().map(state -> mapToEnum(state, AccountState.class)).collect(Collectors.toSet()) : null,
                 query
         );
     }

@@ -118,7 +118,7 @@ public class AuthenticationController {
                     BAD_AUTHENTICATION}
     )
     @GetMapping("/request-email-verification/")
-    public void requestEmailVerification(@ValidationMetadata(value = HTML_EMAIL, required = false) @Valid @RequestParam(defaultValue = "true") boolean html) {
+    public void requestEmailVerification(@ValidationMetadata(value = HTML_EMAIL, required = false) @Valid @RequestParam(defaultValue = "true", name = "html") boolean html) {
         executor.requestEmailVerification(html);
     }
 }
