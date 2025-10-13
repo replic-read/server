@@ -162,4 +162,29 @@ class AuthenticationExecutorImplTest extends BaseExecutorTest {
                 () -> subject.requestEmailVerification(true));
     }
 
+    @Test
+    void logoutCallsServiceLogoutAllIfAll() {
+        subject.setAuth(AccountImpl.builder().build());
+        subject.logout(UUID.randomUUID(), true);
+
+        verify(authService).logoutAll(any());
+    }
+
+    @Test
+    void logoutCallsServiceLogoutIfNotAll() throws InvalidTokenException {
+        subject.logout(UUID.randomUUID(), false);
+
+        verify(authService).logout(any());
+    }
+
+    @Test
+    void logoutConvertsException() throws InvalidTokenException {
+        doThrow(new InvalidTokenException())
+                .when(authService)
+                .logout(any());
+
+        assertThrows(HttpErrorResponseException.class,
+                () -> subject.logout(UUID.randomUUID(), false));
+    }
+
 }

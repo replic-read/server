@@ -2,6 +2,7 @@ package com.rere.server.inter.execution.impl;
 
 import com.rere.server.domain.model.account.Account;
 import com.rere.server.domain.model.exception.DomainException;
+import com.rere.server.domain.model.exception.NotFoundException;
 import com.rere.server.domain.model.exception.NotUniqueException;
 import com.rere.server.domain.model.exception.NotUniqueSubject;
 import com.rere.server.domain.model.exception.OperationDisabledException;
@@ -9,6 +10,7 @@ import com.rere.server.domain.model.exception.OperationDisabledOperation;
 import com.rere.server.domain.model.impl.AccountImpl;
 import com.rere.server.inter.dto.parameter.AccountSortParameter;
 import com.rere.server.inter.dto.request.CreateAccountRequest;
+import com.rere.server.inter.dto.request.ResetPasswordRequest;
 import com.rere.server.inter.dto.response.AccountResponse;
 import com.rere.server.inter.dto.response.PartialAccountResponse;
 import com.rere.server.inter.execution.HttpErrorResponseException;
@@ -16,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -87,6 +92,35 @@ class AccountExecutorImplTest extends BaseExecutorTest {
 
         verify(accountService, times(1)).getAccounts(any(), any(), any(), any());
         assertEquals(10, response.size());
+    }
+
+    @Test
+    void resetAccountPasswordPropagatesAuthorization() {
+        assertAuthorizationIsPropagated(() -> subject.resetAccountPassword(null, null));
+    }
+
+    @Test
+    void resetAccountPasswordCallsService() throws NotFoundException {
+        Account acc = AccountImpl.builder().build();
+        when(accountService.getAccountById(any()))
+                .thenReturn(Optional.ofNullable(acc));
+
+        var response = subject.resetAccountPassword(new ResetPasswordRequest("new-pas"), UUID.randomUUID());
+
+        verify(accountService).getAccountById(any());
+        verify(authService).changePassword(any(), any());
+
+        assertEquals(acc.getId().toString(), response.id());
+    }
+
+    @Test
+    void resetAccountPasswordConvertsDomain() throws NotFoundException {
+        doThrow(NotFoundException.account(UUID.randomUUID()))
+                .when(authService)
+                .changePassword(any(), any());
+
+        assertThrows(HttpErrorResponseException.class,
+                () -> subject.resetAccountPassword(new ResetPasswordRequest("new-pas"), UUID.randomUUID()));
     }
 
 }

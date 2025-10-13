@@ -2,6 +2,7 @@ package com.rere.server.inter.execution.impl;
 
 import com.rere.server.domain.model.account.Account;
 import com.rere.server.domain.model.account.AccountState;
+import com.rere.server.domain.model.exception.NotFoundException;
 import com.rere.server.domain.model.exception.NotUniqueException;
 import com.rere.server.domain.model.exception.OperationDisabledException;
 import com.rere.server.domain.service.AccountService;
@@ -14,6 +15,7 @@ import com.rere.server.inter.authorization.Authorizer;
 import com.rere.server.inter.dto.parameter.AccountSortParameter;
 import com.rere.server.inter.dto.parameter.SortDirectionParameter;
 import com.rere.server.inter.dto.request.CreateAccountRequest;
+import com.rere.server.inter.dto.request.ResetPasswordRequest;
 import com.rere.server.inter.dto.response.AccountResponse;
 import com.rere.server.inter.dto.response.PartialAccountResponse;
 import com.rere.server.inter.execution.AbstractExecutor;
@@ -49,6 +51,23 @@ public class AccountExecutorImpl extends AbstractExecutor implements AccountExec
             // OperationDisabledException: We bypass config rules.
             throw new IllegalStateException(e);
         }
+    }
+
+    @Override
+    public AccountResponse resetAccountPassword(ResetPasswordRequest request, UUID accountId) {
+        authorizer.requireChangeServerConfig(getAuth());
+
+        Account account;
+
+        try {
+            authService.changePassword(accountId, request.password());
+            account = accountService.getAccountById(accountId)
+                    .orElseThrow(() -> NotFoundException.account(accountId));
+        } catch (NotFoundException e) {
+            throw HttpErrorResponseException.fromDomainException(e);
+        }
+
+        return createAccountResponse(account);
     }
 
     @Override

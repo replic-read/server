@@ -1,6 +1,7 @@
 package com.rere.server.inter.execution;
 
 import com.rere.server.inter.dto.request.CreateAccountRequest;
+import com.rere.server.inter.dto.request.ResetPasswordRequest;
 import com.rere.server.inter.dto.response.AccountResponse;
 import com.rere.server.inter.dto.response.PartialAccountResponse;
 
@@ -20,6 +21,15 @@ public interface AccountExecutor<ASP, AS, D, I> {
      * @return The response body.
      */
     AccountResponse createAccount(CreateAccountRequest request, boolean sendVerificationEmail, boolean verified);
+
+    /**
+     * Executor for POST /accounts/{id}/.
+     *
+     * @param request   The request body.
+     * @param accountId The 'id' path variable.
+     * @return The response body.
+     */
+    AccountResponse resetAccountPassword(ResetPasswordRequest request, I accountId);
 
     /**
      * Executor for GET /accounts/partial/.
