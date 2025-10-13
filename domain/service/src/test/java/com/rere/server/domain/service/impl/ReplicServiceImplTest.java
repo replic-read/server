@@ -4,6 +4,7 @@ import com.rere.server.domain.io.ReplicFileAccessor;
 import com.rere.server.domain.model.account.Account;
 import com.rere.server.domain.model.config.ServerConfig;
 import com.rere.server.domain.model.exception.DomainException;
+import com.rere.server.domain.model.exception.ExpiredException;
 import com.rere.server.domain.model.exception.InvalidExpirationException;
 import com.rere.server.domain.model.exception.InvalidPasswordException;
 import com.rere.server.domain.model.exception.NotFoundException;
@@ -53,6 +54,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -98,7 +100,7 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
         Account account = AccountImpl.builder().build();
         doThrow(new ReplicQuotaMetException(account.getId())).when(quotaService).checkAccountQuota(account.getId());
 
-        ReplicQuotaMetException ex = Assertions.assertThrows(ReplicQuotaMetException.class, () -> subject.createReplic(URL, MediaMode.ALL, null, null, null, account, file -> false));
+        ReplicQuotaMetException ex = assertThrows(ReplicQuotaMetException.class, () -> subject.createReplic(URL, MediaMode.ALL, null, null, null, account, file -> false));
         Assertions.assertEquals(account.getId(), ex.getAccountId());
     }
 
@@ -108,7 +110,7 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
                 .maximumActivePeriod(Period.of(1, 2, 3)).build();
         when(configService.get()).thenReturn(config);
 
-        InvalidExpirationException ex = Assertions.assertThrows(InvalidExpirationException.class,
+        InvalidExpirationException ex = assertThrows(InvalidExpirationException.class,
                 () -> subject.createReplic(URL, MediaMode.ALL, null, null, null, null, file -> false));
         Assertions.assertTrue(ex.isExpirationMissing());
     }
@@ -121,7 +123,7 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
         when(configService.get()).thenReturn(config);
 
         // Attempt to create replic that expires 6 days in the future, but 5 is maximum allowed
-        InvalidExpirationException ex = Assertions.assertThrows(InvalidExpirationException.class,
+        InvalidExpirationException ex = assertThrows(InvalidExpirationException.class,
                 () -> subject.createReplic(URL, MediaMode.ALL, null, now.plus(6, ChronoUnit.DAYS), null, null, file -> false));
         Assertions.assertFalse(ex.isExpirationMissing());
     }
@@ -133,7 +135,7 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
 
         // Attempt to create replic that expires 6 days in the future, but 5 is maximum allowed
         AtomicBoolean wasInsideAccessor = new AtomicBoolean(false);
-        Assertions.assertThrows(ReplicContentWriteException.class,
+        assertThrows(ReplicContentWriteException.class,
                 () -> subject.createReplic(URL, MediaMode.ALL, null, null,
                         null, null, file -> {
                             wasInsideAccessor.set(true);
@@ -292,7 +294,7 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
 
         when(replicRepo.getById(specialId)).thenReturn(Optional.empty());
 
-        NotFoundException ex = Assertions.assertThrows(NotFoundException.class, () -> subject.setReplicState(specialId, ReplicState.ACTIVE));
+        NotFoundException ex = assertThrows(NotFoundException.class, () -> subject.setReplicState(specialId, ReplicState.ACTIVE));
         Assertions.assertEquals(NotFoundSubject.REPLIC, ex.getSubject());
         Assertions.assertEquals(specialId, ex.getIdentifier());
     }
@@ -327,12 +329,12 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
         when(replicRepo.getById(replicNoNExistId)).thenReturn(Optional.empty());
         when(accountService.getAccountById(accountNoExistId)).thenReturn(Optional.empty());
 
-        NotFoundException ex1 = Assertions.assertThrows(NotFoundException.class,
+        NotFoundException ex1 = assertThrows(NotFoundException.class,
                 () -> subject.visitReplic(replicNoNExistId, accountNoExistId));
         Assertions.assertEquals(NotFoundSubject.REPLIC, ex1.getSubject());
         Assertions.assertEquals(replicNoNExistId, ex1.getIdentifier());
 
-        NotFoundException ex2 = Assertions.assertThrows(NotFoundException.class,
+        NotFoundException ex2 = assertThrows(NotFoundException.class,
                 () -> subject.visitReplic(replicExistId, accountNoExistId));
         Assertions.assertEquals(NotFoundSubject.ACCOUNT, ex2.getSubject());
         Assertions.assertEquals(accountNoExistId, ex2.getIdentifier());
@@ -388,7 +390,7 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
 
         UUID id = UUID.randomUUID();
 
-        NotFoundException ex1 = Assertions.assertThrows(NotFoundException.class,
+        NotFoundException ex1 = assertThrows(NotFoundException.class,
                 () -> subject.receiveContent(id, null).close());
         Assertions.assertEquals(NotFoundSubject.REPLIC, ex1.getSubject());
         Assertions.assertEquals(id, ex1.getIdentifier());
@@ -405,8 +407,25 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
         when(replicRepo.getById(id)).thenReturn(Optional.of(replic));
         when(passwordEncoder.matches(any(), any())).thenReturn(false);
 
-        Assertions.assertThrows(InvalidPasswordException.class,
+        assertThrows(InvalidPasswordException.class,
                 () -> subject.receiveContent(id, "password").close());
+    }
+
+    @Test
+    void receiveContentThrowsForExpiredReplic() {
+        UUID id = UUID.randomUUID();
+        Instant now = Instant.now();
+
+        ReplicBaseData replic = ReplicBaseDataImpl.builder()
+                .expirationTimestamp(now.minusSeconds(60))
+                .passwordHash(null)
+                .build();
+
+        when(replicRepo.getById(id)).thenReturn(Optional.ofNullable(replic));
+        when(clock.instant()).thenReturn(now);
+
+        assertThrows(ExpiredException.class,
+                () -> subject.receiveContent(id, null));
     }
 
     @Test
