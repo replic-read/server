@@ -53,20 +53,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider provider) throws Exception {
         return http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable) // Safe to disable because we use JWT's.
                 .authorizeHttpRequests(config -> {
                             config
-                                    .requestMatchers("/**").permitAll();
-                            //        .requestMatchers(HttpMethod.GET, "/auth/request-email-verification/")
-                            //        .authenticated()
-                            //        .requestMatchers("/auth/**")
-                            //        .permitAll();
+                                    .requestMatchers(HttpMethod.GET, "/auth/request-email-verification/")
+                                    .authenticated()
+                                    .requestMatchers("/auth/**")
+                                    .permitAll();
 
-                            //for (Endpoint endpoint : UNAUTHENTICATED_ENDPOINTS) {
-                            //    config
-                            //            .requestMatchers(endpoint.method(), endpoint.endpoint())
-                            //            .permitAll();
-                            //}
+                    for (Endpoint endpoint : UNAUTHENTICATED_ENDPOINTS) {
+                        config
+                                .requestMatchers(endpoint.method(), endpoint.endpoint())
+                                .permitAll();
+                    }
                         }
                 )
                 .sessionManagement(context -> context

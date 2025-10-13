@@ -53,8 +53,12 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
     private static boolean validateAllowedValues(Object value, String[] values) {
         if (value instanceof Iterable<?>) {
             for (Object o : (Iterable<?>) value) {
-                return validateAllowedValues(o, values);
+                boolean valid = validateAllowedValues(o, values);
+                if (!valid) {
+                    return false;
+                }
             }
+            return true;
         }
         return Arrays.asList(values).contains(value);
     }
@@ -119,6 +123,13 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
         }
         Serializable value = (Serializable) object;
 
+        Set<ErrorResponseInfo> errorInfos = validate(value);
+
+        publishViolations(errorInfos, context);
+        return errorInfos.isEmpty();
+    }
+
+    private Set<ErrorResponseInfo> validate(Serializable value) {
         Set<ErrorResponseInfo> errorInfos = new HashSet<>();
 
         if (metadata.required()) {
@@ -127,8 +138,7 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
                 errorInfos.add(new RequiredErrorResponse());
 
                 // We return, so that for missing values we don't run all other validations.
-                publishViolations(errorInfos, context);
-                return false;
+                return errorInfos;
             }
         }
         if (fieldType.getValues() != null) {
@@ -150,8 +160,7 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
             }
         }
 
-        publishViolations(errorInfos, context);
-        return errorInfos.isEmpty();
+        return errorInfos;
     }
 
     private void publishViolations(Set<ErrorResponseInfo> infos, ConstraintValidatorContext context) {
