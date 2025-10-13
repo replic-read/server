@@ -1,6 +1,7 @@
 package com.rere.server.inter.dto.error;
 
 import com.rere.server.domain.model.exception.DomainException;
+import com.rere.server.domain.model.exception.ExpiredException;
 import com.rere.server.domain.model.exception.InvalidExpirationException;
 import com.rere.server.domain.model.exception.InvalidTokenException;
 import com.rere.server.domain.model.exception.NotUniqueException;
@@ -43,6 +44,7 @@ public abstract class ErrorResponseInfo implements Serializable {
             case InvalidExpirationException ignored -> new MessageBasedInfo("The provided expiration was invalid.");
             case InvalidTokenException ignored -> new MessageBasedInfo("The provided token was invalid.");
             case ReplicQuotaMetException ignored -> new MessageBasedInfo("You reached the limit of your replic quota.");
+            case ExpiredException ignored -> new MessageBasedInfo("The access to this resource is expired.");
             case OperationDisabledException e -> new MessageBasedInfo(switch (e.getOperation()) {
                 case REPORT -> "";
                 case SIGNUP -> "Signing up is disabled.";
