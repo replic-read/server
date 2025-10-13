@@ -71,6 +71,7 @@ public class SecurityConfig {
                                 .requestMatchers(endpoint.method(), endpoint.endpoint())
                                 .permitAll();
                     }
+                    config.anyRequest().authenticated();
                         }
                 )
                 .sessionManagement(context -> context
