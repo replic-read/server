@@ -35,12 +35,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -73,6 +76,8 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
     private PasswordEncoder encoder;
     @Mock
     private AccountRepository accountRepo;
+    @Mock
+    private Clock clock;
     @InjectMocks
     private AuthenticationServiceImpl subject;
 
@@ -220,6 +225,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
                 .sign(algorithm);
 
         when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
+        when(clock.instant()).thenReturn(Instant.now());
 
         Optional<Account> returned = subject.authenticateWithJwt(token);
 
@@ -299,6 +305,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
         when(tokenRepo.getAll()).thenReturn(List.of(token));
         when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
+        when(clock.instant()).thenReturn(Instant.now());
 
         Optional<Account> returned = subject.authenticateWithRefreshToken(token.getToken());
 
@@ -317,6 +324,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
         when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
         when(tokenRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
+        when(clock.instant()).thenReturn(Instant.now());
 
         UUID returned = subject.createRefreshToken(account.getId());
 
@@ -338,6 +346,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         Account account = AccountImpl.builder().build();
 
         when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
+        when(clock.instant()).thenReturn(Instant.now());
 
         String token = subject.createAccessToken(account.getId());
 
@@ -359,6 +368,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
         when(tokenRepo.saveModel(any())).thenAnswer(inv -> inv.getArguments()[0]);
         when(emailSender.sendVerificationToken(any(), any(), anyBoolean())).thenReturn(true);
+        when(clock.instant()).thenReturn(Instant.now());
 
         subject.requestEmailVerification(account.getId(), true);
 
@@ -393,6 +403,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
         when(accountService.getAccountById(any())).thenReturn(Optional.of(AccountImpl.builder().build()));
         when(accountService.getByEmail(any())).thenReturn(Optional.empty());
         when(accountService.getByUsername(any())).thenReturn(Optional.empty());
+        when(clock.instant()).thenReturn(Instant.now());
 
         Account returned1 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, false, false, false);
         Account returned2 = subject.createAccount("email@gmail.com", "user123", "password", 0, false, false, true, false);
@@ -562,6 +573,7 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
         when(tokenRepo.getAll()).thenReturn(List.of(expiredToken, invalidatedToken, wrongTypeToken, validToken));
         when(accountService.getAccountById(account.getId())).thenReturn(Optional.of(account));
+        when(clock.instant()).thenReturn(Instant.now());
 
         assertThrows(InvalidTokenException.class, () -> subject.validateEmail(expiredToken.getToken()));
         assertThrows(InvalidTokenException.class, () -> subject.validateEmail(invalidatedToken.getToken()));
@@ -570,6 +582,97 @@ class AuthenticationServiceImplTest extends BaseDomainServiceTest {
 
         Account accountForExistingToken = subject.validateEmail(validToken.getToken());
         assertEquals(account, accountForExistingToken);
+    }
+
+    @Test
+    void logoutThrowsForInvalidToken() {
+        Instant now = Instant.now();
+        when(clock.instant()).thenReturn(now);
+
+        AuthToken invalid = AuthTokenImpl.builder()
+                .expirationTimestamp(now.minusSeconds(60))
+                .build();
+
+        when(tokenRepo.getAll()).thenReturn(List.of(invalid));
+
+        assertThrows(InvalidTokenException.class, () -> subject.validateEmail(invalid.getToken()));
+        assertThrows(InvalidTokenException.class, () -> subject.validateEmail(UUID.randomUUID()));
+    }
+
+    @Test
+    void logoutMarksTokenInvalid() throws DomainException {
+        Instant now = Instant.now();
+        when(clock.instant()).thenReturn(now);
+
+        UUID accountId = UUID.randomUUID();
+        AuthToken token = AuthTokenImpl.builder()
+                .expirationTimestamp(now.plusSeconds(60))
+                .accountId(accountId)
+                .build();
+
+        when(tokenRepo.getAll()).thenReturn(List.of(token));
+
+        subject.logout(token.getToken());
+
+        var tokenCaptor = ArgumentCaptor.<AuthToken>captor();
+        verify(tokenRepo).saveModel(tokenCaptor.capture());
+
+        assertTrue(tokenCaptor.getValue().isInvalidated());
+    }
+
+    @Test
+    void logoutAllMarksAllTokensForUserAsInvalidated() {
+        UUID accountId = UUID.randomUUID();
+
+        List<AuthToken> forUser = IntStream.range(0, 5)
+                .mapToObj(i -> (AuthToken) AuthTokenImpl.builder()
+                        .accountId(accountId)
+                        .build())
+                .toList();
+        List<AuthToken> notForUser = IntStream.range(0, 5)
+                .mapToObj(i -> (AuthToken) AuthTokenImpl.builder()
+                        .accountId(UUID.randomUUID())
+                        .build())
+                .toList();
+
+        List<AuthToken> merged = new ArrayList<>();
+        merged.addAll(forUser);
+        merged.addAll(notForUser);
+        Collections.shuffle(merged);
+
+        when(tokenRepo.getAll()).thenReturn(merged);
+
+        subject.logoutAll(accountId);
+
+        var tokenCaptor = ArgumentCaptor.<AuthToken>captor();
+
+        verify(tokenRepo, times(5)).saveModel(tokenCaptor.capture());
+
+        for (AuthToken token : tokenCaptor.getAllValues()) {
+            assertTrue(token.isInvalidated());
+        }
+    }
+
+    @Test
+    void changePasswordThrowsForUserNotFound() {
+        throwsForAccountNotFoundTest(id -> subject.changePassword(id, UUID.randomUUID().toString()));
+    }
+
+    @Test
+    void changePasswordChangesPassword() throws NotFoundException {
+        Account acc = AccountImpl.builder()
+                .passwordHash("old-pas").build();
+
+        when(accountService.getAccountById(acc.getId())).thenReturn(Optional.of(acc));
+        when(encoder.encode(any())).thenReturn("new-pas");
+
+        subject.changePassword(acc.getId(), "new-pas");
+
+        var captor = ArgumentCaptor.<Account>captor();
+
+        verify(accountRepo).saveModel(captor.capture());
+
+        assertEquals("new-pas", captor.getValue().getPasswordHash());
     }
 
 }

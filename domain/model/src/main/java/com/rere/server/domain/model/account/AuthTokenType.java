@@ -13,6 +13,11 @@ public enum AuthTokenType {
     /**
      * Token is used as a refresh token.
      */
-    REFRESH_TOKEN
+    REFRESH_TOKEN,
+
+    /**
+     * Token is used to reset a password.
+     */
+    PASSWORD_RESET
 
 }

@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,6 +60,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final AccountRepository accountRepo;
 
+    private final Clock clock;
+
     @Value("${rere.auth.access.expiration}")
     private long accessTokenExpiration;
 
@@ -81,13 +84,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private String adminPassword;
 
     @Autowired
-    public AuthenticationServiceImpl(AccountService accountService, AuthTokenRepository tokenRepo, EmailSender emailSender, ServerConfigService configService, PasswordEncoder encoder, AccountRepository accountRepo) {
+    public AuthenticationServiceImpl(AccountService accountService, AuthTokenRepository tokenRepo, EmailSender emailSender, ServerConfigService configService, PasswordEncoder encoder, AccountRepository accountRepo, Clock clock) {
         this.accountService = accountService;
         this.tokenRepo = tokenRepo;
         this.emailSender = emailSender;
         this.configService = configService;
         this.encoder = encoder;
         this.accountRepo = accountRepo;
+        this.clock = clock;
     }
 
     private Algorithm createAlgorithm() {
@@ -137,7 +141,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return Optional.empty();
         }
 
-        if (expiration.isBefore(Instant.now())) {
+        if (expiration.isBefore(clock.instant())) {
             return Optional.empty();
         }
 
@@ -154,7 +158,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElse(null);
 
         if (token == null ||
-            !token.isValid(AuthTokenType.REFRESH_TOKEN, Instant.now())
+            !token.isValid(AuthTokenType.REFRESH_TOKEN, clock.instant())
         ) {
             return Optional.empty();
         }
@@ -173,7 +177,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return JWT.create()
                 .withIssuer(JWT_ISSUER)
                 .withSubject(account.getId().toString())
-                .withExpiresAt(Instant.now().plusMillis(accessTokenExpiration))
+                .withExpiresAt(clock.instant().plusMillis(accessTokenExpiration))
                 .sign(createAlgorithm());
     }
 
@@ -184,7 +188,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .getAccountById(accountId)
                 .orElseThrow(() -> new NotFoundException(NotFoundSubject.ACCOUNT, accountId));
 
-        Instant now = Instant.now();
+        Instant now = clock.instant();
         AuthToken token = AuthTokenImpl.builder()
                 .creationTimestamp(now)
                 .expirationTimestamp(now.plusMillis(refreshTokenExpiration))
@@ -299,7 +303,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .getAccountById(accountId)
                 .orElseThrow(() -> new NotFoundException(NotFoundSubject.ACCOUNT, accountId));
 
-        Instant now = Instant.now();
+        Instant now = clock.instant();
         AuthToken emailToken = AuthTokenImpl.builder()
                 .creationTimestamp(now)
                 .expirationTimestamp(now.plusMillis(emailTokenExpiration))
@@ -320,9 +324,45 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .stream()
                 .filter(t -> t.getToken().equals(authToken))
                 .findFirst()
-                .flatMap(t -> t.isValid(AuthTokenType.EMAIL_VERIFICATION, Instant.now()) ? Optional.of(t) : Optional.empty())
+                .flatMap(t -> t.isValid(AuthTokenType.EMAIL_VERIFICATION, clock.instant()) ? Optional.of(t) : Optional.empty())
                 .map(AuthToken::getAccountId)
                 .flatMap(accountService::getAccountById)
                 .orElseThrow(InvalidTokenException::new);
+    }
+
+    @Override
+    public void logout(@Nonnull UUID refreshToken) throws InvalidTokenException {
+        AuthToken token = tokenRepo
+                .getAll()
+                .stream()
+                .filter(t -> t.getToken().equals(refreshToken))
+                .findFirst()
+                .flatMap(t -> t.isValid(AuthTokenType.REFRESH_TOKEN, clock.instant()) ? Optional.of(t) : Optional.empty())
+                .orElseThrow(InvalidTokenException::new);
+
+        token.setInvalidated(true);
+        tokenRepo.saveModel(token);
+    }
+
+    @Override
+    public void logoutAll(@Nonnull UUID accountId) {
+        tokenRepo
+                .getAll()
+                .stream()
+                .filter(token -> token.getAccountId().equals(accountId))
+                .forEach(token -> {
+                    token.setInvalidated(true);
+                    tokenRepo.saveModel(token);
+                });
+    }
+
+    @Override
+    public void changePassword(@Nonnull UUID accountId, @Nonnull String newPassword) throws NotFoundException {
+        Account account = accountService
+                .getAccountById(accountId)
+                .orElseThrow(() -> new NotFoundException(NotFoundSubject.ACCOUNT, accountId));
+
+        account.setPasswordHash(encoder.encode(newPassword));
+        accountRepo.saveModel(account);
     }
 }
