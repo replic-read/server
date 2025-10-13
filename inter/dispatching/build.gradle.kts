@@ -12,6 +12,7 @@ dependencies {
     implementation(libs.lombok)
     implementation(libs.starter.web)
     implementation(libs.starter.security)
+    implementation(libs.spring.security.test)
     implementation(libs.springdoc.starter)
     implementation(project(":domain:model"))
     implementation(project(":domain:service"))
