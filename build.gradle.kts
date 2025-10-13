@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
 plugins {
     alias(libs.plugins.convention.java)
     alias(libs.plugins.convention.test)
@@ -29,4 +31,9 @@ dependencies {
     implementation(project(":infrastructure:database"))
     implementation(project(":infrastructure:io"))
     implementation(project(":infrastructure:messaging"))
+}
+
+// See https://stackoverflow.com/questions/69134136/gradle-7-task-disttar-is-a-duplicate-but-no-duplicate-handling-strategy-has-b
+tasks.named<BootJar>("bootJar") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
