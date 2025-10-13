@@ -10,6 +10,7 @@ import com.rere.server.domain.model.exception.OperationDisabledException;
 import com.rere.server.domain.model.exception.OperationDisabledOperation;
 import com.rere.server.domain.model.exception.ReplicQuotaMetException;
 import com.rere.server.inter.dto.error.domain.MessageBasedInfo;
+import com.rere.server.inter.dto.error.domain.NotFoundInfo;
 import com.rere.server.inter.dto.error.domain.NotUniqueInfo;
 import org.junit.jupiter.api.Test;
 
@@ -47,8 +48,12 @@ class ErrorResponseInfoTest {
     }
 
     @Test
+    void fromDomainExceptionWorksForNotFound() {
+        assertInstanceOf(NotFoundInfo.class, ErrorResponseInfo.fromDomainException(NotFoundException.replic(UUID.randomUUID())));
+    }
+
+    @Test
     void fromDomainExceptionWorksForOthers() {
-        assertNull(ErrorResponseInfo.fromDomainException(NotFoundException.replic(UUID.randomUUID())));
         assertNull(ErrorResponseInfo.fromDomainException(new InvalidPasswordException()));
     }
 
