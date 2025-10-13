@@ -96,12 +96,19 @@ class ReplicControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void getReplicContentFailsForNoAuth() throws Exception {
+        UUID replicId = UUID.randomUUID();
+        assertForbidden(get("/replics/%s/content/".formatted(replicId)));
+    }
+
+    @Test
     void getReplicContentCallsExecutorAndReturns() throws Exception {
         when(replicExecutor.getReplicContent(any(), any()))
                 .thenReturn("<h1>Hello world!</h1>");
 
         UUID replicId = UUID.randomUUID();
 
+        setupAuth();
         client.perform(get("/replics/%s/content/".formatted(replicId)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("<h1>Hello world!</h1>"));
@@ -114,8 +121,15 @@ class ReplicControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void updateReplicStateFailsForNoAuth() throws Exception {
+        UUID replicId = UUID.randomUUID();
+        assertForbidden(put("/replics/%s/".formatted(replicId)));
+    }
+
+    @Test
     void updateReplicStateCallsExecutorAndReturns() throws Exception {
         UUID replicId = UUID.randomUUID();
+        setupAuth();
         client.perform(put("/replics/%s/".formatted(replicId))
                         .queryParam("state", "removed"))
                 .andExpect(status().isOk());

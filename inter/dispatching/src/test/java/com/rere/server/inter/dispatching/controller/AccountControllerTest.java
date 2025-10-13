@@ -28,6 +28,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AccountControllerTest extends AbstractControllerTest {
 
     @Test
+    void createAccountFailsForNoAuth() throws Exception {
+        assertForbidden(post("/account/create"));
+    }
+
+    @Test
     void createAccountCallsExecutorAndReturns() throws Exception {
         String content = """
                 {
@@ -43,6 +48,7 @@ class AccountControllerTest extends AbstractControllerTest {
                 new AccountResponse(accountId.toString(), Instant.now().toString(), "email", "username", 42, "active")
         );
 
+        setupAuth();
         client.perform(post("/accounts/")
                         .content(content)
                         .queryParam("send_email", "true")
@@ -93,6 +99,11 @@ class AccountControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void getAccountsFullFailsForNoAuth() throws Exception {
+        assertForbidden(get("/account/full/"));
+    }
+
+    @Test
     void getAccountsFullCallsExecutorAndReturns() throws Exception {
         UUID accId = UUID.randomUUID();
         when(accountExecutor.getAccountsFull(any(), any(), any(), any(), any())).thenReturn(
@@ -100,6 +111,7 @@ class AccountControllerTest extends AbstractControllerTest {
                         new AccountResponse(accId.toString(), Instant.now().toString(), "email@server1.com", "user124", 39, "inactive"))
         );
 
+        setupAuth();
         client.perform(get("/accounts/full/")
                         .queryParam("sort", "status")
                         .queryParam("direction", "ascending")

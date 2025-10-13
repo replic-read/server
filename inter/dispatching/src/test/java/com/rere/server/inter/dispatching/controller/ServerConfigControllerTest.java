@@ -26,6 +26,11 @@ class ServerConfigControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void updateReportFailsForNoAuth() throws Exception {
+        assertForbidden(put("/server-config/"));
+    }
+
+    @Test
     void setServerConfigCallsExecutorAndReturns() throws Exception {
         when(configExecutor.setServerConfig(any()))
                 .thenReturn(
@@ -46,6 +51,7 @@ class ServerConfigControllerTest extends AbstractControllerTest {
                 }
                 """;
 
+        setupAuth();
         client.perform(put("/server-config/").content(content))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.create_replic_group").value("all"))

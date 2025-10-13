@@ -41,7 +41,12 @@ public class SecurityConfig {
             new Endpoint("/replics/", HttpMethod.GET),
             new Endpoint("/replics/", HttpMethod.POST),
             new Endpoint("/reports/", HttpMethod.POST),
-            new Endpoint("/server-config/", HttpMethod.GET)
+            new Endpoint("/server-config/", HttpMethod.GET),
+            new Endpoint("/swagger-ui/**", HttpMethod.GET),
+            new Endpoint("/swagger-ui.html", HttpMethod.GET),
+            new Endpoint("/v3/api-docs", HttpMethod.GET),
+            new Endpoint("/v3/api-docs.yaml", HttpMethod.GET),
+            new Endpoint("/v3/api-docs/**", HttpMethod.GET),
     };
     private final AccessTokenFilter accessTokenFilter;
 
@@ -66,6 +71,7 @@ public class SecurityConfig {
                                 .requestMatchers(endpoint.method(), endpoint.endpoint())
                                 .permitAll();
                     }
+                    config.anyRequest().authenticated();
                         }
                 )
                 .sessionManagement(context -> context

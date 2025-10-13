@@ -14,16 +14,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PersonalControllerTest extends AbstractControllerTest {
 
     @Test
+    void getMeFailsForNoAuth() throws Exception {
+        assertForbidden(get("/me/"));
+    }
+
+    @Test
     void getMeCallsExecutorAndReturns() throws Exception {
         UUID id = UUID.randomUUID();
         when(personalExecutor.getMe()).thenReturn(
                 new AccountResponse(id.toString(), Instant.now().toString(), "email", "username", 55, "active")
         );
 
+        setupAuth();
         client.perform(get("/me/"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.profile_color").value(55));
+    }
+
+    @Test
+    void updateMeFailsForNoAuth() throws Exception {
+        assertForbidden(post("/me/"));
     }
 
     @Test
@@ -41,6 +52,7 @@ class PersonalControllerTest extends AbstractControllerTest {
                 }
                 """;
 
+        setupAuth();
         client.perform(post("/me/").content(content))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
