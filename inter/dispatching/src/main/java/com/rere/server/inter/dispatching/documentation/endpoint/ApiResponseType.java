@@ -31,7 +31,9 @@ public enum ApiResponseType {
 
     ACCOUNT_UNIQUE(HttpStatus.CONFLICT, "Username or email is already used."),
 
-    ;
+    LOGOUT_BAD_TOKEN(HttpStatus.BAD_REQUEST, "The provided token was invalid"),
+
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "The user was not found");
 
     /**
      * The response code for the response.

@@ -3,6 +3,7 @@ package com.rere.server.domain.service.impl;
 import com.rere.server.domain.io.ReplicFileAccessor;
 import com.rere.server.domain.model.account.Account;
 import com.rere.server.domain.model.config.ServerConfig;
+import com.rere.server.domain.model.exception.ExpiredException;
 import com.rere.server.domain.model.exception.InvalidExpirationException;
 import com.rere.server.domain.model.exception.InvalidPasswordException;
 import com.rere.server.domain.model.exception.NotFoundException;
@@ -183,7 +184,8 @@ public class ReplicServiceImpl implements ReplicService {
     }
 
     @Override
-    public InputStream receiveContent(UUID replicId, String password) throws NotFoundException, InvalidPasswordException {
+    public InputStream receiveContent(UUID replicId, String password)
+            throws NotFoundException, InvalidPasswordException, ExpiredException {
         Replic replic = getReplicById(replicId)
                 .orElseThrow(() -> NotFoundException.replic(replicId));
 
@@ -192,6 +194,11 @@ public class ReplicServiceImpl implements ReplicService {
             if(!matches) {
                 throw new InvalidPasswordException();
             }
+        }
+
+        if (replic.getExpirationTimestamp() != null &&
+            replic.getExpirationTimestamp().isBefore(clock.instant())) {
+            throw ExpiredException.replic(replicId);
         }
 
         return replic.getContentStream();

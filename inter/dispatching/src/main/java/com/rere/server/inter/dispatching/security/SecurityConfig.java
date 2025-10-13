@@ -63,6 +63,8 @@ public class SecurityConfig {
                             config
                                     .requestMatchers(HttpMethod.GET, "/auth/request-email-verification/")
                                     .authenticated()
+                                    .requestMatchers(HttpMethod.POST, "/auth/logout/")
+                                    .authenticated()
                                     .requestMatchers("/auth/**")
                                     .permitAll();
 

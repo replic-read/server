@@ -41,6 +41,9 @@ public enum FieldType {
     REFRESH_TOKEN("uuid", ValidationPatterns.UUID, "The refresh token of the user."),
     ACCESS_TOKEN("jwt", "The access token of the user."),
 
+    LOGOUT_REFRESH_TOKEN("uuid", ValidationPatterns.UUID, "The refresh token that should be invalidated."),
+    LOGOUT_ALL("Whether to invalidate all open refresh tokens."),
+
     ACCOUNT_STATE("The current state of the account.", () -> getAll(AccountState.class)),
 
     REPLIC_DESCRIPTION("The description of the replic."),

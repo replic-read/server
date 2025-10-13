@@ -9,6 +9,8 @@ public enum ErrorType {
 
     NON_UNIQUE,
 
-    MESSAGE
+    MESSAGE,
+
+    NOT_FOUND
 
 }

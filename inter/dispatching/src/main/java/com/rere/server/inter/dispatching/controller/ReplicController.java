@@ -14,6 +14,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -131,14 +135,21 @@ public class ReplicController {
                     BAD_AUTHENTICATION}
     )
     @GetMapping("/{id}/content/")
-    public String getReplicContent(
+    public ResponseEntity<StreamingResponseBody> getReplicContent(
             @ValidationMetadata(REPLIC_ID) @Valid @PathVariable(name = "id") String id,
             @ValidationMetadata(value = REPLIC_PASSWORD, required = false) @RequestParam(name = "password", required = false) String password
     ) {
-        return executor.getReplicContent(
+        InputStream stream = executor.getReplicContent(
                 UUID.fromString(id),
                 password
         );
+
+        StreamingResponseBody responseBody = stream::transferTo;
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=content.html")
+                .contentType(MediaType.TEXT_HTML)
+                .body(responseBody);
     }
 
     @Operation(

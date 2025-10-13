@@ -108,4 +108,28 @@ public interface AuthenticationService {
     @Nonnull
     Account validateEmail(@Nonnull UUID authToken) throws InvalidTokenException;
 
+    /**
+     * Invalidates a specific refresh token.
+     *
+     * @param refreshToken The refresh token.
+     * @throws InvalidTokenException If the token was invalid.
+     */
+    void logout(@Nonnull UUID refreshToken) throws InvalidTokenException;
+
+    /**
+     * Invalidates all refresh tokens of the user.
+     *
+     * @param accountId The id of the account.
+     */
+    void logoutAll(@Nonnull UUID accountId);
+
+    /**
+     * Changes the password of an account.
+     *
+     * @param accountId   The id of the account.
+     * @param newPassword The new password.
+     * @throws NotFoundException If the account was not found.
+     */
+    void changePassword(@Nonnull UUID accountId, @Nonnull String newPassword) throws NotFoundException;
+
 }

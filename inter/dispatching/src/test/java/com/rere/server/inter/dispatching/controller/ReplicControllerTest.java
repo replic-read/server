@@ -8,7 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.MvcResult;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Set;
@@ -22,6 +25,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class ReplicControllerTest extends AbstractControllerTest {
@@ -103,13 +107,16 @@ class ReplicControllerTest extends AbstractControllerTest {
 
     @Test
     void getReplicContentCallsExecutorAndReturns() throws Exception {
+        InputStream content = new ByteArrayInputStream("<h1>Hello world!</h1>".getBytes(StandardCharsets.UTF_8));
         when(replicExecutor.getReplicContent(any(), any()))
-                .thenReturn("<h1>Hello world!</h1>");
+                .thenReturn(content);
 
         UUID replicId = UUID.randomUUID();
 
         setupAuth();
         client.perform(get("/replics/%s/content/".formatted(replicId)))
+                .andExpect(request().asyncStarted())
+                .andDo(MvcResult::getAsyncResult)
                 .andExpect(status().isOk())
                 .andExpect(content().string("<h1>Hello world!</h1>"));
 

@@ -1,6 +1,7 @@
 package com.rere.server.inter.execution;
 
 import com.rere.server.domain.model.exception.DomainException;
+import com.rere.server.domain.model.exception.ExpiredException;
 import com.rere.server.domain.model.exception.InvalidExpirationException;
 import com.rere.server.domain.model.exception.InvalidPasswordException;
 import com.rere.server.domain.model.exception.InvalidTokenException;
@@ -36,6 +37,7 @@ public class HttpErrorResponseException extends RuntimeException {
         DOMAIN_EXCEPTION_CODES.put(OperationDisabledException.class, 403);
         DOMAIN_EXCEPTION_CODES.put(ReplicContentWriteException.class, 500);
         DOMAIN_EXCEPTION_CODES.put(ReplicQuotaMetException.class, 429);
+        DOMAIN_EXCEPTION_CODES.put(ExpiredException.class, 410);
     }
 
     /**

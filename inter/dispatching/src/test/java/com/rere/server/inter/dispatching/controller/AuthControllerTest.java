@@ -9,6 +9,7 @@ import org.mockito.ArgumentCaptor;
 import java.time.Instant;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -130,6 +131,25 @@ class AuthControllerTest extends AbstractControllerTest {
         verify(authExecutor).requestEmailVerification(htmlCaptor.capture());
 
         assertFalse(htmlCaptor.getValue());
+    }
+
+    @Test
+    void logoutFailsForNoAuth() throws Exception {
+        assertForbidden(post("/auth/logout/"));
+    }
+
+    @Test
+    void logoutCallsExecutorAndReturns() throws Exception {
+        UUID id = UUID.randomUUID();
+        setupAuth();
+        client.perform(post("/auth/logout/")
+                        .queryParam("token", id.toString()))
+                .andExpect(status().isOk());
+
+        var idCaptor = ArgumentCaptor.<UUID>captor();
+        verify(authExecutor).logout(idCaptor.capture(), anyBoolean());
+
+        assertEquals(id, idCaptor.getValue());
     }
 
 }

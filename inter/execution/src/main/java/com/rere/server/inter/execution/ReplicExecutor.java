@@ -3,6 +3,7 @@ package com.rere.server.inter.execution;
 import com.rere.server.inter.dto.request.CreateReplicRequest;
 import com.rere.server.inter.dto.response.ReplicResponse;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
@@ -36,9 +37,9 @@ public interface ReplicExecutor<RS, RSP, D, I, C> {
      * Executor for GET /replics/{id}/content/
      * @param id The 'id' path variable.
      * @param password The 'password' query parameter.
-     * @return The response body.
+     * @return The stream that contains the replic content.
      */
-    String getReplicContent(I id, String password);
+    InputStream getReplicContent(I id, String password);
 
     /**
      * Executor for PUT /replics/{id}/.

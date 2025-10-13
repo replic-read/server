@@ -110,6 +110,19 @@ public class AuthenticationExecutorImpl extends AbstractExecutor implements Auth
     }
 
     @Override
+    public void logout(UUID refreshToken, boolean all) {
+        if (all) {
+            authService.logoutAll(getAuth().getId());
+        } else if (refreshToken != null) {
+            try {
+                authService.logout(refreshToken);
+            } catch (InvalidTokenException e) {
+                throw HttpErrorResponseException.fromDomainException(e);
+            }
+        }
+    }
+
+    @Override
     public void requestEmailVerification(boolean html) {
         try {
             authService.requestEmailVerification(getAuth().getId(), html);

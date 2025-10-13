@@ -1,6 +1,7 @@
 package com.rere.server.domain.service;
 
 import com.rere.server.domain.model.account.Account;
+import com.rere.server.domain.model.exception.ExpiredException;
 import com.rere.server.domain.model.exception.InvalidExpirationException;
 import com.rere.server.domain.model.exception.InvalidPasswordException;
 import com.rere.server.domain.model.exception.NotFoundException;
@@ -98,8 +99,9 @@ public interface ReplicService {
      * @return The stream containing the content.
      * @throws NotFoundException        If the replic was not found.
      * @throws InvalidPasswordException If the password was invalid.
+     * @throws ExpiredException If the replic is expired.
      */
     @NonNull
-    InputStream receiveContent(@NonNull UUID replicId, String password) throws NotFoundException, InvalidPasswordException;
+    InputStream receiveContent(@NonNull UUID replicId, String password) throws NotFoundException, InvalidPasswordException, ExpiredException;
 
 }
