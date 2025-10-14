@@ -47,6 +47,10 @@ public class SecurityConfig {
             new Endpoint("/v3/api-docs", HttpMethod.GET),
             new Endpoint("/v3/api-docs.yaml", HttpMethod.GET),
             new Endpoint("/v3/api-docs/**", HttpMethod.GET),
+            new Endpoint("/auth/submit-email-verification/", HttpMethod.POST),
+            new Endpoint("/auth/refresh/", HttpMethod.POST),
+            new Endpoint("/auth/login/", HttpMethod.POST),
+            new Endpoint("/auth/signup/", HttpMethod.POST),
     };
     private final AccessTokenFilter accessTokenFilter;
 
@@ -60,20 +64,15 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable) // Safe to disable because we use JWT's.
                 .authorizeHttpRequests(config -> {
-                            config
-                                    .requestMatchers(HttpMethod.GET, "/auth/request-email-verification/")
-                                    .authenticated()
-                                    .requestMatchers(HttpMethod.POST, "/auth/logout/")
-                                    .authenticated()
-                                    .requestMatchers("/auth/**")
-                                    .permitAll();
-
                     for (Endpoint endpoint : UNAUTHENTICATED_ENDPOINTS) {
                         config
                                 .requestMatchers(endpoint.method(), endpoint.endpoint())
                                 .permitAll();
                     }
-                    config.anyRequest().authenticated();
+
+                    config
+                            .anyRequest()
+                            .authenticated();
                         }
                 )
                 .sessionManagement(context -> context
