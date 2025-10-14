@@ -36,9 +36,12 @@ public class AccessTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String jwt = request.getHeader(AUTH_HEADER_NAME) != null ?
-                request.getHeader(AUTH_HEADER_NAME).replaceFirst(PREFIX, "")
-                : "";
+        if (request.getHeader(AUTH_HEADER_NAME) == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String jwt = request.getHeader(AUTH_HEADER_NAME).replaceFirst(PREFIX, "");
 
         Optional<Account> authentication = authService.authenticateWithJwt(jwt);
 
