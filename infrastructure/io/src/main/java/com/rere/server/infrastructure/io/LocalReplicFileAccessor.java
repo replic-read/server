@@ -38,9 +38,10 @@ public class LocalReplicFileAccessor implements ReplicFileAccessor {
         String filename = FILE_NAME_FORMAT.formatted(replicId.toString());
         File file = new File(rootDirectory.toFile(), filename);
         try {
-            boolean success = file.createNewFile();
+            boolean success = file.getParentFile().mkdirs();
+            success = success && file.createNewFile();
             if (!success) {
-                throw new IOException();
+                throw new IOException("Was not able to create file '%s'.".formatted(file.getAbsolutePath()));
             }
         } catch (IOException e) {
             throw new IllegalStateException("File for replic could not be created.", e);
