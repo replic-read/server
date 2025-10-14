@@ -6,7 +6,7 @@ import com.rere.server.inter.execution.AuthPrincipalSupplier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -58,15 +59,9 @@ public class SecurityConfig {
             new Endpoint("/auth/login/", HttpMethod.POST),
             new Endpoint("/auth/signup/", HttpMethod.POST),
     };
-    private final AccessTokenFilter accessTokenFilter;
-
-    @Autowired
-    public SecurityConfig(AccessTokenFilter accessTokenFilter) {
-        this.accessTokenFilter = accessTokenFilter;
-    }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider provider) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider provider, @Qualifier("rereAuthFilter") OncePerRequestFilter authFilter) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable) // Safe to disable because we use JWT's.
                 .authorizeHttpRequests(config -> {
@@ -84,7 +79,7 @@ public class SecurityConfig {
                 .sessionManagement(context -> context
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(provider)
-                .addFilterBefore(accessTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -148,7 +143,7 @@ public class SecurityConfig {
      * @param endpoint The endpoint value.
      * @param method The method value.
      */
-    private record Endpoint(String endpoint, HttpMethod method) {
+    public record Endpoint(String endpoint, HttpMethod method) {
     }
 
 }

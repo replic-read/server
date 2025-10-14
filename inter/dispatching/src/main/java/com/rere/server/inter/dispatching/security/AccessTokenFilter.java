@@ -7,6 +7,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -19,6 +21,8 @@ import java.util.Optional;
 /**
  * Access-token filter that gives every request that presents a sensible authentication token a spring-security compatible authorization.
  */
+@Profile("!load-test")
+@Qualifier("rereAuthFilter")
 @Component
 public class AccessTokenFilter extends OncePerRequestFilter {
 
@@ -54,3 +58,4 @@ public class AccessTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+
