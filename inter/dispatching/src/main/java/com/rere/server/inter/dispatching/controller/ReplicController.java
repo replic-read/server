@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -95,7 +94,7 @@ public class ReplicController {
                 mapToEnum(sortDirection, SortDirectionParameter.class),
                 replicId != null ? UUID.fromString(replicId) : null,
                 userId != null ? UUID.fromString(userId) : null,
-                stateFilter.stream().map(state -> mapToEnum(state, ReplicState.class)).collect(Collectors.toSet()),
+                stateFilter != null ? stateFilter.stream().map(state -> mapToEnum(state, ReplicState.class)).collect(Collectors.toSet()) : null,
                 query
         );
     }
@@ -134,7 +133,8 @@ public class ReplicController {
                     NO_PERMISSION_NO_EXIST,
                     BAD_AUTHENTICATION}
     )
-    @GetMapping("/{id}/content/")
+    @GetMapping("/{id}/content/"
+    )
     public ResponseEntity<StreamingResponseBody> getReplicContent(
             @ValidationMetadata(REPLIC_ID) @Valid @PathVariable(name = "id") String id,
             @ValidationMetadata(value = REPLIC_PASSWORD, required = false) @RequestParam(name = "password", required = false) String password
@@ -147,7 +147,6 @@ public class ReplicController {
         StreamingResponseBody responseBody = stream::transferTo;
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=content.html")
                 .contentType(MediaType.TEXT_HTML)
                 .body(responseBody);
     }

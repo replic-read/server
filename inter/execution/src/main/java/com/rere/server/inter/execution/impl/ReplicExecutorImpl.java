@@ -45,7 +45,7 @@ import java.util.UUID;
 @Component
 public class ReplicExecutorImpl extends AbstractExecutor implements ReplicExecutor<ReplicState, ReplicSortParameter, SortDirectionParameter, UUID, InputStream> {
 
-    private static final String HOST_URL_FORMAT = "%s/replics/%s";
+    private static final String HOST_URL_FORMAT = "%s/replics/%s/content/";
 
     private final String baseUrl;
 

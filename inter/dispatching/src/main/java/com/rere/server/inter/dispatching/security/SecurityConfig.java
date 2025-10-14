@@ -45,6 +45,7 @@ public class SecurityConfig {
             new Endpoint("/accounts/partial/", HttpMethod.GET),
             new Endpoint("/replics/", HttpMethod.GET),
             new Endpoint("/replics/", HttpMethod.POST),
+            new Endpoint("/replics/{id}/content/", HttpMethod.GET),
             new Endpoint("/reports/", HttpMethod.POST),
             new Endpoint("/server-config/", HttpMethod.GET),
             new Endpoint("/swagger-ui/**", HttpMethod.GET),
