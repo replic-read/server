@@ -5,6 +5,7 @@ import com.rere.server.domain.service.AccountService;
 import com.rere.server.inter.execution.AuthPrincipalSupplier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +31,7 @@ import java.util.Collections;
 /**
  * Security configuration.
  */
+@Slf4j
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -111,7 +113,10 @@ public class SecurityConfig {
 
     @Bean
     public AuthPrincipalSupplier authPrincipalSupplier() {
-        return () -> (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return () -> {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return principal instanceof Account account ? account : null;
+        };
     }
 
     /**
