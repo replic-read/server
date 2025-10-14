@@ -2,13 +2,13 @@ package com.rere.server.inter.dispatching.controller;
 
 import com.rere.server.domain.model.replic.ReplicState;
 import com.rere.server.inter.dispatching.documentation.endpoint.EndpointMetadata;
+import com.rere.server.inter.dto.error.HttpErrorResponseException;
 import com.rere.server.inter.dto.error.domain.MessageBasedInfo;
 import com.rere.server.inter.dto.parameter.ReplicSortParameter;
 import com.rere.server.inter.dto.parameter.SortDirectionParameter;
 import com.rere.server.inter.dto.request.CreateReplicRequest;
 import com.rere.server.inter.dto.response.ReplicResponse;
 import com.rere.server.inter.dto.validation.ValidationMetadata;
-import com.rere.server.inter.execution.HttpErrorResponseException;
 import com.rere.server.inter.execution.ReplicExecutor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

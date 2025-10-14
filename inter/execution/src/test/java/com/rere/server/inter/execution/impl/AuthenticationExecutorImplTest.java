@@ -8,12 +8,12 @@ import com.rere.server.domain.model.exception.NotUniqueException;
 import com.rere.server.domain.model.exception.NotUniqueSubject;
 import com.rere.server.domain.model.impl.AccountImpl;
 import com.rere.server.inter.authorization.AuthorizationException;
+import com.rere.server.inter.dto.error.HttpErrorResponseException;
 import com.rere.server.inter.dto.request.CreateAccountRequest;
 import com.rere.server.inter.dto.request.CredentialsRequest;
 import com.rere.server.inter.dto.request.RefreshRequest;
 import com.rere.server.inter.dto.request.SubmitEmailVerificationRequest;
 import com.rere.server.inter.dto.response.AccountWithTokensResponse;
-import com.rere.server.inter.execution.HttpErrorResponseException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 

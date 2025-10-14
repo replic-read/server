@@ -1,0 +1,10 @@
+{
+  "email": "#{randomAlphanumeric(10)}@#{randomAlphanumeric(5)}.#{randomAlphanumeric(3)}",
+  "username": "#{randomAlphanumeric(10)}",
+  "password": "#{randomAlphanumeric(10)}",
+  "profile_color":
+  #{
+  randomLong(0,
+  2147483647)
+}
+}

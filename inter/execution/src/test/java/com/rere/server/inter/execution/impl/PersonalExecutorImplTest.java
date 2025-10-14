@@ -8,10 +8,10 @@ import com.rere.server.domain.model.exception.NotUniqueSubject;
 import com.rere.server.domain.model.exception.OperationDisabledException;
 import com.rere.server.domain.model.exception.OperationDisabledOperation;
 import com.rere.server.domain.model.impl.AccountImpl;
+import com.rere.server.inter.dto.error.HttpErrorResponseException;
 import com.rere.server.inter.dto.request.UpdateAccountRequest;
 import com.rere.server.inter.dto.response.AccountResponse;
 import com.rere.server.inter.dto.response.QuotaProgressResponse;
-import com.rere.server.inter.execution.HttpErrorResponseException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 
