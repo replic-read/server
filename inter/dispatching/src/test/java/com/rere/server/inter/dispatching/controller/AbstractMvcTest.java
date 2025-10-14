@@ -9,6 +9,7 @@ import com.rere.server.domain.service.AccountService;
 import com.rere.server.domain.service.AuthenticationService;
 import com.rere.server.inter.dispatching.security.AccessTokenFilter;
 import com.rere.server.inter.dispatching.security.SecurityConfig;
+import com.rere.server.inter.dispatching.security.WhitelistBasicAuthFilter;
 import com.rere.server.inter.dto.parameter.AccountSortParameter;
 import com.rere.server.inter.dto.parameter.ReplicSortParameter;
 import com.rere.server.inter.dto.parameter.ReportSortParameter;
@@ -48,8 +49,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Abstract configuration for all mvc tests.
  */
-@SpringBootTest(classes = AbstractControllerTest.Config.class)
-abstract class AbstractControllerTest {
+@SpringBootTest(classes = AbstractMvcTest.Config.class)
+public abstract class AbstractMvcTest {
 
     @MockitoBean
     protected AuthenticationExecutor authExecutor;
@@ -74,7 +75,7 @@ abstract class AbstractControllerTest {
 
     protected String jwt = null;
     @MockitoBean
-    private AuthenticationService authService;
+    protected AuthenticationService authService;
 
     @Autowired
     protected WebApplicationContext context;
@@ -154,7 +155,7 @@ abstract class AbstractControllerTest {
      */
     @EnableWebMvc
     @Configuration
-    @Import({AccessTokenFilter.class, SecurityConfig.class, AuthenticationController.class, AccountController.class, AdminPanelController.class, PersonalController.class, ReplicController.class, ReportController.class, ServerConfigController.class,})
+    @Import({WhitelistBasicAuthFilter.class, AccessTokenFilter.class, SecurityConfig.class, AuthenticationController.class, AccountController.class, AdminPanelController.class, PersonalController.class, ReplicController.class, ReportController.class, ServerConfigController.class,})
     static class Config {
 
         @Bean

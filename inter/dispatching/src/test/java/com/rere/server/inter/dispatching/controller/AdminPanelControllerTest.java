@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class AdminPanelControllerTest extends AbstractControllerTest {
+class AdminPanelControllerTest extends AbstractMvcTest {
 
     @Test
     void shutdownFailsForNoAuth() throws Exception {

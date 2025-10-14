@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Contains tests for the {@link AccountController} class.
  */
-class AccountControllerTest extends AbstractControllerTest {
+class AccountControllerTest extends AbstractMvcTest {
 
     @Test
     void createAccountFailsForNoAuth() throws Exception {
