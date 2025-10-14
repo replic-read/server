@@ -190,7 +190,7 @@ public class ReplicServiceImpl implements ReplicService {
                 .orElseThrow(() -> NotFoundException.replic(replicId));
 
         if(replic.requiresPassword()) {
-            boolean matches = encoder.matches(password, replic.getPasswordHash());
+            boolean matches = password != null && encoder.matches(password, replic.getPasswordHash());
             if(!matches) {
                 throw new InvalidPasswordException();
             }
