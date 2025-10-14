@@ -28,6 +28,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * Security configuration.
@@ -61,8 +62,8 @@ public class SecurityConfig {
     };
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider provider, @Qualifier("rereAuthFilter") OncePerRequestFilter authFilter) throws Exception {
-        return http
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider provider, @Qualifier("rereAuthFilter") Set<OncePerRequestFilter> authFilters) throws Exception {
+        http
                 .csrf(AbstractHttpConfigurer::disable) // Safe to disable because we use JWT's.
                 .authorizeHttpRequests(config -> {
                     for (Endpoint endpoint : UNAUTHENTICATED_ENDPOINTS) {
@@ -78,9 +79,11 @@ public class SecurityConfig {
                 )
                 .sessionManagement(context -> context
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(provider)
-                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .authenticationProvider(provider);
+
+        authFilters.forEach(filter -> http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class));
+
+        return http.build();
     }
 
     /**
