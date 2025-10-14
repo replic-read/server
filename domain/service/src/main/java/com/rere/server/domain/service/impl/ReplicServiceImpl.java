@@ -114,7 +114,7 @@ public class ReplicServiceImpl implements ReplicService {
                 .state(ReplicState.ACTIVE)
                 .description(description)
                 .expirationTimestamp(expiration)
-                .passwordHash(encoder.encode(password))
+                .passwordHash(password != null ? encoder.encode(password) : null)
                 .ownerId(account != null ? account.getId() : null)
                 .build();
 
