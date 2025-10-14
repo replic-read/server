@@ -68,8 +68,13 @@ public class WhitelistBasicAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader(HEADER_NAME) != null ? request.getHeader(HEADER_NAME) : "";
         String basicContent = authHeader.replace(PREFIX, "");
-        byte[] decodedArray = Base64.getDecoder().decode(basicContent.getBytes(StandardCharsets.UTF_8));
-        String decodedContent = new String(decodedArray, StandardCharsets.UTF_8);
+        String decodedContent;
+        try {
+            byte[] decodedArray = Base64.getDecoder().decode(basicContent.getBytes(StandardCharsets.UTF_8));
+            decodedContent = new String(decodedArray, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            decodedContent = "";
+        }
 
         String username = extractUsername(decodedContent);
         String password = extractPassword(decodedContent);
