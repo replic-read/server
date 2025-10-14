@@ -15,9 +15,9 @@ import com.rere.server.inter.authorization.Authorizer;
 import com.rere.server.inter.dto.request.ServerConfigRequest;
 import com.rere.server.inter.dto.response.ServerConfigResponse;
 import com.rere.server.inter.execution.AbstractExecutor;
+import com.rere.server.inter.execution.AuthPrincipalSupplier;
 import com.rere.server.inter.execution.ServerConfigExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
@@ -30,8 +30,8 @@ import static com.rere.server.inter.dto.mapper.EnumMapper.mapToString;
 @Component
 public class ServerConfigExecutorImpl extends AbstractExecutor implements ServerConfigExecutor {
     @Autowired
-    protected ServerConfigExecutorImpl(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer, @Value("${rere.baseurl") String baseUrl) {
-        super(accountService, authService, replicService, reportService, configService, quotaService, authorizer);
+    protected ServerConfigExecutorImpl(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer, AuthPrincipalSupplier authSupplier) {
+        super(accountService, authService, replicService, reportService, configService, quotaService, authorizer, authSupplier);
     }
 
     private static ServerConfigResponse createServerConfigResponse(ServerConfig config) {

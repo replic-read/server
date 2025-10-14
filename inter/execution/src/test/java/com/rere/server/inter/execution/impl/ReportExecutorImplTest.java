@@ -69,7 +69,7 @@ class ReportExecutorImplTest extends BaseExecutorTest {
     void createReportConvertsDomainException() throws DomainException {
         when(reportService.reportReplic(any(), any(), any()))
                 .thenThrow(NotFoundException.replic(UUID.randomUUID()));
-        subject.setAuth(AccountImpl.builder().build());
+        when(authSupplier.get()).thenReturn(AccountImpl.builder().build());
 
         assertThrows(HttpErrorResponseException.class,
                 () -> subject.createReport(new CreateReportRequest(""), UUID.randomUUID()));

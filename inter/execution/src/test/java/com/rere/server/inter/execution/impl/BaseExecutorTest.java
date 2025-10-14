@@ -8,6 +8,7 @@ import com.rere.server.domain.service.ReportService;
 import com.rere.server.domain.service.ServerConfigService;
 import com.rere.server.inter.authorization.AuthorizationException;
 import com.rere.server.inter.authorization.Authorizer;
+import com.rere.server.inter.execution.AuthPrincipalSupplier;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,6 +34,8 @@ public abstract class BaseExecutorTest {
     protected QuotaService quotaService;
     @Mock(strictness = Mock.Strictness.LENIENT)
     protected Authorizer authorizer;
+    @Mock
+    protected AuthPrincipalSupplier authSupplier;
 
     protected void assertAuthorizationIsPropagated(Runnable call) {
         doThrow(AuthorizationException.genericUnauthorized()).when(authorizer).requireAccessReplics(any());

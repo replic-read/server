@@ -1,6 +1,8 @@
 package com.rere.server.inter.dispatching.security;
 
+import com.rere.server.domain.model.account.Account;
 import com.rere.server.domain.service.AccountService;
+import com.rere.server.inter.execution.AuthPrincipalSupplier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -104,6 +107,11 @@ public class SecurityConfig {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(service);
         provider.setPasswordEncoder(encoder);
         return provider;
+    }
+
+    @Bean
+    public AuthPrincipalSupplier authPrincipalSupplier() {
+        return () -> (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     /**

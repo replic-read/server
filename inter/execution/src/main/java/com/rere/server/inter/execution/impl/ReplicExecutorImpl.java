@@ -23,6 +23,7 @@ import com.rere.server.inter.dto.parameter.SortDirectionParameter;
 import com.rere.server.inter.dto.request.CreateReplicRequest;
 import com.rere.server.inter.dto.response.ReplicResponse;
 import com.rere.server.inter.execution.AbstractExecutor;
+import com.rere.server.inter.execution.AuthPrincipalSupplier;
 import com.rere.server.inter.execution.ReplicExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,8 +50,8 @@ public class ReplicExecutorImpl extends AbstractExecutor implements ReplicExecut
     private final String baseUrl;
 
     @Autowired
-    protected ReplicExecutorImpl(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer, @Value("${rere.baseurl}") String baseUrl) {
-        super(accountService, authService, replicService, reportService, configService, quotaService, authorizer);
+    protected ReplicExecutorImpl(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer, AuthPrincipalSupplier authSupplier, @Value("${rere.baseurl}") String baseUrl) {
+        super(accountService, authService, replicService, reportService, configService, quotaService, authorizer, authSupplier);
         this.baseUrl = baseUrl;
     }
 

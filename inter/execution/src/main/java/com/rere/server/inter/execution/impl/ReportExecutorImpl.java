@@ -18,6 +18,7 @@ import com.rere.server.inter.dto.parameter.SortDirectionParameter;
 import com.rere.server.inter.dto.request.CreateReportRequest;
 import com.rere.server.inter.dto.response.ReportResponse;
 import com.rere.server.inter.execution.AbstractExecutor;
+import com.rere.server.inter.execution.AuthPrincipalSupplier;
 import com.rere.server.inter.execution.ReportExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -30,8 +31,8 @@ import java.util.UUID;
 @Component
 public class ReportExecutorImpl extends AbstractExecutor implements ReportExecutor<ReportState, ReportSortParameter, SortDirectionParameter, UUID> {
     @Autowired
-    protected ReportExecutorImpl(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer) {
-        super(accountService, authService, replicService, reportService, configService, quotaService, authorizer);
+    protected ReportExecutorImpl(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer, AuthPrincipalSupplier authSupplier) {
+        super(accountService, authService, replicService, reportService, configService, quotaService, authorizer, authSupplier);
     }
 
     @Override

@@ -146,7 +146,7 @@ class AuthenticationExecutorImplTest extends BaseExecutorTest {
 
     @Test
     void requestEmailVerificationCallsService() throws DomainException {
-        subject.setAuth(AccountImpl.builder().build());
+        when(authSupplier.get()).thenReturn(AccountImpl.builder().build());
         subject.requestEmailVerification(true);
 
         verify(authService, times(1)).requestEmailVerification(any(), anyBoolean());
@@ -154,7 +154,7 @@ class AuthenticationExecutorImplTest extends BaseExecutorTest {
 
     @Test
     void requestEmailVerificationConvertsNotFound() throws DomainException {
-        subject.setAuth(AccountImpl.builder().build());
+        when(authSupplier.get()).thenReturn(AccountImpl.builder().build());
         doThrow(NotFoundException.account(UUID.randomUUID()))
                 .when(authService).requestEmailVerification(any(), anyBoolean());
 
@@ -164,7 +164,7 @@ class AuthenticationExecutorImplTest extends BaseExecutorTest {
 
     @Test
     void logoutCallsServiceLogoutAllIfAll() {
-        subject.setAuth(AccountImpl.builder().build());
+        when(authSupplier.get()).thenReturn(AccountImpl.builder().build());
         subject.logout(UUID.randomUUID(), true);
 
         verify(authService).logoutAll(any());
