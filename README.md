@@ -39,25 +39,27 @@ For further instructions on deployment, refer to the [deployment guide](DEPLOYME
 
 ### Database
 
-The [Docker-compose file](docker-compose.yml) in the root of the project is preconfigured with a postgres database.
-Ensure that the `spring.datasource.*` values `username`, `password` and `url` match the values you provided in the
-compose file.
+When developing, it is helpful to have a local database running. This can be achieved by creating a `docker-compose.yml`
+file:
 
-You can start the database by running
-
-```bash
-docker compose up -d
+```yaml
+services:
+  database:
+    image: postgres:18
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: replic_read
 ```
 
-in the project root directory.
+For you development setup to be able to connect to your local database, tweak the `spring.datasource.*` values in
+the [config file for the 'dev' profile](src/main/resources/application-dev.yml).
 
 ### Email
 
-You also need to adjust the `rere.mail.*` values. Most important are:
-
-- `username`: The username for authentication with the SMTP server. This usually is the email address.
-- `password`: The password for the username.
-- `smtpHost`: The host domain of the SMTP server.
+For the messaging to work, you also need to change the `rere.mail.*` values.
 
 Note: using `*@gmail.com` addresses need special setup.
 Refer to
