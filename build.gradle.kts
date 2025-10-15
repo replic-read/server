@@ -20,6 +20,10 @@ repositories {
     mavenCentral()
 }
 
+springBoot {
+    buildInfo()
+}
+
 dependencies {
     implementation(libs.starter.actuator)
 

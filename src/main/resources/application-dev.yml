@@ -1,5 +1,8 @@
 # Application config
 rere:
+
+  meta.version: ${version:${spring.application.version:unknown}}
+
   # Base url with schema and no trailing slash.
   baseurl: 'http://localhost:8080'
 
@@ -79,3 +82,4 @@ spring:
 
 logging.level.org.springframework.security: DEBUG
 log4j.logger.org.hibernate.validator: debug
+management.endpoints.web.exposure.include: "*"

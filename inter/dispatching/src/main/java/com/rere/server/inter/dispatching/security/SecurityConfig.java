@@ -71,6 +71,9 @@ public class SecurityConfig {
             new Endpoint("/v3/api-docs/**", HttpMethod.GET),
             new Endpoint("/swagger-ui.html", HttpMethod.GET),
             new Endpoint("/swagger-ui/**", HttpMethod.GET),
+            new Endpoint("/swagger-ui/**", HttpMethod.GET),
+            new Endpoint("/actuator", null),
+            new Endpoint("/actuator/**", null),
     };
 
     @Bean
