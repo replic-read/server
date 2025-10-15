@@ -7,3 +7,15 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: replic_read
+
+  server:
+    image: docker.io/library/server:0.0.2
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+
+    environment:
+      RERE_DB_URL: jdbc:postgresql://database/replic_read
+      RERE_DB_USERNAME: admin
+      RERE_DB_PASSWORD: admin

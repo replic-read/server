@@ -31,6 +31,10 @@
 # Replic-Read server component
 Welcome to the GitHub repository for the server component of the Replic-Read system.
 
+## Deployment
+
+For further instructions on deployment, refer to the [deployment guide](DEPLOYMENT.md).
+
 ## Development setup
 
 ### Database
