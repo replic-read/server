@@ -22,6 +22,7 @@
 [![Coverage](https://sonar.bumiller.me/api/project_badges/measure?project=server&metric=coverage&token=sqb_85f2dbd8a01b37bb3d98220a34b0ea7cafcbf2e6)](https://sonar.bumiller.me/dashboard?id=server)
 [![Duplicated Lines (%)](https://sonar.bumiller.me/api/project_badges/measure?project=server&metric=duplicated_lines_density&token=sqb_85f2dbd8a01b37bb3d98220a34b0ea7cafcbf2e6)](https://sonar.bumiller.me/dashboard?id=server)
 [![Lines of Code](https://sonar.bumiller.me/api/project_badges/measure?project=server&metric=ncloc&token=sqb_85f2dbd8a01b37bb3d98220a34b0ea7cafcbf2e6)](https://sonar.bumiller.me/dashboard?id=server)
+<br>
 ![Scala](https://img.shields.io/badge/scala-%23DC322F.svg?style=for-the-badge&logo=scala&logoColor=white)
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Gradle](https://img.shields.io/badge/Gradle-02303A.svg?style=for-the-badge&logo=Gradle&logoColor=white)
