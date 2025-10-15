@@ -1,58 +1,61 @@
 # Application config
 rere:
 
-  # Base url with schema and no trailing slash.
-  baseurl: 'http://localhost:8080'
+  meta.version: ${version:${spring.application.version:unknown}}
 
-  content.root: '/home/simon/IdeaProjects/Replic-Read Server/server_content_root/'
+  # Base url with schema and no trailing slash.
+  baseurl: ${RERE_BASEURL:https://example.com}
+
+  # Directory where replic content is stored
+  content.root: ${RERE_CONTENT_ROOT:}
 
   # Config for the authentication
   auth:
 
     # Refresh-token expiration in millis
-    refresh.expiration: 2592000000 # 30 days
+    refresh.expiration: ${RERE_AUTH_REFRESH_EXP:2592000000}
 
     # Email-token expiration in millis
-    email.expiration: 900000 # 15 minutes
+    email.expiration: ${RERE_EMAIL_EXP:900000}
 
     # Config for the access-tokens
     access:
 
       # Access-token expiration duration in millis
-      expiration: 900000 # 15 minutes
+      expiration: ${RERE_AUTH_ACCESS_EXP:900000}
 
       # Private key for signing JWT's
-      secret: d2cf0591-a08d-4547-8cec-363daee402b0
+      secret: ${RERE_AUTH_ACCESS_SECRET:d2cf0591-a08d-4547-8cec-363daee402b0}
 
   # Config for the email messaging
   mail:
 
     # Username for authenticating to the smtp server
-    username: test@bumiller.me
+    username: ${RERE_MAIL_USERNAME:user@example.com}
 
     # Password for authenticating to the smtp server
-    password: 8%*$5d6*XU!i#C
+    password: ${RERE_MAIL_PASSWORD:examplepassword}
 
     # Host of the smtp server
-    smtpHost: smtp.ionos.de
+    smtpHost: ${RERE_MAIL_HOST:smtp.example.com}
 
     # Port of the smtp server
-    smtpPort: 465
+    smtpPort: ${RERE_MAIL_PORT:465}
 
     # Whether to use ssl encryption
-    ssl: true
+    ssl: ${RERE_MAIL_SSL:true}
 
   # Config about the admin account
   admin:
 
     # Username of the admin account
-    username: root
+    username: ${RERE_ADMIN_USERNAME:root}
 
     # Email of the admin account
-    email: admin@example.com
+    email: ${RERE_ADMIN_EMAIL:root@example.com}
 
     # Password to the admin account
-    password: root
+    password: ${RERE_ADMIN_PASSWORD:root}
 
 # Spring config
 spring:
@@ -61,13 +64,13 @@ spring:
   datasource:
 
     # Database username
-    username: admin
+    username: ${RERE_DB_USERNAME}
 
     # Database password
-    password: admin
+    password: ${RERE_DB_PASSWORD}
 
     # Database url
-    url: 'jdbc:postgresql://localhost:5432/replic_read'
+    url: ${RERE_DB_URL}
 
     # Driver class of the database
     driver-class-name: org.postgresql.Driver
@@ -77,7 +80,3 @@ spring:
 
   # How hibernate should react to schema differences. We want to update the schema.
   jpa.hibernate.ddl-auto: update
-
-logging.level.org.springframework.security: DEBUG
-log4j.logger.org.hibernate.validator: debug
-management.endpoints.web.exposure.include: "*"
