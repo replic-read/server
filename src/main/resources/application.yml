@@ -1,8 +1,6 @@
 # Application config
 rere:
 
-  meta.version: ${version:${spring.application.version:unknown}}
-
   # Base url with schema and no trailing slash.
   baseurl: ${RERE_BASEURL:https://example.com}
 

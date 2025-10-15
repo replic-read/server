@@ -1,5 +1,5 @@
 [versions]
-spring_starter = "4.0.0-M3"
+spring_starter = "3.5.6"
 springdoc = "2.8.13"
 lombok = "1.18.36"
 mockito = "5.20.0"
