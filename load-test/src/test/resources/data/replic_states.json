@@ -1,0 +1,11 @@
+[
+  {
+    "replicState": "active"
+  },
+  {
+    "replicState": "inactive"
+  },
+  {
+    "replicState": "removed"
+  }
+]

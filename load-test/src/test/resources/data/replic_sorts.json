@@ -1,0 +1,14 @@
+[
+  {
+    "replicSort": "date"
+  },
+  {
+    "replicSort": "expiration"
+  },
+  {
+    "replicSort": "size"
+  },
+  {
+    "replicSort": "origin"
+  }
+]

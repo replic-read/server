@@ -1,0 +1,11 @@
+[
+  {
+    "accountState": "active"
+  },
+  {
+    "accountState": "inactive"
+  },
+  {
+    "accountState": "unverified"
+  }
+]
