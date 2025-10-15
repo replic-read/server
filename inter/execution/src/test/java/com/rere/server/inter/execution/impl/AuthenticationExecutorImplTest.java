@@ -8,12 +8,12 @@ import com.rere.server.domain.model.exception.NotUniqueException;
 import com.rere.server.domain.model.exception.NotUniqueSubject;
 import com.rere.server.domain.model.impl.AccountImpl;
 import com.rere.server.inter.authorization.AuthorizationException;
+import com.rere.server.inter.dto.error.HttpErrorResponseException;
 import com.rere.server.inter.dto.request.CreateAccountRequest;
 import com.rere.server.inter.dto.request.CredentialsRequest;
 import com.rere.server.inter.dto.request.RefreshRequest;
 import com.rere.server.inter.dto.request.SubmitEmailVerificationRequest;
 import com.rere.server.inter.dto.response.AccountWithTokensResponse;
-import com.rere.server.inter.execution.HttpErrorResponseException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 
@@ -146,7 +146,7 @@ class AuthenticationExecutorImplTest extends BaseExecutorTest {
 
     @Test
     void requestEmailVerificationCallsService() throws DomainException {
-        subject.setAuth(AccountImpl.builder().build());
+        when(authSupplier.get()).thenReturn(AccountImpl.builder().build());
         subject.requestEmailVerification(true);
 
         verify(authService, times(1)).requestEmailVerification(any(), anyBoolean());
@@ -154,7 +154,7 @@ class AuthenticationExecutorImplTest extends BaseExecutorTest {
 
     @Test
     void requestEmailVerificationConvertsNotFound() throws DomainException {
-        subject.setAuth(AccountImpl.builder().build());
+        when(authSupplier.get()).thenReturn(AccountImpl.builder().build());
         doThrow(NotFoundException.account(UUID.randomUUID()))
                 .when(authService).requestEmailVerification(any(), anyBoolean());
 
@@ -164,7 +164,7 @@ class AuthenticationExecutorImplTest extends BaseExecutorTest {
 
     @Test
     void logoutCallsServiceLogoutAllIfAll() {
-        subject.setAuth(AccountImpl.builder().build());
+        when(authSupplier.get()).thenReturn(AccountImpl.builder().build());
         subject.logout(UUID.randomUUID(), true);
 
         verify(authService).logoutAll(any());

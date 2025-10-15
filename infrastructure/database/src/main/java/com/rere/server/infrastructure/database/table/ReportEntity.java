@@ -59,7 +59,7 @@ public class ReportEntity extends BaseEntity implements Report {
 
     @Override
     public UUID getAuthorId() {
-        return author.getId();
+        return author != null ? author.getId() : null;
     }
 
 }

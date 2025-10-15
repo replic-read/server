@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class ServerConfigControllerTest extends AbstractControllerTest {
+class ServerConfigControllerTest extends AbstractMvcTest {
 
     @Test
     void getServerConfigCallsExecutorAndReturns() throws Exception {

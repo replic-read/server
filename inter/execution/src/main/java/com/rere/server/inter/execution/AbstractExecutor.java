@@ -16,8 +16,6 @@ import com.rere.server.inter.dto.response.AccountResponse;
 import com.rere.server.inter.dto.response.PartialAccountResponse;
 import com.rere.server.inter.dto.response.ReplicResponse;
 import com.rere.server.inter.dto.response.ReportResponse;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Comparator;
 
@@ -58,14 +56,13 @@ public class AbstractExecutor {
      * The authorizer.
      */
     protected final Authorizer authorizer;
-    /**
-     * The authentication of the client that is currently being handled.
-     */
-    @Getter
-    @Setter
-    private Account auth;
 
-    protected AbstractExecutor(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer) {
+    /**
+     * The supplier that provides the auth principal.
+     */
+    protected final AuthPrincipalSupplier authSupplier;
+
+    protected AbstractExecutor(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer, AuthPrincipalSupplier authSupplier) {
         this.accountService = accountService;
         this.authService = authService;
         this.replicService = replicService;
@@ -73,6 +70,11 @@ public class AbstractExecutor {
         this.configService = configService;
         this.quotaService = quotaService;
         this.authorizer = authorizer;
+        this.authSupplier = authSupplier;
+    }
+
+    protected Account getAuth() {
+        return authSupplier.get();
     }
 
     /**

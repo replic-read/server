@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Contains tests for the {@link AuthControllerTest} class.
  */
-class AuthControllerTest extends AbstractControllerTest {
+class AuthControllerTest extends AbstractMvcTest {
 
     @Test
     void submitEmailVerificationCallsExecutorAndReturns() throws Exception {

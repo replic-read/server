@@ -16,13 +16,14 @@ import com.rere.server.domain.service.ReportService;
 import com.rere.server.domain.service.ServerConfigService;
 import com.rere.server.inter.authorization.AuthorizationException;
 import com.rere.server.inter.authorization.Authorizer;
+import com.rere.server.inter.dto.error.HttpErrorResponseException;
 import com.rere.server.inter.dto.mapper.EnumMapper;
 import com.rere.server.inter.dto.parameter.ReplicSortParameter;
 import com.rere.server.inter.dto.parameter.SortDirectionParameter;
 import com.rere.server.inter.dto.request.CreateReplicRequest;
 import com.rere.server.inter.dto.response.ReplicResponse;
 import com.rere.server.inter.execution.AbstractExecutor;
-import com.rere.server.inter.execution.HttpErrorResponseException;
+import com.rere.server.inter.execution.AuthPrincipalSupplier;
 import com.rere.server.inter.execution.ReplicExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,13 +45,13 @@ import java.util.UUID;
 @Component
 public class ReplicExecutorImpl extends AbstractExecutor implements ReplicExecutor<ReplicState, ReplicSortParameter, SortDirectionParameter, UUID, InputStream> {
 
-    private static final String HOST_URL_FORMAT = "%s/replics/%s";
+    private static final String HOST_URL_FORMAT = "%s/replics/%s/content/";
 
     private final String baseUrl;
 
     @Autowired
-    protected ReplicExecutorImpl(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer, @Value("${rere.baseurl}") String baseUrl) {
-        super(accountService, authService, replicService, reportService, configService, quotaService, authorizer);
+    protected ReplicExecutorImpl(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer, AuthPrincipalSupplier authSupplier, @Value("${rere.baseurl}") String baseUrl) {
+        super(accountService, authService, replicService, reportService, configService, quotaService, authorizer, authSupplier);
         this.baseUrl = baseUrl;
     }
 

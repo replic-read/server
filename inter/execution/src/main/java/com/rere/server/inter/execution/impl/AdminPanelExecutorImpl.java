@@ -9,6 +9,7 @@ import com.rere.server.domain.service.ServerConfigService;
 import com.rere.server.inter.authorization.Authorizer;
 import com.rere.server.inter.execution.AbstractExecutor;
 import com.rere.server.inter.execution.AdminPanelExecutor;
+import com.rere.server.inter.execution.AuthPrincipalSupplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -22,8 +23,8 @@ public class AdminPanelExecutorImpl extends AbstractExecutor implements AdminPan
     private final ApplicationContext context;
 
     @Autowired
-    protected AdminPanelExecutorImpl(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer, ApplicationContext context) {
-        super(accountService, authService, replicService, reportService, configService, quotaService, authorizer);
+    protected AdminPanelExecutorImpl(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer, ApplicationContext context, AuthPrincipalSupplier authSupplier) {
+        super(accountService, authService, replicService, reportService, configService, quotaService, authorizer, authSupplier);
         this.context = context;
     }
 

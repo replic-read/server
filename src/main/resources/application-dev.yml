@@ -1,9 +1,9 @@
 # Application config
 rere:
   # Base url with schema and no trailing slash.
-  baseurl: 'https://example.com'
+  baseurl: 'http://localhost:8080'
 
-  content.root: '~/IdeaProjects/Replic-Read Server/server_content_root/'
+  content.root: '/home/simon/IdeaProjects/Replic-Read Server/server_content_root/'
 
   # Config for the authentication
   auth:
@@ -76,3 +76,6 @@ spring:
 
   # How hibernate should react to schema differences. We want to update the schema.
   jpa.hibernate.ddl-auto: update
+
+logging.level.org.springframework.security: DEBUG
+log4j.logger.org.hibernate.validator: debug

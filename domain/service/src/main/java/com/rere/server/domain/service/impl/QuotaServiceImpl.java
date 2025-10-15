@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 /**
@@ -41,7 +42,7 @@ public class QuotaServiceImpl implements QuotaService {
         }
 
         Instant periodStart = limit.getPeriodStart();
-        while (periodStart.plus(limit.getPeriod()).isBefore(clock.instant())) {
+        while (periodStart.plus(limit.getPeriod().getDays(), ChronoUnit.DAYS).isBefore(clock.instant())) {
             periodStart = periodStart.plus(limit.getPeriod());
         }
 

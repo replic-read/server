@@ -153,7 +153,6 @@ class ReplicServiceImplTest extends BaseDomainServiceTest {
         when(fileAccessor.getFileData(any())).thenReturn(ReplicFileDataImpl.builder()
                 .size(42).build());
         when(replicRepo.saveModel(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(passwordEncoder.encode(any())).thenReturn("hash");
 
         Replic createdReplic = subject.createReplic(URL, MediaMode.ALL, null, null, null, null, file -> true);
 

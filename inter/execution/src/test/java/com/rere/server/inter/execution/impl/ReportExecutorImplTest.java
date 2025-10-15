@@ -7,10 +7,10 @@ import com.rere.server.domain.model.impl.ReportImpl;
 import com.rere.server.domain.model.report.Report;
 import com.rere.server.domain.model.report.ReportState;
 import com.rere.server.inter.authorization.AuthorizationException;
+import com.rere.server.inter.dto.error.HttpErrorResponseException;
 import com.rere.server.inter.dto.parameter.ReportSortParameter;
 import com.rere.server.inter.dto.request.CreateReportRequest;
 import com.rere.server.inter.dto.response.ReportResponse;
-import com.rere.server.inter.execution.HttpErrorResponseException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 
@@ -69,7 +69,7 @@ class ReportExecutorImplTest extends BaseExecutorTest {
     void createReportConvertsDomainException() throws DomainException {
         when(reportService.reportReplic(any(), any(), any()))
                 .thenThrow(NotFoundException.replic(UUID.randomUUID()));
-        subject.setAuth(AccountImpl.builder().build());
+        when(authSupplier.get()).thenReturn(AccountImpl.builder().build());
 
         assertThrows(HttpErrorResponseException.class,
                 () -> subject.createReport(new CreateReportRequest(""), UUID.randomUUID()));

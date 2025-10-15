@@ -1,9 +1,12 @@
 package com.rere.server.inter.dispatching.security;
 
+import com.rere.server.domain.model.account.Account;
 import com.rere.server.domain.service.AccountService;
+import com.rere.server.inter.execution.AuthPrincipalSupplier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,19 +17,23 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * Security configuration.
  */
+@Slf4j
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -40,6 +47,7 @@ public class SecurityConfig {
             new Endpoint("/accounts/partial/", HttpMethod.GET),
             new Endpoint("/replics/", HttpMethod.GET),
             new Endpoint("/replics/", HttpMethod.POST),
+            new Endpoint("/replics/{id}/content/", HttpMethod.GET),
             new Endpoint("/reports/", HttpMethod.POST),
             new Endpoint("/server-config/", HttpMethod.GET),
             new Endpoint("/swagger-ui/**", HttpMethod.GET),
@@ -47,40 +55,35 @@ public class SecurityConfig {
             new Endpoint("/v3/api-docs", HttpMethod.GET),
             new Endpoint("/v3/api-docs.yaml", HttpMethod.GET),
             new Endpoint("/v3/api-docs/**", HttpMethod.GET),
+            new Endpoint("/auth/submit-email-verification/", HttpMethod.POST),
+            new Endpoint("/auth/refresh/", HttpMethod.POST),
+            new Endpoint("/auth/login/", HttpMethod.POST),
+            new Endpoint("/auth/signup/", HttpMethod.POST),
     };
-    private final AccessTokenFilter accessTokenFilter;
-
-    @Autowired
-    public SecurityConfig(AccessTokenFilter accessTokenFilter) {
-        this.accessTokenFilter = accessTokenFilter;
-    }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider provider) throws Exception {
-        return http
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider provider, @Qualifier("rereAuthFilter") Set<OncePerRequestFilter> authFilters) throws Exception {
+        http
                 .csrf(AbstractHttpConfigurer::disable) // Safe to disable because we use JWT's.
                 .authorizeHttpRequests(config -> {
-                            config
-                                    .requestMatchers(HttpMethod.GET, "/auth/request-email-verification/")
-                                    .authenticated()
-                                    .requestMatchers(HttpMethod.POST, "/auth/logout/")
-                                    .authenticated()
-                                    .requestMatchers("/auth/**")
-                                    .permitAll();
-
                     for (Endpoint endpoint : UNAUTHENTICATED_ENDPOINTS) {
                         config
                                 .requestMatchers(endpoint.method(), endpoint.endpoint())
                                 .permitAll();
                     }
-                    config.anyRequest().authenticated();
+
+                    config
+                            .anyRequest()
+                            .authenticated();
                         }
                 )
                 .sessionManagement(context -> context
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(provider)
-                .addFilterBefore(accessTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .authenticationProvider(provider);
+
+        authFilters.forEach(filter -> http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class));
+
+        return http.build();
     }
 
     /**
@@ -105,6 +108,14 @@ public class SecurityConfig {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(service);
         provider.setPasswordEncoder(encoder);
         return provider;
+    }
+
+    @Bean
+    public AuthPrincipalSupplier authPrincipalSupplier() {
+        return () -> {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return principal instanceof Account account ? account : null;
+        };
     }
 
     /**
@@ -135,7 +146,7 @@ public class SecurityConfig {
      * @param endpoint The endpoint value.
      * @param method The method value.
      */
-    private record Endpoint(String endpoint, HttpMethod method) {
+    public record Endpoint(String endpoint, HttpMethod method) {
     }
 
 }

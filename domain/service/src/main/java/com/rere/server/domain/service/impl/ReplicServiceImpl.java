@@ -114,7 +114,7 @@ public class ReplicServiceImpl implements ReplicService {
                 .state(ReplicState.ACTIVE)
                 .description(description)
                 .expirationTimestamp(expiration)
-                .passwordHash(encoder.encode(password))
+                .passwordHash(password != null ? encoder.encode(password) : null)
                 .ownerId(account != null ? account.getId() : null)
                 .build();
 
@@ -190,7 +190,7 @@ public class ReplicServiceImpl implements ReplicService {
                 .orElseThrow(() -> NotFoundException.replic(replicId));
 
         if(replic.requiresPassword()) {
-            boolean matches = encoder.matches(password, replic.getPasswordHash());
+            boolean matches = password != null && encoder.matches(password, replic.getPasswordHash());
             if(!matches) {
                 throw new InvalidPasswordException();
             }

@@ -12,6 +12,6 @@ public record CreateReplicRequest(
         @ValidationMetadata(FieldType.REPLIC_MEDIA_MODE) @JsonProperty("media_mode") String mediaMode,
         @ValidationMetadata(value = FieldType.REPLIC_EXPIRATION, required = false) String expiration,
         @ValidationMetadata(value = FieldType.REPLIC_DESCRIPTION, required = false) String description,
-        @ValidationMetadata(value = FieldType.ACCOUNT_PASSWORD, required = false) String password
+        @ValidationMetadata(value = FieldType.REPLIC_PASSWORD, required = false) String password
 ) {
 }

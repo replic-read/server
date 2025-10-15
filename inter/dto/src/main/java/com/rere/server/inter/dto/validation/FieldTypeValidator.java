@@ -1,13 +1,14 @@
 package com.rere.server.inter.dto.validation;
 
-import com.rere.server.inter.dto.SerializationUtils;
 import com.rere.server.inter.dto.error.ErrorResponseInfo;
+import com.rere.server.inter.dto.error.HttpErrorResponseException;
 import com.rere.server.inter.dto.error.validation.EnumErrorResponse;
 import com.rere.server.inter.dto.error.validation.PatternErrorResponse;
 import com.rere.server.inter.dto.error.validation.RequiredErrorResponse;
 import com.rere.server.inter.dto.error.validation.SpecificFormatErrorResponse;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -16,11 +17,13 @@ import java.time.Period;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
  * Constraint-validator that takes the annotation-metadata provided by {@link ValidationMetadata} annotation and does individual validating.
  */
+@Slf4j
 public class FieldTypeValidator implements ConstraintValidator<ValidationMetadata, Object> {
 
     /**
@@ -113,6 +116,7 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
     }
 
     @Override
+    @SuppressWarnings("squid:S3516")
     public boolean isValid(Object object, ConstraintValidatorContext context) {
         if ((!metadata.required() && object == null) || !metadata.doValidate()) { // Not required means we allow null values.
             return true;
@@ -123,10 +127,22 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
         }
         Serializable value = (Serializable) object;
 
-        Set<ErrorResponseInfo> errorInfos = validate(value);
+        Optional<ErrorResponseInfo> infoToThrow = validate(value)
+                .stream()
+                .findFirst();
 
-        publishViolations(errorInfos, context);
-        return errorInfos.isEmpty();
+        /*
+         * Although we extend the ConstraintValidator from jakarta validation, we don't properly use jakarta validation.
+         * We use the constraint annotation system to run this code at the same time jakarta validation would normally
+         *      run to write our own validation code.
+         * Instead of writing constraint violations to the validator context, we throw our own runtime exception that we later catch.
+         * This is a hack, but is the only simple way for easy request validation.
+         */
+        if (infoToThrow.isPresent()) {
+            throw new HttpErrorResponseException(infoToThrow.get(), 400);
+        }
+
+        return true;
     }
 
     private Set<ErrorResponseInfo> validate(Serializable value) {
@@ -161,18 +177,5 @@ public class FieldTypeValidator implements ConstraintValidator<ValidationMetadat
         }
 
         return errorInfos;
-    }
-
-    private void publishViolations(Set<ErrorResponseInfo> infos, ConstraintValidatorContext context) {
-        /*
-         * Jakarta validation only allows us to pass a custom error message when a validation fails.
-         * Because we want to pass object to the validation exception that is thrown, we serialize
-         *      the error info object into a string (base 64) and deserialize it when we catch the
-         *      exception later on.
-         */
-        for (ErrorResponseInfo errorInfo : infos) {
-            String errorMessage = SerializationUtils.toBase64(errorInfo);
-            context.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
-        }
     }
 }

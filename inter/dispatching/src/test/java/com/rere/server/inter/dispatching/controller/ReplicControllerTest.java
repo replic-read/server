@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class ReplicControllerTest extends AbstractControllerTest {
+class ReplicControllerTest extends AbstractMvcTest {
 
     @Test
     void getReplicsCallsExecutorAndReturns() throws Exception {
@@ -97,12 +97,6 @@ class ReplicControllerTest extends AbstractControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.host_url").value("https://example.com/replics/sss"));
-    }
-
-    @Test
-    void getReplicContentFailsForNoAuth() throws Exception {
-        UUID replicId = UUID.randomUUID();
-        assertForbidden(get("/replics/%s/content/".formatted(replicId)));
     }
 
     @Test

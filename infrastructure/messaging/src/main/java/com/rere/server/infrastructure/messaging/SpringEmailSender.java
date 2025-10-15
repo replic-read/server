@@ -7,6 +7,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -90,7 +91,11 @@ public class SpringEmailSender implements EmailSender {
             throw new IllegalStateException("An error occurred when creating an InternetAddress.", e);
         }
 
-        mailSender.send(message);
+        try {
+            mailSender.send(message);
+        } catch (MailSendException e) {
+            return false;
+        }
         return true;
     }
 

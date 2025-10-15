@@ -12,6 +12,7 @@ import com.rere.server.domain.service.ReplicService;
 import com.rere.server.domain.service.ReportService;
 import com.rere.server.domain.service.ServerConfigService;
 import com.rere.server.inter.authorization.Authorizer;
+import com.rere.server.inter.dto.error.HttpErrorResponseException;
 import com.rere.server.inter.dto.parameter.AccountSortParameter;
 import com.rere.server.inter.dto.parameter.SortDirectionParameter;
 import com.rere.server.inter.dto.request.CreateAccountRequest;
@@ -20,7 +21,7 @@ import com.rere.server.inter.dto.response.AccountResponse;
 import com.rere.server.inter.dto.response.PartialAccountResponse;
 import com.rere.server.inter.execution.AbstractExecutor;
 import com.rere.server.inter.execution.AccountExecutor;
-import com.rere.server.inter.execution.HttpErrorResponseException;
+import com.rere.server.inter.execution.AuthPrincipalSupplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -33,8 +34,8 @@ import java.util.UUID;
 @Component
 public class AccountExecutorImpl extends AbstractExecutor implements AccountExecutor<AccountSortParameter, AccountState, SortDirectionParameter, UUID> {
     @Autowired
-    protected AccountExecutorImpl(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer) {
-        super(accountService, authService, replicService, reportService, configService, quotaService, authorizer);
+    protected AccountExecutorImpl(AccountService accountService, AuthenticationService authService, ReplicService replicService, ReportService reportService, ServerConfigService configService, QuotaService quotaService, Authorizer authorizer, AuthPrincipalSupplier authSupplier) {
+        super(accountService, authService, replicService, reportService, configService, quotaService, authorizer, authSupplier);
     }
 
     @Override

@@ -1,0 +1,7 @@
+{
+  "original_url": "https://#{randomAlphanumeric(10)}.com/article/#{randomInt(1,2147483647)}/",
+  "media_mode": "#{mediaMode}",
+  "expiration": "#{expiration}",
+  "description": "#{randomAlphanumeric(128)}",
+  "password": null
+}

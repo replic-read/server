@@ -8,10 +8,10 @@ import com.rere.server.domain.model.exception.NotUniqueSubject;
 import com.rere.server.domain.model.exception.OperationDisabledException;
 import com.rere.server.domain.model.exception.OperationDisabledOperation;
 import com.rere.server.domain.model.impl.AccountImpl;
+import com.rere.server.inter.dto.error.HttpErrorResponseException;
 import com.rere.server.inter.dto.request.UpdateAccountRequest;
 import com.rere.server.inter.dto.response.AccountResponse;
 import com.rere.server.inter.dto.response.QuotaProgressResponse;
-import com.rere.server.inter.execution.HttpErrorResponseException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 
@@ -34,7 +34,7 @@ class PersonalExecutorImplTest extends BaseExecutorTest {
     @Test
     void getMeReturnsAuth() {
         Account account = AccountImpl.builder().build();
-        subject.setAuth(account);
+        when(authSupplier.get()).thenReturn(account);
 
         AccountResponse response = subject.getMe();
 
@@ -45,7 +45,7 @@ class PersonalExecutorImplTest extends BaseExecutorTest {
     @Test
     void updateMeCallsService() throws DomainException {
         Account account = AccountImpl.builder().build();
-        subject.setAuth(account);
+        when(authSupplier.get()).thenReturn(account);
 
         when(accountService.updateAccount(any(), any(), any(), anyInt()))
                 .thenReturn(account);
@@ -59,7 +59,7 @@ class PersonalExecutorImplTest extends BaseExecutorTest {
 
     @Test
     void updateMeConvertsNotUnique() throws DomainException {
-        subject.setAuth(AccountImpl.builder().build());
+        when(authSupplier.get()).thenReturn(AccountImpl.builder().build());
 
         when(accountService.updateAccount(any(), any(), any(), anyInt()))
                 .thenThrow(new NotUniqueException(NotUniqueSubject.EMAIL));
@@ -70,7 +70,7 @@ class PersonalExecutorImplTest extends BaseExecutorTest {
 
     @Test
     void updateMeConvertsNotFound() throws DomainException {
-        subject.setAuth(AccountImpl.builder().build());
+        when(authSupplier.get()).thenReturn(AccountImpl.builder().build());
 
         when(accountService.updateAccount(any(), any(), any(), anyInt()))
                 .thenThrow(NotFoundException.account(UUID.randomUUID()));
@@ -81,7 +81,7 @@ class PersonalExecutorImplTest extends BaseExecutorTest {
 
     @Test
     void getQuotaProgressReturnsQuota() throws DomainException {
-        subject.setAuth(AccountImpl.builder().build());
+        when(authSupplier.get()).thenReturn(AccountImpl.builder().build());
 
         when(quotaService.getCreatedReplicCountInPeriod(any()))
                 .thenReturn(42L);
@@ -93,7 +93,7 @@ class PersonalExecutorImplTest extends BaseExecutorTest {
 
     @Test
     void getQuotaProgressConvertsDisabled() throws DomainException {
-        subject.setAuth(AccountImpl.builder().build());
+        when(authSupplier.get()).thenReturn(AccountImpl.builder().build());
 
         when(quotaService.getCreatedReplicCountInPeriod(any()))
                 .thenThrow(new OperationDisabledException(OperationDisabledOperation.QUOTA_INFO));
