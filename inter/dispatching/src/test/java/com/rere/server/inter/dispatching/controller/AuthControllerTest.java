@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -53,11 +54,13 @@ class AuthControllerTest extends AbstractMvcTest {
                 {
                   "email": "user@example.com",
                   "username": "user123",
-                  "password": "secret$123"
+                  "password": "secret$123",
+                  "profile_color": 3
                 }
                 """;
 
         client.perform(post("/auth/signup/").content(content))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.account.id").value(accountId.toString()))
                 .andExpect(jsonPath("$.refresh_token").value("refresh-token"))
