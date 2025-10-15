@@ -91,7 +91,7 @@ class ReplicControllerTest extends AbstractMvcTest {
                 """.formatted(Instant.now().toString());
         MockMultipartFile bodyFile = new MockMultipartFile("request_body", "", "application/json", body.getBytes(StandardCharsets.UTF_8));
 
-        client.perform(multipart(HttpMethod.POST, "/replics/")
+        client.perform(multipart(HttpMethod.POST, "/api/v1/replics/")
                         .file(mockFile)
                         .file(bodyFile)
                 )

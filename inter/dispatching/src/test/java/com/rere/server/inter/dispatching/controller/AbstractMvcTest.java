@@ -7,6 +7,7 @@ import com.rere.server.domain.model.replic.ReplicState;
 import com.rere.server.domain.model.report.ReportState;
 import com.rere.server.domain.service.AccountService;
 import com.rere.server.domain.service.AuthenticationService;
+import com.rere.server.inter.dispatching.WebMvcConfig;
 import com.rere.server.inter.dispatching.security.AccessTokenFilter;
 import com.rere.server.inter.dispatching.security.SecurityConfig;
 import com.rere.server.inter.dispatching.security.WhitelistBasicAuthFilter;
@@ -42,6 +43,7 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.rere.server.inter.dispatching.WebMvcConfig.BASE_PATH_PREFIX;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -112,21 +114,21 @@ public abstract class AbstractMvcTest {
      * Performs a get request.
      */
     protected MockHttpServletRequestBuilder get(String uriTemplate) {
-        return maybeAuthenticate(MockMvcRequestBuilders.get(uriTemplate).contentType("application/json"));
+        return maybeAuthenticate(MockMvcRequestBuilders.get(BASE_PATH_PREFIX + uriTemplate).contentType("application/json"));
     }
 
     /**
      * Performs a post request.
      */
     protected MockHttpServletRequestBuilder post(String uriTemplate) {
-        return maybeAuthenticate(MockMvcRequestBuilders.post(uriTemplate).contentType("application/json"));
+        return maybeAuthenticate(MockMvcRequestBuilders.post(BASE_PATH_PREFIX + uriTemplate).contentType("application/json"));
     }
 
     /**
      * Performs a put request.
      */
     protected MockHttpServletRequestBuilder put(String uriTemplate) {
-        return maybeAuthenticate(MockMvcRequestBuilders.put(uriTemplate).contentType("application/json"));
+        return maybeAuthenticate(MockMvcRequestBuilders.put(BASE_PATH_PREFIX + uriTemplate).contentType("application/json"));
     }
 
     /**
@@ -155,7 +157,7 @@ public abstract class AbstractMvcTest {
      */
     @EnableWebMvc
     @Configuration
-    @Import({WhitelistBasicAuthFilter.class, AccessTokenFilter.class, SecurityConfig.class, AuthenticationController.class, AccountController.class, AdminPanelController.class, PersonalController.class, ReplicController.class, ReportController.class, ServerConfigController.class,})
+    @Import({WebMvcConfig.class, WhitelistBasicAuthFilter.class, AccessTokenFilter.class, SecurityConfig.class, AuthenticationController.class, AccountController.class, AdminPanelController.class, PersonalController.class, ReplicController.class, ReportController.class, ServerConfigController.class,})
     static class Config {
 
         @Bean
