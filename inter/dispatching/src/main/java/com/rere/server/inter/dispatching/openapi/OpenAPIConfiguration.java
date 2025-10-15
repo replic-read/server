@@ -7,6 +7,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,11 +20,12 @@ import java.util.List;
 public class OpenAPIConfiguration {
 
     @Bean
-    public OpenAPI openAPI() {
+    public OpenAPI openAPI(BuildProperties props) {
         return new OpenAPI()
                 .info(new Info()
                         .title("Replic-Read REST-API")
                         .description("This is the open-api documentation for the REST-API exposed by the backend server of the Replic-Read system")
+                        .version(props.getVersion())
                         .contact(new Contact()
                                 .email("simon@bumiller.me")
                                 .name("Simon Bumiller")
