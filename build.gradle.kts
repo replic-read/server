@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.rere"
-version = "0.0.1"
+version = "0.0.2"
 description = "The backend component of the replic-read system. Exposes the REST-API for communication with clients."
 
 /*

@@ -1,0 +1,75 @@
+#
+# Contains jobs that execute a release.
+#
+
+name: Create GitHub Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: The sem-ver of this release
+        required: true
+        type: string
+
+jobs:
+
+  #
+  # Job to create the GitHub release package for this specific release.
+  # Will create a GitHub release tagged with the release name and include the following assets:
+  #
+  # - Source code archives (.zip and .tar.gz)
+  # - Jar
+  #
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build jar
+        run: ./gradlew bootJar
+
+      - name: Create Tag
+        uses: tvdias/github-tagger@v0.0.1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ inputs.releaseVersion }}
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          repository: ${{ github.repository }}
+          files: ./build/libs/server.${{ inputs.releaseVersion }}.jar
+          name: ${{ inputs.releaseVersion }}
+          tag_name: ${{ inputs.releaseVersion }}
+
+  #
+  # Job to publish an image to the GitHub container registry (ghcr.io).
+  # Will use the spring-boot gradle task 'bootBuildImage' to locally build an image, tag it with the release name and then push it to the registry
+  #
+  publish-image:
+    name: Publish Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        shell: bash
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build the Image
+        shell: bash
+        run: ./gradlew bootBuildImage
+
+      - name: Tag local image
+        shell: bash
+        run: docker image tag docker.io/library/server:${{ input.releaseVersion }} ghcr.io/${{ github.repository }}:${{ inputs.releaseVersion }}
+
+      - name: Push to Registry
+        shell: bash
+        run: docker push ghcr.io/${{ github.repository }}:${{ inputs.releaseVersion }}
