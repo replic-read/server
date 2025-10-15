@@ -104,6 +104,14 @@ The server has three spring profiles:
 - `load-test`: The profile that is used for load testing. It provides additional authentication options that make the
   tests easier to construct.
 
+## API-Documentation
+
+An [OpenAPI](https://www.openapis.org/) specification is automatically generated and deployed when the server is run.
+Following endpoints are important:
+
+- `/swagger-ui/index.html/`: The human-readable swagger ui for manual testing and as a development reference.
+- `/v3/api-docs`: The JSON-formatted documentation to be used by clients.
+
 ## Architecture
 An in-depth overview about the architecture, interfaces and third-party libraries can be seen in the [design-report](https://github.com/replic-read/design).
 
