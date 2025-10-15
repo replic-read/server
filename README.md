@@ -116,3 +116,11 @@ This component structure is reflected in the code by the following gradle module
 - _Domain_ corresponds to `:domain`
 - _Interface_ corresponds to `:inter`
 - _Infrastructure_ corresponds to `:infrastructure`
+
+## Roadmap
+
+While the application is in the state that was anticipated from the beginning, following possible future enhancements
+have been identified:
+
+- **Extension of the load-tests**, see the [issue](https://github.com/replic-read/server/issues/25) for further
+  information.
