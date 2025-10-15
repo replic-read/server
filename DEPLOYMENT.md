@@ -47,7 +47,7 @@ services:
       POSTGRES_DB: replic_read
 
   server:
-    image: ghcr.io
+    image: ghcr.io/replic-read/server:0.0.3
     ports:
       - "8080:8080"
     depends_on:
@@ -58,3 +58,16 @@ services:
       RERE_DB_USERNAME: admin
       RERE_DB_PASSWORD: admin
 ```
+
+## In a JVM
+
+Each release comes with a `.jar` file that can be found on the same release packe.
+
+It can be executed like any other jar file, using
+
+```bash
+
+java -jar app.jar
+```
+
+Don't forget to provide the environment variables.
