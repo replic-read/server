@@ -68,7 +68,7 @@ jobs:
 
       - name: Tag local image
         shell: bash
-        run: docker image tag docker.io/library/server:${{ input.releaseVersion }} ghcr.io/${{ github.repository }}:${{ inputs.releaseVersion }}
+        run: docker image tag docker.io/library/server:${{ inputs.releaseVersion }} ghcr.io/${{ github.repository }}:${{ inputs.releaseVersion }}
 
       - name: Push to Registry
         shell: bash
