@@ -30,6 +30,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import static com.rere.server.inter.dispatching.WebMvcConfig.BASE_PATH_PREFIX;
+
 /**
  * Security configuration.
  */
@@ -43,7 +45,7 @@ public class SecurityConfig {
      * <br>
      * If they do, we check in by manual authorization.
      */
-    private static final Endpoint[] UNAUTHENTICATED_ENDPOINTS = {
+    private static final Endpoint[] UNAUTHENTICATED_REST_ENDPOINTS = {
             new Endpoint("/accounts/partial/", HttpMethod.GET),
             new Endpoint("/replics/", HttpMethod.GET),
             new Endpoint("/replics/", HttpMethod.POST),
@@ -52,13 +54,23 @@ public class SecurityConfig {
             new Endpoint("/server-config/", HttpMethod.GET),
             new Endpoint("/swagger-ui/**", HttpMethod.GET),
             new Endpoint("/swagger-ui.html", HttpMethod.GET),
-            new Endpoint("/v3/api-docs", HttpMethod.GET),
-            new Endpoint("/v3/api-docs.yaml", HttpMethod.GET),
-            new Endpoint("/v3/api-docs/**", HttpMethod.GET),
             new Endpoint("/auth/submit-email-verification/", HttpMethod.POST),
             new Endpoint("/auth/refresh/", HttpMethod.POST),
             new Endpoint("/auth/login/", HttpMethod.POST),
-            new Endpoint("/auth/signup/", HttpMethod.POST),
+            new Endpoint("/auth/signup/", HttpMethod.POST)
+    };
+
+    /**
+     * Endpoints that <b>may</b> not require authentication, depending on the config.
+     * <br>
+     * If they do, we check in by manual authorization.
+     */
+    private static final Endpoint[] UNAUTHENTICATED_ENDPOINTS = {
+            new Endpoint("/v3/api-docs", HttpMethod.GET),
+            new Endpoint("/v3/api-docs.yaml", HttpMethod.GET),
+            new Endpoint("/v3/api-docs/**", HttpMethod.GET),
+            new Endpoint("/swagger-ui.html", HttpMethod.GET),
+            new Endpoint("/swagger-ui/**", HttpMethod.GET),
     };
 
     @Bean
@@ -66,6 +78,11 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Safe to disable because we use JWT's.
                 .authorizeHttpRequests(config -> {
+                    for (Endpoint endpoint : UNAUTHENTICATED_REST_ENDPOINTS) {
+                        config
+                                .requestMatchers(endpoint.method(), BASE_PATH_PREFIX + endpoint.endpoint())
+                                .permitAll();
+                    }
                     for (Endpoint endpoint : UNAUTHENTICATED_ENDPOINTS) {
                         config
                                 .requestMatchers(endpoint.method(), endpoint.endpoint())
