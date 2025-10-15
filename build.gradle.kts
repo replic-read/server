@@ -41,3 +41,11 @@ dependencies {
 tasks.named<BootJar>("bootJar") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
+sonar {
+    properties {
+        property("sonar.projectKey", "server")
+        property("sonar.projectName", "Replic-Read Server")
+        property("sonar.projectVersion", project.version)
+    }
+}
