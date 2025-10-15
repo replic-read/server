@@ -2,7 +2,9 @@ package com.rere.server.inter.dto.validation;
 
 import com.rere.server.inter.dto.SerializationUtils;
 import com.rere.server.inter.dto.error.ErrorResponseInfo;
+import com.rere.server.inter.dto.error.HttpErrorResponseException;
 import jakarta.validation.Validation;
+import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.AfterAll;
@@ -15,6 +17,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Abstract test for testing the validation of a specific DTO.
@@ -64,16 +68,14 @@ public abstract class AbstractValidationTest<D> {
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Test
-    void invalidDtosDontCreateErrors() {
+    void invalidDtosDoCreateErrors() {
         for (Pair<D, ? extends ErrorResponseInfo> pair : getInvalidDtos()) {
-            Set<ErrorResponseInfo> errorInfos = validator.validate(pair.first())
-                    .stream().map(violation -> SerializationUtils.<ErrorResponseInfo>fromBase64(violation.getMessageTemplate()))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
-            assertEquals(1, errorInfos.size(),
-                    () -> "Expected to find exactly one constraint violation for dto " + pair.first() + ", but got: " + errorInfos + ".");
+            ValidationException ex = assertThrows(ValidationException.class,
+                    () -> validator.validate(pair.first()));
+            assertInstanceOf(HttpErrorResponseException.class, ex.getCause());
+            HttpErrorResponseException e = (HttpErrorResponseException) ex.getCause();
 
-            assertEquals(errorInfos.stream().findFirst().get(), pair.second());
+            assertEquals(e.getError(), pair.second());
         }
     }
 
