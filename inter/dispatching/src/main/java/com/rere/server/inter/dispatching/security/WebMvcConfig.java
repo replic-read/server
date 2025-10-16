@@ -6,6 +6,7 @@ import org.springdoc.webmvc.ui.SwaggerConfigResource;
 import org.springdoc.webmvc.ui.SwaggerWelcomeWebMvc;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
@@ -16,6 +17,7 @@ import java.net.URL;
 import java.util.function.Predicate;
 
 @Slf4j
+@Profile("!dev")
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
