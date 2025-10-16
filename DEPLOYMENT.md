@@ -10,7 +10,7 @@ expected. Some functionality might not work.
 
 | Variable                | Description                                                                               | Default value                                  | Example                              |
 |-------------------------|-------------------------------------------------------------------------------------------|------------------------------------------------|--------------------------------------|
-| RERE_BASE_URL           | The base url of the frontend. Must not end with a '/'.                                    | https://example.com                            | https://example.com                  |
+| RERE_BASE_URL           | The base url of the frontend. Must not end with a '/'.                                    | <Empty string>                                 | https://example.com                  |
 | RERE_CONTENT_ROOT       | The directory in which the replic content files should be saved. Must not end with a '/'. | Empty string, i.e. the root of the filesystem. | /home/john/documents/replic_content  |
 | RERE_AUTH_REFRESH_EXP   | The lifespan of refresh tokens, in milliseconds.                                          | 2592000000                                     | 2592000000                           |
 | RERE_MAIL_EXP           | The lifespan of mail-verification tokens, in milliseconds.                                | 900000                                         | 900000                               |

@@ -2,7 +2,7 @@
 rere:
 
   # Base url with schema and no trailing slash.
-  baseurl: ${RERE_BASEURL:https://example.com}
+  baseurl: ${RERE_BASEURL:}
 
   # Directory where replic content is stored
   content.root: ${RERE_CONTENT_ROOT:}
