@@ -54,18 +54,6 @@ services:
       POSTGRES_DB: replic_read
 ```
 
-For you development setup to be able to connect to your local database, tweak the `spring.datasource.*` values in
-the [config file for the 'dev' profile](src/main/resources/application-dev.yml).
-
-### Email
-
-For the messaging to work, you also need to change the `rere.mail.*` values.
-
-Note: using `*@gmail.com` addresses need special setup.
-Refer to
-this [Medium article](https://medium.com/tuanhdotnet/tips-for-sending-mail-from-a-spring-boot-application-using-google-as-mail-server-fcf5ab042594)
-for help.
-
 ### Building
 
 To build and test the project, run
@@ -75,15 +63,16 @@ To build and test the project, run
 
 ### Starting the server
 
-For the values provided above to work, the `dev` profile needs to be activated.
-For this, run
+To start the server, use the following command:
 
 ```bash
-./gradlew bootRun --args='--spring.profiles.active=dev'
+./gradlew bootRun
 ```
 in the project root.
 
-Most IDE's offer simpler method to run spring applications.
+Remember that also for development setups you need to provide some environment variables. For more infos, refer to the [deployment guide](DEPLOYMENT.md).
+
+Most IDE's can help you run spring projects, as well as setting up environment variables.
 
 ### Load tests
 
@@ -105,8 +94,7 @@ in `load-test/` where <base-url> is the base url of the server that should be te
 The server has three spring profiles:
 
 - `default`: The default spring profile. This is used for production.
-- `dev`: The development profile. It is mostly used to load custom development configuration using
-  the [application-dev.yml](src/main/resources/application-dev.yml).
+- `dev`: The development profile. It is mostly used to configure specific settings for developing like logging, but also lessens some security setup, e.g. allows CORS access from any origin..
 - `load-test`: The profile that is used for load testing. It provides additional authentication options that make the
   tests easier to construct.
 

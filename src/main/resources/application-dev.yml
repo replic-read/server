@@ -1,83 +1,8 @@
-# Application config
-rere:
-
-  # Base url with schema and no trailing slash.
-  baseurl: 'http://localhost:8080'
-
-  content.root: '/home/simon/IdeaProjects/Replic-Read Server/server_content_root/'
-
-  # Config for the authentication
-  auth:
-
-    # Refresh-token expiration in millis
-    refresh.expiration: 2592000000 # 30 days
-
-    # Email-token expiration in millis
-    email.expiration: 900000 # 15 minutes
-
-    # Config for the access-tokens
-    access:
-
-      # Access-token expiration duration in millis
-      expiration: 900000 # 15 minutes
-
-      # Private key for signing JWT's
-      secret: d2cf0591-a08d-4547-8cec-363daee402b0
-
-  # Config for the email messaging
-  mail:
-
-    # Username for authenticating to the smtp server
-    username: test@bumiller.me
-
-    # Password for authenticating to the smtp server
-    password: 8%*$5d6*XU!i#C
-
-    # Host of the smtp server
-    smtpHost: smtp.ionos.de
-
-    # Port of the smtp server
-    smtpPort: 465
-
-    # Whether to use ssl encryption
-    ssl: true
-
-  # Config about the admin account
-  admin:
-
-    # Username of the admin account
-    username: root
-
-    # Email of the admin account
-    email: admin@example.com
-
-    # Password to the admin account
-    password: root
-
-# Spring config
-spring:
-
-  # Datasource config:
-  datasource:
-
-    # Database username
-    username: admin
-
-    # Database password
-    password: admin
-
-    # Database url
-    url: 'jdbc:postgresql://localhost:5432/replic_read'
-
-    # Driver class of the database
-    driver-class-name: org.postgresql.Driver
-
-  # SQl dialect of database implementation
-  jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
-
-  # How hibernate should react to schema differences. We want to update the schema.
-  jpa.hibernate.ddl-auto: update
-
+# Logging level for spring security
 logging.level.org.springframework.security: DEBUG
+
+# Logging level for hibernate validation
 log4j.logger.org.hibernate.validator: debug
+
+# Exposes all actuator endpoints
 management.endpoints.web.exposure.include: "*"
