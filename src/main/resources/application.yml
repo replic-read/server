@@ -78,3 +78,5 @@ spring:
 
   # How hibernate should react to schema differences. We want to update the schema.
   jpa.hibernate.ddl-auto: update
+
+  profiles.active: ${RERE_SPRING_PROFILES:default}

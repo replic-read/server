@@ -27,6 +27,7 @@ expected. Some functionality might not work.
 | RERE_DB_USERNAME        | Username for authenticating on the database.                                              |                                                | root                                 |
 | RERE_DB_PASSWORD        | Password for authenticating on the database.                                              |                                                | root                                 |
 | RERE_DB_URL             | The JDBC-URL to the database.                                                             |                                                | jdbc/postgres://database/replic_read |
+| RERE_SPRING_PROFILES    | A comma-separated list of spring profiles to run                                          | default                                        | dev,load-test                        |
 
 ## Containerized
 
