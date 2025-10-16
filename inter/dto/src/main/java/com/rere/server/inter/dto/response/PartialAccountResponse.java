@@ -10,7 +10,7 @@ import com.rere.server.inter.dto.validation.ValidationMetadata;
 public record PartialAccountResponse(
         @ValidationMetadata(FieldType.ACCOUNT_USERNAME) String username,
         @ValidationMetadata(FieldType.ACCOUNT_PROFILE_COLOR) @JsonProperty("profile_color") int profileColor,
-        @ValidationMetadata(FieldType.ACCOUNT_STATE) @JsonProperty("account_state") String accountState
+        @ValidationMetadata(FieldType.ACCOUNT_ID) @JsonProperty("account_id") String accountId
 ) {
 
 }

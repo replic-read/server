@@ -94,7 +94,7 @@ public class AbstractExecutor {
      * @return The PartialAccountResponse.
      */
     protected PartialAccountResponse createAccountResponsePartial(Account account) {
-        return new PartialAccountResponse(account.getUsername(), account.getProfileColor(), mapToString(account.getAccountState()));
+        return new PartialAccountResponse(account.getUsername(), account.getProfileColor(), account.getId().toString());
     }
 
     /**
