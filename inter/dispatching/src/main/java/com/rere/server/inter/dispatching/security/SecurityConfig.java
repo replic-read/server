@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import static com.rere.server.inter.dispatching.WebMvcConfig.BASE_PATH_PREFIX;
+import static com.rere.server.inter.dispatching.security.WebMvcConfig.BASE_PATH_PREFIX;
 
 /**
  * Security configuration.
