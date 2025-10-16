@@ -79,6 +79,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider provider, @Qualifier("rereAuthFilter") Set<OncePerRequestFilter> authFilters) throws Exception {
         http
+                .cors(c -> {})
                 .csrf(AbstractHttpConfigurer::disable) // Safe to disable because we use JWT's.
                 .authorizeHttpRequests(config -> {
                     for (Endpoint endpoint : UNAUTHENTICATED_REST_ENDPOINTS) {
