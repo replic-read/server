@@ -49,7 +49,7 @@ services:
       POSTGRES_DB: replic_read
 
   server:
-    image: ghcr.io/replic-read/server:0.0.3
+    image: ghcr.io/replic-read/server:0.0.4
     ports:
       - "8080:8080"
     depends_on:

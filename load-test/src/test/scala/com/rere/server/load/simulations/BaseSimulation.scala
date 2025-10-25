@@ -65,10 +65,10 @@ abstract class BaseSimulation extends Simulation {
   // Currently only uses a capacity-test approach.
   protected def configureTestScenario(scenario: ScenarioBuilder): PopulationBuilder = {
     scenario.inject(
-      incrementUsersPerSec(3)
-        .times(5)
+      incrementUsersPerSec(1)
+        .times(13)
         .eachLevelLasting(10)
-        .startingFrom(3)
+        .startingFrom(1)
     )
   }
 
