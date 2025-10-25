@@ -12,6 +12,7 @@ expected. Some functionality might not work.
 |-------------------------|-------------------------------------------------------------------------------------------|------------------------------------------------|--------------------------------------|
 | RERE_BASE_URL           | The base url of the frontend. Must not end with a '/'.                                    | <Empty string>                                 | https://example.com                  |
 | RERE_CONTENT_ROOT       | The directory in which the replic content files should be saved. Must not end with a '/'. | Empty string, i.e. the root of the filesystem. | /home/john/documents/replic_content  |
+| RERE_CONTENT_MAX_SIZE   | The maximum size that a single replic can have, in megabyte.                              | 1                                              | 256                                  |
 | RERE_AUTH_REFRESH_EXP   | The lifespan of refresh tokens, in milliseconds.                                          | 2592000000                                     | 2592000000                           |
 | RERE_MAIL_EXP           | The lifespan of mail-verification tokens, in milliseconds.                                | 900000                                         | 900000                               |
 | RERE_AUTH_ACCESS_EXP    | The lifespan of access tokens, in milliseconds.                                           | 900000                                         | 900000                               |

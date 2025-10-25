@@ -73,10 +73,16 @@ spring:
     # Driver class of the database
     driver-class-name: org.postgresql.Driver
 
+  servlet.multipart:
+
+    # The maximum size that a multipart file request can have.
+    max-file-size: ${RERE_CONTENT_MAX_SIZE:1}MB
+
   # SQl dialect of database implementation
   jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
 
   # How hibernate should react to schema differences. We want to update the schema.
   jpa.hibernate.ddl-auto: update
 
+  # The active profiles.
   profiles.active: ${RERE_SPRING_PROFILES:default}
