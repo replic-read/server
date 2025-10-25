@@ -55,6 +55,8 @@ public class ServerConfigServiceImpl implements ServerConfigService {
 
     @Override
     public ServerConfig get() {
-        return configRepo.getConfig().orElse(UNRESTRICTED_CONFIG);
+        ServerConfig config =  configRepo.getConfig().orElse(UNRESTRICTED_CONFIG);
+        configRepo.saveConfig(config);
+        return config;
     }
 }

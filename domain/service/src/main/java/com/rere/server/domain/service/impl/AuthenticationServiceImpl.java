@@ -327,6 +327,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .flatMap(t -> t.isValid(AuthTokenType.EMAIL_VERIFICATION, clock.instant()) ? Optional.of(t) : Optional.empty())
                 .map(AuthToken::getAccountId)
                 .flatMap(accountService::getAccountById)
+                .map(account -> {
+                    account.setAccountState(AccountState.ACTIVE);
+                    accountRepo.saveModel(account);
+                    return account;
+                })
                 .orElseThrow(InvalidTokenException::new);
     }
 
