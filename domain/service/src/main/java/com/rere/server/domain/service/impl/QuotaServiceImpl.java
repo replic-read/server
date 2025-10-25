@@ -43,7 +43,7 @@ public class QuotaServiceImpl implements QuotaService {
 
         Instant periodStart = limit.getPeriodStart();
         while (periodStart.plus(limit.getPeriod().getDays(), ChronoUnit.DAYS).isBefore(clock.instant())) {
-            periodStart = periodStart.plus(limit.getPeriod());
+            periodStart = periodStart.plus(limit.getPeriod().getDays(), ChronoUnit.DAYS);
         }
 
         return periodStart;
