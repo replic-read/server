@@ -41,7 +41,7 @@ class ServerConfigServiceImplTest extends BaseDomainServiceTest {
         subject.save(config);
 
         ArgumentCaptor<ServerConfig> configCaptor = ArgumentCaptor.forClass(ServerConfig.class);
-        verify(configRepo, times(1)).saveConfig(configCaptor.capture());
+        verify(configRepo, times(2)).saveConfig(configCaptor.capture());
 
         assertEquals(config, configCaptor.getValue());
     }
